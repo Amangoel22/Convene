@@ -1,32 +1,21 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  BedDouble,
   Check,
   ChevronDown,
-  Download,
   FileDown,
   FileUp,
-  MoreHorizontal,
   Plus,
   QrCode,
   Search,
   Upload,
-  Utensils,
   X,
-  Award,
-  ShieldAlert,
-  UserCheck,
-  Users
+  Award
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
-import { MetricCard } from "@/components/common/MetricCard";
-import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { GlassButton } from "@/components/glass/GlassButton";
-import { GlassCard } from "@/components/glass/GlassCard";
-import { GlassInput } from "@/components/glass/GlassInput";
 import { GlassModal } from "@/components/glass/GlassModal";
 import { participantTeams } from "@/data/participants";
 import { cn } from "@/lib/utils";
@@ -34,28 +23,26 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 
 const filterOptions = {
   department: ["All Departments", "Registration", "Hospitality", "Operations", "Tech", "Stage", "Logistics"],
-  status: ["All Statuses", "Registered", "Confirmed", "Checked In", "Rejected", "Completed"],
-  college: ["All Colleges", ...Array.from(new Set(participantTeams.map((team) => team.college)))],
-  accommodation: ["All Accommodation", "Assigned", "Pending", "Not Required"],
-  food: ["All Food", "Issued", "Pending", "Dietary Flag"]
+  status: ["All Statuses", "Unconfirmed", "Confirmed", "Checked In", "Rejected", "Completed"],
+  college: ["All Colleges", ...Array.from(new Set(participantTeams.map((team) => team.college)))]
 };
 
 function SelectFilter({ value, onChange, options, label }) {
   return (
-    <label className="glass-surface flex h-9 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold text-[#6B7280]">
+    <label className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#5A6577]">
       <span className="sr-only">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="cursor-pointer bg-transparent text-xs font-medium text-[#111827] outline-none"
+        className="cursor-pointer bg-transparent text-xs font-semibold text-[#1A1D23] outline-none"
       >
         {options.map((option) => (
-          <option key={option} className="bg-[#111827] text-white">
+          <option key={option} value={option} className="bg-white text-[#1A1D23]">
             {option}
           </option>
         ))}
       </select>
-      <ChevronDown size={13} strokeWidth={1.75} className="shrink-0 text-[#9CA3AF]" />
+      <ChevronDown size={13} strokeWidth={2} className="shrink-0 text-[#8E99A8]" />
     </label>
   );
 }
@@ -73,23 +60,25 @@ function useDebouncedValue(value, delay = 180) {
 
 function MiniBadge({ children, tone = "neutral" }) {
   const tones = {
-    neutral: "border-white/20 bg-white/10 text-[#cbd5e1]",
-    success: "border-[#34C759]/35 bg-[#34C759]/18 text-[#4ade80]",
-    warning: "border-[#FF9F0A]/35 bg-[#FF9F0A]/18 text-[#fbbf24]",
-    info: "border-[#007AFF]/35 bg-[#007AFF]/18 text-[#38bdf8]",
-    error: "border-[#FF453A]/35 bg-[#FF453A]/18 text-[#f87171]"
+    neutral: "bg-[#F0F2F5] text-[#5A6577]",
+    success: "bg-[#22A65E]/10 text-[#22A65E]",
+    warning: "bg-[#D4930E]/10 text-[#D4930E]",
+    info: "bg-[#3B6FD4]/10 text-[#3B6FD4]",
+    error: "bg-[#D6453D]/10 text-[#D6453D]"
   };
-  return <span className={cn("inline-flex whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[11px] font-semibold", tones[tone])}>{children}</span>;
+  return <span className={cn("inline-flex whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-bold", tones[tone])}>{children}</span>;
 }
 
-function ParticipantDrawer({ team, onClose }) {
+function ParticipantDrawer({ team, member, onClose }) {
   if (!team) return null;
+
+  const isIndividual = Boolean(member);
 
   return (
     <AnimatePresence>
-      <motion.div className="fixed inset-0 z-40 bg-[#111827]/10 backdrop-blur-[2px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
+      <motion.div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
       <motion.aside
-        className="glass-surface fixed bottom-4 right-4 top-4 z-50 w-[min(520px,calc(100vw-32px))] overflow-y-auto rounded-[32px] p-6 shadow-[0_24px_70px_rgba(31,41,55,0.18)]"
+        className="fixed bottom-4 right-4 top-4 z-50 w-[min(520px,calc(100vw-32px))] overflow-y-auto rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 shadow-xl text-[#1A1D23]"
         initial={{ x: 540, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 540, opacity: 0 }}
@@ -97,62 +86,91 @@ function ParticipantDrawer({ team, onClose }) {
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9CA3AF]">Participant Details</p>
-            <h2 className="mt-2 text-2xl font-bold text-[#111827]">{team.team}</h2>
-            <p className="mt-1 text-sm font-medium text-[#6B7280]">{team.project}</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[#8E99A8]">
+              {isIndividual ? "Teammate Profile" : "Team Overview"}
+            </p>
+            <h2 className="mt-1 text-2xl font-bold text-[#1A1D23]">
+              {isIndividual ? member.name : `${team.team}: ${team.teamName}`}
+            </h2>
+            {isIndividual && (
+              <p className="mt-0.5 text-xs font-semibold text-[#5A6577]">
+                {team.team}: {team.teamName} • {member.role === "Leader" ? "Team Leader" : "Team Member"}
+              </p>
+            )}
           </div>
-          <button className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/45 text-[#6B7280] hover:bg-white/65" onClick={onClose} aria-label="Close drawer">
-            <X size={18} strokeWidth={1.75} />
+          <button className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]" onClick={onClose} aria-label="Close drawer">
+            <X size={18} strokeWidth={2} />
           </button>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <Info label="College" value={team.college} />
-          <Info label="Leader" value={team.leader.name} />
-          <Info label="Contact" value={team.leader.phone} />
-          <Info label="QR Status" value={team.qr} />
-          <Info label="Accommodation" value={team.accommodation} />
-          <Info label="Food" value={team.food} />
-          <Info label="Certificates" value={team.certificates} />
-          <Info label="Feedback" value={team.feedback} />
+        {/* Info Grid */}
+        <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
+          {isIndividual ? (
+            <>
+              <Info label="Name" value={member.name} />
+              <Info label="Phone Number" value={member.phone} />
+              <Info label="Email" value={member.email} />
+              <Info label="Role" value={member.role === "Leader" ? "Team Leader" : "Team Member"} />
+              <Info label="College" value={team.college} />
+              <Info label="Team" value={`${team.team}: ${team.teamName}`} />
+            </>
+          ) : (
+            <>
+              <Info label="College" value={team.college} />
+              <Info label="Leader" value={team.leader.name} />
+              <Info label="Contact (Leader)" value={team.leader.phone} />
+              <Info label="QR Status" value={team.qr} />
+              <Info label="Certificates" value={team.certificates} />
+              <Info label="Feedback" value={team.feedback} />
+            </>
+          )}
         </div>
 
         <div className="mt-6">
-          <h3 className="text-sm font-bold text-[#111827]">Team Members</h3>
-          <div className="mt-3 space-y-3">
-            {team.members.map((member) => (
-              <div key={member.email} className="rounded-[20px] border border-white/45 bg-white/35 p-3">
+          <h3 className="text-sm font-bold text-[#1A1D23]">Team Members ({team.members.length})</h3>
+          <div className="mt-3 space-y-2">
+            {team.members.map((m) => (
+              <div
+                key={m.email}
+                className={cn(
+                  "rounded-2xl border p-3 transition-colors",
+                  isIndividual && m.email === member.email
+                    ? "bg-[#EBF0FA] border-[#3B6FD4]/30"
+                    : "bg-[#F7F8FA] border-[rgba(0,0,0,0.06)]"
+                )}
+              >
                 <div className="flex items-center gap-3">
-                  <UserAvatar initials={member.initials} image={member.avatar} />
+                  <UserAvatar initials={m.initials} image={m.avatar} className="bg-[#EBF0FA] text-[#3B6FD4]" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-[#111827]">{member.name}</p>
-                    <p className="truncate text-xs font-medium text-[#9CA3AF]">{member.email}</p>
+                    <p className="truncate text-sm font-bold text-[#1A1D23]">{m.name}</p>
+                    <p className="truncate text-xs font-medium text-[#8E99A8]">{m.email}</p>
                   </div>
-                  <MiniBadge>{member.role}</MiniBadge>
+                  <MiniBadge tone={m.role === "Leader" ? "warning" : "neutral"}>
+                    {m.role === "Leader" ? "Leader" : "Member"}
+                  </MiniBadge>
                 </div>
-                <p className="mt-2 text-xs font-medium text-[#6B7280]">{member.phone}</p>
+                <p className="mt-2 text-xs font-medium text-[#5A6577]">{m.phone}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
           {[
             ["Mark Check-In", Check],
-            ["Assign Room", BedDouble],
             ["Generate QR", QrCode],
             ["Issue Certificate", Award],
             ["Add Note", Plus]
           ].map(([label, Icon], index) => (
-            <GlassButton key={label} variant={index === 0 ? "primary" : "secondary"} icon={<Icon size={17} strokeWidth={1.75} />} className="justify-start">
+            <GlassButton key={label} variant={index === 0 ? "primary" : "secondary"} icon={<Icon size={16} strokeWidth={2} />} className="justify-start rounded-full text-xs">
               {label}
             </GlassButton>
           ))}
         </div>
 
-        <div className="mt-6 rounded-[20px] border border-white/45 bg-white/35 p-4">
-          <p className="text-sm font-bold text-[#111827]">Internal Notes</p>
-          <p className="mt-2 text-sm leading-6 text-[#6B7280]">{team.notes}</p>
+        <div className="mt-6 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-[#1A1D23]">Internal Notes</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-[#5A6577] font-medium">{team.notes}</p>
         </div>
       </motion.aside>
     </AnimatePresence>
@@ -161,9 +179,9 @@ function ParticipantDrawer({ team, onClose }) {
 
 function Info({ label, value }) {
   return (
-    <div className="rounded-[18px] border border-white/45 bg-white/35 p-3">
-      <p className="text-xs font-semibold text-[#9CA3AF]">{label}</p>
-      <p className="mt-1 truncate text-sm font-bold text-[#111827]">{value}</p>
+    <div className="rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3">
+      <p className="text-[11px] font-semibold text-[#8E99A8]">{label}</p>
+      <p className="mt-0.5 truncate text-sm font-bold text-[#1A1D23]">{value}</p>
     </div>
   );
 }
@@ -171,61 +189,71 @@ function Info({ label, value }) {
 function ImportModal({ open, onClose }) {
   const previewRows = participantTeams.slice(0, 4);
   return (
-    <GlassModal open={open} className="w-[min(720px,calc(100vw-32px))] max-w-none">
+    <GlassModal open={open} className="w-[min(720px,calc(100vw-32px))] max-w-none bg-white border border-[rgba(0,0,0,0.08)] rounded-3xl p-6 text-[#1A1D23]">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-[#111827]">Import participants</h2>
-          <p className="mt-1 text-sm font-medium text-[#6B7280]">Upload a CSV exported from your registration platform.</p>
+          <h2 className="text-xl font-bold text-[#1A1D23]">Import participants</h2>
+          <p className="mt-1 text-xs font-medium text-[#5A6577]">Upload a CSV exported from your registration platform.</p>
         </div>
-        <button className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/45 text-[#6B7280] hover:bg-white/65" onClick={onClose} aria-label="Close import modal">
-          <X size={18} strokeWidth={1.75} />
+        <button className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]" onClick={onClose} aria-label="Close import modal">
+          <X size={18} strokeWidth={2} />
         </button>
       </div>
-      <div className="mt-6 rounded-[24px] border border-dashed border-white/70 bg-white/35 p-8 text-center">
-        <Upload className="mx-auto text-[#6B7280]" size={30} strokeWidth={1.75} />
-        <p className="mt-3 text-sm font-bold text-[#111827]">Drop CSV here</p>
-        <p className="mt-1 text-xs font-medium text-[#9CA3AF]">Team, leader, college, members, project, accommodation and food columns supported.</p>
+      <div className="mt-6 rounded-2xl border-2 border-dashed border-[rgba(0,0,0,0.12)] bg-[#F7F8FA] p-8 text-center">
+        <Upload className="mx-auto text-[#3B6FD4]" size={30} strokeWidth={2} />
+        <p className="mt-3 text-sm font-bold text-[#1A1D23]">Drop CSV here</p>
+        <p className="mt-1 text-xs font-medium text-[#8E99A8]">Team, leader, college, and members columns supported.</p>
       </div>
-      <div className="mt-5 overflow-hidden rounded-[20px] border border-white/45 bg-white/30">
+      <div className="mt-5 overflow-hidden rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)]">
         {previewRows.map((row) => (
-          <div key={row.id} className="grid grid-cols-[1fr_1fr_0.8fr] gap-3 border-b border-white/35 px-4 py-3 text-sm last:border-b-0">
-            <span className="truncate font-semibold text-[#111827]">{row.team}</span>
-            <span className="truncate text-[#6B7280]">{row.college}</span>
-            <span className="truncate text-[#6B7280]">{row.members.length} members</span>
+          <div key={row.id} className="grid grid-cols-[1fr_1fr_0.8fr] gap-3 border-b border-[rgba(0,0,0,0.06)] px-4 py-3 text-xs last:border-b-0">
+            <span className="truncate font-semibold text-[#1A1D23]">{row.team}: {row.teamName}</span>
+            <span className="truncate text-[#5A6577]">{row.college}</span>
+            <span className="truncate text-[#8E99A8]">{row.members.length} members</span>
           </div>
         ))}
       </div>
       <div className="mt-6 flex justify-end gap-3">
-        <GlassButton onClick={onClose}>Cancel</GlassButton>
-        <GlassButton variant="primary" icon={<FileUp size={17} strokeWidth={1.75} />}>Import CSV</GlassButton>
+        <GlassButton onClick={onClose} className="rounded-full">Cancel</GlassButton>
+        <GlassButton variant="primary" icon={<FileUp size={16} strokeWidth={2} />} className="rounded-full">Import CSV</GlassButton>
       </div>
     </GlassModal>
   );
 }
 
+import { useAppStore } from "@/store/useAppStore";
+
 export function ParticipantsPage() {
+  const [teams, setTeams] = useState(participantTeams);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search);
   const [department, setDepartment] = useState("All Departments");
   const [status, setStatus] = useState("All Statuses");
   const [college, setCollege] = useState("All Colleges");
-  const [food, setFood] = useState("All Food");
   const [sort, setSort] = useState("Team A-Z");
   const [selectedTeam, setSelectedTeam] = useState(null);
+  const [selectedMember, setSelectedMember] = useState(null);
   const [importOpen, setImportOpen] = useState(false);
   const [loading] = useState(false);
 
+  const role = useAppStore((state) => state.role);
+  const isLead = role === "lead";
+
+  const handleUpdateTeamStatus = (teamId, newStatus) => {
+    setTeams((prev) => prev.map((t) => (t.id === teamId ? { ...t, status: newStatus } : t)));
+    setSelectedTeam((prev) => (prev && prev.id === teamId ? { ...prev, status: newStatus } : prev));
+  };
+
   const filteredTeams = useMemo(() => {
     const query = debouncedSearch.trim().toLowerCase();
-    return participantTeams
+    return teams
       .filter((team) => {
-        const matchesSearch = !query || [team.team, team.leader.name, team.college, team.project, team.status].some((value) => value.toLowerCase().includes(query));
+        const matchesSearch = !query || [team.team, team.teamName, team.leader.name, team.college, team.status].some((value) => value && value.toLowerCase().includes(query));
         return (
           matchesSearch &&
           (department === "All Departments" || team.department === department) &&
           (status === "All Statuses" || team.status === status) &&
-          (college === "All Colleges" || team.college === college) &&
-          (food === "All Food" || team.food === food)
+          (college === "All Colleges" || team.college === college)
         );
       })
       .sort((a, b) => {
@@ -233,111 +261,160 @@ export function ParticipantsPage() {
         if (sort === "Status") return a.status.localeCompare(b.status);
         return a.team.localeCompare(b.team, undefined, { numeric: true });
       });
-  }, [college, debouncedSearch, department, food, sort, status]);
+  }, [college, debouncedSearch, department, sort, status, teams]);
 
-  const totalParticipants = participantTeams.reduce((sum, team) => sum + team.members.length, 0);
-  const checkedIn = participantTeams.filter((team) => team.status === "Checked In" || team.status === "Completed").reduce((sum, team) => sum + team.members.length, 0);
-  const metrics = [
-    { label: "Total Participants", value: String(totalParticipants), detail: `${participantTeams.length} teams imported`, icon: Users, tone: "info" },
-    { label: "Checked In", value: String(checkedIn), detail: "Across registration desks", icon: UserCheck, tone: "success" },
-    { label: "Pending Check-In", value: String(totalParticipants - checkedIn), detail: "Needs arrival follow-up", icon: ShieldAlert, tone: "warning" },
-    { label: "Certificates Issued", value: String(participantTeams.filter((team) => team.certificates === "Issued").length), detail: "Completed teams", icon: Award, tone: "gold" }
-  ];
+  const handleCloseDrawer = () => {
+    setSelectedTeam(null);
+    setSelectedMember(null);
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-        <PageHeader title="Participants" description="Manage teams, check-ins, accommodation and event operations." />
-        <div className="flex flex-wrap gap-3">
-          <GlassButton variant="success" icon={<FileUp size={17} strokeWidth={1.75} />} onClick={() => setImportOpen(true)}>Import CSV</GlassButton>
-          <GlassButton variant="success" icon={<FileDown size={17} strokeWidth={1.75} />}>Export</GlassButton>
-          <GlassButton icon={<Plus size={17} strokeWidth={1.75} />}>Create Participant</GlassButton>
+    <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-[#1A1D23] md:text-3xl">Participants</h1>
+          <p className="mt-1 text-sm text-[#5A6577] font-medium">Manage teams, check-ins, and event operations.</p>
+        </div>
+        <div className="flex flex-wrap gap-2.5">
+          {isLead && <GlassButton variant="secondary" icon={<FileUp size={16} strokeWidth={2} />} onClick={() => setImportOpen(true)} className="rounded-full">Import CSV</GlassButton>}
+          <GlassButton variant="secondary" icon={<FileDown size={16} strokeWidth={2} />} className="rounded-full">Export</GlassButton>
+          {isLead && <GlassButton variant="primary" icon={<Plus size={16} strokeWidth={2} />} className="rounded-full">Create Participant</GlassButton>}
         </div>
       </div>
 
-      <GlassCard className="p-3">
-        <div className="flex flex-wrap items-center gap-2 overflow-x-auto lg:flex-nowrap">
-          <GlassInput
-            className="h-9 min-w-[220px] flex-1 bg-white/48 text-xs"
-            leftIcon={<Search size={15} strokeWidth={1.75} />}
+      {/* Filters Bar */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex h-9 min-w-[240px] flex-1 items-center gap-2 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-medium text-[#1A1D23] focus-within:ring-1 focus-within:ring-[#3B6FD4]">
+          <Search size={15} strokeWidth={2} className="text-[#8E99A8] shrink-0" />
+          <input
+            type="text"
             placeholder="Search teams, leaders, colleges..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
+            className="w-full bg-transparent outline-none text-xs font-medium text-[#1A1D23] placeholder:text-[#8E99A8]"
             aria-label="Search participants"
           />
-          <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
-            <SelectFilter label="Department" value={department} onChange={setDepartment} options={filterOptions.department} />
-            <SelectFilter label="Status" value={status} onChange={setStatus} options={filterOptions.status} />
-            <SelectFilter label="College" value={college} onChange={setCollege} options={filterOptions.college} />
-            <SelectFilter label="Food" value={food} onChange={setFood} options={filterOptions.food} />
-            <SelectFilter label="Sort" value={sort} onChange={setSort} options={["Team A-Z", "College", "Status"]} />
-          </div>
         </div>
-      </GlassCard>
+        <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
+          <SelectFilter label="Department" value={department} onChange={setDepartment} options={filterOptions.department} />
+          <SelectFilter label="Status" value={status} onChange={setStatus} options={filterOptions.status} />
+          <SelectFilter label="College" value={college} onChange={setCollege} options={filterOptions.college} />
+          <SelectFilter label="Sort" value={sort} onChange={setSort} options={["Team A-Z", "College", "Status"]} />
+        </div>
+      </div>
 
-      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4" aria-label="Participant metrics">
-        {metrics.map((metric) => <MetricCard key={metric.label} metric={metric} />)}
-      </section>
+      {/* Grouped Participant Teams */}
+      {loading ? (
+        <div className="space-y-6">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <LoadingSkeleton key={index} className="h-48 rounded-3xl" />
+          ))}
+        </div>
+      ) : filteredTeams.length === 0 ? (
+        <div className="p-10 text-center rounded-3xl border border-[rgba(0,0,0,0.08)] bg-white">
+          <EmptyState
+            title="No matching participants found."
+            description="Adjust your search query or filters to view participant teams."
+            actionLabel="Import CSV"
+            onAction={() => setImportOpen(true)}
+          />
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {filteredTeams.map((team) => (
+            <div
+              key={team.id}
+              className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] overflow-hidden transition-colors hover:border-[rgba(0,0,0,0.14)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+            >
+              {/* Team Group Header */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-[#F7F8FA] px-6 py-4 border-b border-[rgba(0,0,0,0.06)]">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="font-mono text-xs font-bold text-[#3B6FD4] bg-[#EBF0FA] px-3 py-1 rounded-full shrink-0">
+                    {team.team}
+                  </span>
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <h3 className="text-base font-bold text-[#1A1D23]">{team.teamName}</h3>
+                    <span className="text-xs font-medium text-[#8E99A8]">({team.college} • {team.members.length} Members)</span>
+                  </div>
+                </div>
 
-      <GlassCard padding="none" className="overflow-hidden">
-        {loading ? (
-          <div className="space-[#3] p-4">{Array.from({ length: 8 }).map((_, index) => <LoadingSkeleton key={index} className="h-14" />)}</div>
-        ) : filteredTeams.length === 0 ? (
-          <div className="p-6"><EmptyState title="Import your first participant list." description="No matching participants were found. Adjust filters or import your CSV to begin operating." actionLabel="Import CSV" /></div>
-        ) : (
-          <div className="max-h-[620px] overflow-auto">
-            <table className="w-full min-w-[1000px] border-separate border-spacing-0 text-left">
-              <thead className="sticky top-0 z-10 bg-slate-900/90 text-[#9CA3AF] border-b border-white/10 backdrop-blur-2xl">
-                <tr className="text-[11px] font-bold uppercase tracking-wider">
-                  {["Team", "Leader", "College", "Members", "Project", "Status", "Food", "QR", "Actions"].map((column) => (
-                    <th key={column} className={cn("border-b border-white/45 px-3.5 py-3", column === "Members" && "text-center", column === "Actions" && "text-right")}>
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredTeams.map((team, index) => {
-                  const highlighted = debouncedSearch && [team.team, team.leader.name, team.college, team.project].some((value) => value.toLowerCase().includes(debouncedSearch.toLowerCase()));
-                  return (
-                    <motion.tr
-                      key={team.id}
-                      className={cn("group cursor-pointer transition-colors hover:bg-white/40", highlighted && "bg-[#F6C445]/10")}
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.01, type: "spring", stiffness: 300, damping: 28 }}
-                      onClick={() => setSelectedTeam(team)}
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-[#8E99A8]">Status:</span>
+                    <select
+                      value={team.status}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handleUpdateTeamStatus(team.id, e.target.value);
+                      }}
+                      className="cursor-pointer rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 py-1 text-xs font-bold text-[#1A1D23] outline-none"
                     >
-                      <td className="border-b border-white/35 px-3.5 py-2.5">
-                        <p className="text-xs font-bold text-[#111827]">{team.team}</p>
-                      </td>
-                      <td className="border-b border-white/35 px-3.5 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <UserAvatar initials={team.leader.initials} image={team.leader.avatar} className="h-7 w-7 text-[10px]" />
-                          <span className="text-xs font-semibold text-[#111827]">{team.leader.name}</span>
-                        </div>
-                      </td>
-                      <td className="border-b border-white/35 px-3.5 py-2.5 text-xs font-medium text-[#6B7280]">{team.college}</td>
-                      <td className="border-b border-white/35 px-3.5 py-2.5 text-center text-xs font-bold text-[#111827]">{team.members.length}</td>
-                      <td className="max-w-[200px] truncate border-b border-white/35 px-3.5 py-2.5 text-xs font-medium text-[#6B7280]">{team.project}</td>
-                      <td className="border-b border-white/35 px-3.5 py-2.5"><StatusBadge status={team.status} /></td>
-                      <td className="border-b border-white/35 px-3.5 py-2.5"><MiniBadge tone={team.food === "Issued" ? "success" : team.food === "Dietary Flag" ? "warning" : "neutral"}>{team.food}</MiniBadge></td>
-                      <td className="border-b border-white/35 px-3.5 py-2.5"><MiniBadge tone={team.qr === "Scanned" ? "success" : team.qr === "Missing" ? "error" : "info"}>{team.qr}</MiniBadge></td>
-                      <td className="border-b border-white/35 px-3.5 py-2.5 text-right">
-                        <button className="min-h-0 rounded-lg p-1.5 text-[#6B7280] hover:bg-white/55" aria-label={`Actions for ${team.team}`}>
-                          <MoreHorizontal size={16} />
-                        </button>
-                      </td>
-                    </motion.tr>
+                      <option value="Unconfirmed">Unconfirmed</option>
+                      <option value="Confirmed">Confirmed</option>
+                      <option value="Checked In">Checked In</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                  </div>
+                  <GlassButton
+                    onClick={() => {
+                      setSelectedTeam(team);
+                      setSelectedMember(null);
+                    }}
+                    className="h-8 px-3 text-xs font-semibold rounded-full min-h-0 text-[#5A6577] hover:text-[#1A1D23]"
+                  >
+                    View Details
+                  </GlassButton>
+                </div>
+              </div>
+
+              {/* Members List */}
+              <div className="divide-y divide-[rgba(0,0,0,0.05)]">
+                {team.members.map((member) => {
+                  const isLeader = member.role === "Leader";
+
+                  return (
+                    <div
+                      key={member.email}
+                      onClick={() => {
+                        setSelectedTeam(team);
+                        setSelectedMember(member);
+                      }}
+                      className="group grid grid-cols-1 sm:grid-cols-[280px_1fr_180px_110px] items-center gap-4 px-6 py-3.5 text-xs transition-colors hover:bg-[#F7F8FA] cursor-pointer"
+                    >
+                      {/* Col 1: Participant Name */}
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <UserAvatar initials={member.initials} image={member.avatar} className="h-8 w-8 text-[11px] bg-[#EBF0FA] text-[#3B6FD4] shrink-0" />
+                        <p className="font-bold text-[#1A1D23] truncate">{member.name}</p>
+                      </div>
+
+                      {/* Col 2: Email */}
+                      <div className="min-w-0 truncate">
+                        <span className="font-medium text-[#5A6577] truncate">{member.email}</span>
+                      </div>
+
+                      {/* Col 3: Phone */}
+                      <div className="min-w-0 shrink-0">
+                        <span className="font-medium text-[#5A6577]">{member.phone}</span>
+                      </div>
+
+                      {/* Col 4: Leader vs Member Badge */}
+                      <div className="text-left sm:text-right shrink-0">
+                        {isLeader ? (
+                          <MiniBadge tone="warning">Leader</MiniBadge>
+                        ) : (
+                          <MiniBadge tone="neutral">Member</MiniBadge>
+                        )}
+                      </div>
+                    </div>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </GlassCard>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
-      <ParticipantDrawer team={selectedTeam} onClose={() => setSelectedTeam(null)} />
+      <ParticipantDrawer team={selectedTeam} member={selectedMember} onClose={handleCloseDrawer} />
       <ImportModal open={importOpen} onClose={() => setImportOpen(false)} />
     </div>
   );

@@ -21,7 +21,7 @@ const projects = [
 ];
 
 const departments = ["Registration", "Hospitality", "Operations", "Tech", "Stage", "Logistics"];
-const statuses = ["Registered", "Confirmed", "Checked In", "Rejected", "Completed"];
+const statuses = ["Unconfirmed", "Confirmed", "Checked In", "Rejected", "Completed"];
 const firstNames = ["Aarav", "Diya", "Kabir", "Meera", "Rohan", "Tara", "Ishaan", "Anika", "Vihaan", "Prisha", "Reyansh", "Sara"];
 const lastNames = ["Kapoor", "Shah", "Nair", "Menon", "Rao", "Iyer", "Mehta", "Bose", "Singh", "Gupta", "Ahuja", "Sethi"];
 const roles = ["Leader", "Frontend", "Backend", "Design", "Hardware"];
@@ -40,6 +40,33 @@ function memberFor(teamIndex, memberIndex) {
   };
 }
 
+const teamNamesList = [
+  "Quantum Coders",
+  "Binary Beasts",
+  "Neural Nets",
+  "Code Alchemists",
+  "Byte Busters",
+  "Data Dynamos",
+  "Logic Lords",
+  "Syntax Squad",
+  "Pixel Pioneers",
+  "Stack Overlords",
+  "Tensor Titans",
+  "Cyber Knights",
+  "Algorithm Aces",
+  "Cloud Cruisers",
+  "Dev Dynamics",
+  "Matrix Masters",
+  "Prompt Engineers",
+  "Bit Wizards",
+  "Git Heroes",
+  "Kernel Kings",
+  "Web Mavericks",
+  "Sync Synthetics",
+  "Vector Vanguards",
+  "Zero One Zen"
+];
+
 export const participantTeams = Array.from({ length: 24 }, (_, index) => {
   const memberCount = index % 3 === 0 ? 5 : 4;
   const members = Array.from({ length: memberCount }, (__, memberIndex) => memberFor(index, memberIndex));
@@ -51,6 +78,7 @@ export const participantTeams = Array.from({ length: 24 }, (_, index) => {
   return {
     id: `team-${index + 1}`,
     team: `Team ${index + 1}`,
+    teamName: teamNamesList[index % teamNamesList.length],
     leader: members[0],
     college: colleges[index % colleges.length],
     members,

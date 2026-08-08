@@ -1,65 +1,49 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertCircle,
-  AlertTriangle,
   Archive,
-  Calendar,
   Check,
-  CheckCircle2,
   ChevronDown,
-  Clock,
   Copy,
   Download,
-  FileText,
-  Filter,
   Kanban,
   LayoutList,
-  MoreHorizontal,
-  Paperclip,
   Plus,
   Search,
   Send,
-  Sparkles,
-  UserCheck,
   Users,
-  X,
-  Zap
+  X
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
-import { MetricCard } from "@/components/common/MetricCard";
-import { PageHeader } from "@/components/common/PageHeader";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { GlassButton } from "@/components/glass/GlassButton";
-import { GlassCard } from "@/components/glass/GlassCard";
-import { GlassInput } from "@/components/glass/GlassInput";
 import { GlassModal } from "@/components/glass/GlassModal";
 import { initialTasks } from "@/data/tasks";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 
-const departments = ["All Departments", "Registration", "Hospitality", "Operations", "Tech", "Stage", "Logistics"];
+const teams = ["All Teams", "Registration", "Hospitality", "Operations", "Tech", "Stage", "Logistics"];
 const priorities = ["All Priorities", "Critical", "High", "Medium", "Low"];
 const statuses = ["All Statuses", "Todo", "In Progress", "Blocked", "Completed"];
 
 function SelectFilter({ value, onChange, options, label }) {
   return (
-    <label className="glass-surface flex h-9 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold text-[#6B7280]">
+    <label className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#5A6577]">
       <span className="sr-only">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="cursor-pointer bg-transparent text-xs font-medium text-[#111827] outline-none"
+        className="cursor-pointer bg-transparent text-xs font-semibold text-[#1A1D23] outline-none"
       >
         {options.map((option) => (
-          <option key={option} className="bg-[#111827] text-white">
+          <option key={option} value={option} className="bg-white text-[#1A1D23]">
             {option}
           </option>
         ))}
       </select>
-      <ChevronDown size={13} strokeWidth={1.75} className="shrink-0 text-[#9CA3AF]" />
+      <ChevronDown size={13} strokeWidth={2} className="shrink-0 text-[#8E99A8]" />
     </label>
   );
 }
@@ -76,7 +60,7 @@ function TaskDrawer({ task, onClose, onUpdateTask, onDuplicateTask, onArchiveTas
     );
     const completedCount = updatedChecklist.filter((c) => c.completed).length;
     const activityMsg = `updated checklist (${completedCount}/${updatedChecklist.length} completed)`;
-    
+
     onUpdateTask({
       ...task,
       checklist: updatedChecklist,
@@ -143,93 +127,88 @@ function TaskDrawer({ task, onClose, onUpdateTask, onDuplicateTask, onArchiveTas
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-40 bg-[#111827]/15 backdrop-blur-[3px]"
+        className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       />
       <motion.aside
-        className="glass-surface fixed bottom-4 right-4 top-4 z-50 flex w-[min(560px,calc(100vw-32px))] flex-col overflow-hidden rounded-[32px] p-6 shadow-[0_24px_70px_rgba(31,41,55,0.22)]"
+        className="fixed bottom-4 right-4 top-4 z-50 flex w-[min(560px,calc(100vw-32px))] flex-col overflow-hidden rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 shadow-xl text-[#1A1D23]"
         initial={{ x: 580, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 580, opacity: 0 }}
         transition={{ type: "spring", stiffness: 320, damping: 30 }}
       >
         {/* Drawer Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-white/20 pb-4">
+        <div className="flex items-start justify-between gap-4 border-b border-[rgba(0,0,0,0.06)] pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-semibold text-[#9CA3AF]">{task.id}</span>
               <PriorityBadge priority={task.priority} />
             </div>
-            <h2 className="mt-2 text-xl font-bold text-[#111827]">{task.title}</h2>
+            <h2 className="mt-1.5 text-xl font-bold text-[#1A1D23]">{task.title}</h2>
           </div>
           <button
-            className="flex h-9 w-9 min-h-0 items-center justify-center rounded-xl bg-white/45 text-[#6B7280] hover:bg-white/70"
+            className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
             onClick={onClose}
             aria-label="Close task drawer"
           >
-            <X size={17} strokeWidth={1.75} />
+            <X size={18} strokeWidth={2} />
           </button>
         </div>
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto py-5 space-y-6 pr-1">
           {/* Status & Properties Matrix */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div className="rounded-2xl border border-white/35 bg-white/25 p-3">
-              <p className="text-[11px] font-semibold text-[#9CA3AF]">Status</p>
+          <div className="grid grid-cols-3 gap-2.5">
+            <div className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]">
+              <p className="text-[11px] font-semibold text-[#8E99A8]">Status</p>
               <select
                 value={task.status}
                 onChange={(e) => handleStatusChange(e.target.value)}
-                className="mt-1 w-full bg-transparent text-xs font-bold text-[#111827] outline-none cursor-pointer"
+                className="mt-1 w-full bg-transparent text-xs font-bold text-[#1A1D23] outline-none cursor-pointer"
               >
                 {statuses.slice(1).map((s) => (
-                  <option key={s} value={s} className="bg-[#111827] text-white">
+                  <option key={s} value={s} className="bg-white text-[#1A1D23]">
                     {s}
                   </option>
                 ))}
               </select>
             </div>
-            <div className="rounded-2xl border border-white/35 bg-white/25 p-3">
-              <p className="text-[11px] font-semibold text-[#9CA3AF]">Priority</p>
+            <div className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]">
+              <p className="text-[11px] font-semibold text-[#8E99A8]">Priority</p>
               <select
                 value={task.priority}
                 onChange={(e) => handlePriorityChange(e.target.value)}
-                className="mt-1 w-full bg-transparent text-xs font-bold text-[#111827] outline-none cursor-pointer"
+                className="mt-1 w-full bg-transparent text-xs font-bold text-[#1A1D23] outline-none cursor-pointer"
               >
                 {priorities.slice(1).map((p) => (
-                  <option key={p} value={p} className="bg-[#111827] text-white">
+                  <option key={p} value={p} className="bg-white text-[#1A1D23]">
                     {p}
                   </option>
                 ))}
               </select>
             </div>
-            <div className="rounded-2xl border border-white/35 bg-white/25 p-3">
-              <p className="text-[11px] font-semibold text-[#9CA3AF]">Department</p>
-              <p className="mt-1 text-xs font-bold text-[#111827] truncate">{task.department}</p>
-            </div>
-            <div className="rounded-2xl border border-white/35 bg-white/25 p-3">
-              <p className="text-[11px] font-semibold text-[#9CA3AF]">Due Time</p>
-              <p className="mt-1 text-xs font-bold text-[#111827] truncate">{task.dueDate}</p>
+            <div className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]">
+              <p className="text-[11px] font-semibold text-[#8E99A8]">Team</p>
+              <p className="mt-1 text-xs font-bold text-[#1A1D23] truncate">{task.department}</p>
             </div>
           </div>
 
           {/* Assignee Box */}
-          <div className="flex items-center gap-3 rounded-2xl border border-white/35 bg-white/30 p-3.5">
-            <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-9 w-9 text-xs" />
+          <div className="flex items-center gap-3 rounded-2xl bg-[#F7F8FA] p-3.5 border border-[rgba(0,0,0,0.06)]">
+            <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-9 w-9 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-[#9CA3AF]">Assigned Member</p>
-              <p className="text-sm font-bold text-[#111827] truncate">{task.assignee.name}</p>
+              <p className="text-[11px] font-semibold text-[#8E99A8]">Assigned Member</p>
+              <p className="text-sm font-bold text-[#1A1D23] truncate">{task.assignee.name}</p>
             </div>
-            <span className="text-xs font-medium text-[#6B7280]">{task.assignee.email}</span>
+            <span className="text-xs font-medium text-[#5A6577]">{task.assignee.email}</span>
           </div>
 
           {/* Task Description */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#9CA3AF]">Description</h3>
-            <p className="mt-2 text-sm leading-6 text-[#111827] bg-white/20 rounded-2xl border border-white/30 p-3.5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Description</h3>
+            <p className="mt-2 text-sm leading-relaxed text-[#5A6577] bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] rounded-2xl p-3.5 font-medium">
               {task.description}
             </p>
           </div>
@@ -237,8 +216,8 @@ function TaskDrawer({ task, onClose, onUpdateTask, onDuplicateTask, onArchiveTas
           {/* Subtask Checklist */}
           <div>
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#9CA3AF]">Checklist Subtasks</h3>
-              <span className="text-xs font-semibold text-[#6B7280]">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Checklist Subtasks</h3>
+              <span className="text-xs font-semibold text-[#5A6577]">
                 {task.checklist.filter((c) => c.completed).length} / {task.checklist.length} completed
               </span>
             </div>
@@ -246,18 +225,18 @@ function TaskDrawer({ task, onClose, onUpdateTask, onDuplicateTask, onArchiveTas
               {task.checklist.map((item) => (
                 <label
                   key={item.id}
-                  className="flex items-center gap-3 rounded-xl border border-white/35 bg-white/30 px-3.5 py-2.5 transition-colors cursor-pointer hover:bg-white/45"
+                  className="flex items-center gap-3 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] px-3.5 py-2.5 transition-colors cursor-pointer hover:bg-[#F0F2F5]"
                 >
                   <input
                     type="checkbox"
                     checked={item.completed}
                     onChange={() => toggleChecklist(item.id)}
-                    className="h-4 w-4 rounded accent-[#34C759] cursor-pointer"
+                    className="h-4 w-4 rounded accent-[#3B6FD4] cursor-pointer"
                   />
                   <span
                     className={cn(
                       "text-xs font-semibold transition-all",
-                      item.completed ? "line-through text-[#9CA3AF]" : "text-[#111827]"
+                      item.completed ? "line-through text-[#8E99A8]" : "text-[#1A1D23]"
                     )}
                   >
                     {item.title}
@@ -271,49 +250,25 @@ function TaskDrawer({ task, onClose, onUpdateTask, onDuplicateTask, onArchiveTas
                 placeholder="Add new subtask item..."
                 value={newSubtask}
                 onChange={(e) => setNewSubtask(e.target.value)}
-                className="h-9 flex-1 rounded-xl border border-white/35 bg-white/25 px-3 text-xs font-medium text-[#111827] outline-none placeholder:text-[#9CA3AF]"
+                className="h-9 flex-1 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-medium text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
               />
               <button
                 type="submit"
-                className="flex h-9 px-3.5 min-h-0 items-center gap-1.5 rounded-xl bg-white/50 text-xs font-semibold text-[#111827] hover:bg-white/80"
+                className="flex h-9 px-4 min-h-0 items-center gap-1.5 rounded-full bg-[#3B6FD4] text-xs font-semibold text-white hover:bg-[#2F5BB8]"
               >
                 <Plus size={14} /> Add
               </button>
             </form>
           </div>
 
-          {/* Attachments */}
-          {task.attachments.length > 0 && (
-            <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#9CA3AF]">Attachments</h3>
-              <div className="mt-2.5 space-y-2">
-                {task.attachments.map((att) => (
-                  <div
-                    key={att.name}
-                    className="flex items-center justify-between rounded-xl border border-white/35 bg-white/30 px-3.5 py-2.5 text-xs"
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      <Paperclip size={14} className="text-[#9CA3AF] shrink-0" />
-                      <span className="font-semibold text-[#111827] truncate">{att.name}</span>
-                      <span className="text-[#9CA3AF] text-[11px] shrink-0">({att.size})</span>
-                    </div>
-                    <button className="flex h-7 w-7 min-h-0 items-center justify-center rounded-lg bg-white/40 text-[#6B7280] hover:bg-white/70">
-                      <Download size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Internal Notes */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#9CA3AF]">Internal Operational Notes</h3>
-            <div className="mt-2 rounded-2xl border border-white/35 bg-white/25 p-3.5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Internal Operational Notes</h3>
+            <div className="mt-2 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5">
               {task.notes ? (
-                <p className="whitespace-pre-wrap text-xs leading-5 text-[#6B7280] font-medium">{task.notes}</p>
+                <p className="whitespace-pre-wrap text-xs leading-relaxed text-[#5A6577] font-medium">{task.notes}</p>
               ) : (
-                <p className="text-xs text-[#9CA3AF] italic">No internal notes added yet.</p>
+                <p className="text-xs text-[#8E99A8] italic">No internal notes added yet.</p>
               )}
               <form onSubmit={handleAddNote} className="mt-3 flex gap-2">
                 <input
@@ -321,41 +276,24 @@ function TaskDrawer({ task, onClose, onUpdateTask, onDuplicateTask, onArchiveTas
                   placeholder="Type an internal note..."
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
-                  className="h-8 flex-1 rounded-xl border border-white/35 bg-white/30 px-3 text-xs text-[#111827] outline-none placeholder:text-[#9CA3AF]"
+                  className="h-8 flex-1 rounded-full bg-white border border-[rgba(0,0,0,0.08)] px-3.5 text-xs text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
                 />
                 <button
                   type="submit"
-                  className="flex h-8 px-3 min-h-0 items-center justify-center rounded-xl bg-white/60 text-xs font-semibold text-[#111827] hover:bg-white"
+                  className="flex h-8 px-3 min-h-0 items-center justify-center rounded-full bg-[#3B6FD4] text-xs font-semibold text-white hover:bg-[#2F5BB8]"
                 >
                   <Send size={13} />
                 </button>
               </form>
             </div>
           </div>
-
-          {/* Activity Timeline */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#9CA3AF]">Activity Timeline</h3>
-            <div className="mt-3 space-y-3 pl-1">
-              {task.activity.map((act) => (
-                <div key={act.id} className="relative flex items-start gap-3 pl-3 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:rounded-full before:bg-[#F6C445]">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-[#111827]">
-                      <span className="font-bold text-[#111827]">{act.user}</span> {act.action}
-                    </p>
-                    <p className="text-[11px] font-medium text-[#9CA3AF]">{act.timestamp}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Quick Actions Footer */}
-        <div className="border-t border-white/20 pt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="border-t border-[rgba(0,0,0,0.06)] pt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
           <GlassButton
             variant={task.status === "Completed" ? "secondary" : "success"}
-            className="h-9 text-xs justify-center"
+            className="h-9 text-xs justify-center rounded-full"
             icon={<Check size={15} />}
             onClick={() => handleStatusChange(task.status === "Completed" ? "In Progress" : "Completed")}
           >
@@ -364,7 +302,7 @@ function TaskDrawer({ task, onClose, onUpdateTask, onDuplicateTask, onArchiveTas
 
           <GlassButton
             variant="secondary"
-            className="h-9 text-xs justify-center"
+            className="h-9 text-xs justify-center rounded-full"
             icon={<Copy size={14} />}
             onClick={() => onDuplicateTask(task)}
           >
@@ -373,7 +311,7 @@ function TaskDrawer({ task, onClose, onUpdateTask, onDuplicateTask, onArchiveTas
 
           <GlassButton
             variant="secondary"
-            className="h-9 text-xs justify-center"
+            className="h-9 text-xs justify-center rounded-full"
             icon={<Users size={14} />}
             onClick={() => alert("Assignee transfer dialog invoked.")}
           >
@@ -382,7 +320,7 @@ function TaskDrawer({ task, onClose, onUpdateTask, onDuplicateTask, onArchiveTas
 
           <GlassButton
             variant="secondary"
-            className="h-9 text-xs justify-center text-rose-500 hover:text-rose-600"
+            className="h-9 text-xs justify-center text-rose-600 hover:text-rose-700 rounded-full"
             icon={<Archive size={14} />}
             onClick={() => onArchiveTask(task.id)}
           >
@@ -399,7 +337,6 @@ function NewTaskModal({ open, onClose, onCreateTask }) {
   const [description, setDescription] = useState("");
   const [department, setDepartment] = useState("Operations");
   const [priority, setPriority] = useState("High");
-  const [dueDate, setDueDate] = useState("Today, 04:00 PM");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -418,7 +355,6 @@ function NewTaskModal({ open, onClose, onCreateTask }) {
         avatar: "https://i.pravatar.cc/96?img=33",
         email: "aman.goel@convene.edu"
       },
-      dueDate: dueDate.trim() || "Today, 05:00 PM",
       completedToday: false,
       checklist: [{ id: "c1", title: "Initial operational setup", completed: false }],
       attachments: [],
@@ -433,14 +369,14 @@ function NewTaskModal({ open, onClose, onCreateTask }) {
   };
 
   return (
-    <GlassModal open={open} className="w-[min(540px,calc(100vw-32px))] max-w-none">
+    <GlassModal open={open} className="w-[min(540px,calc(100vw-32px))] max-w-none bg-white border border-[rgba(0,0,0,0.08)] rounded-3xl p-6 text-[#1A1D23]">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-[#111827]">Create Operational Task</h2>
-          <p className="mt-1 text-xs font-medium text-[#6B7280]">Assign a new duty allocation for team execution.</p>
+          <h2 className="text-xl font-bold text-[#1A1D23]">Create Operational Task</h2>
+          <p className="mt-1 text-xs font-medium text-[#5A6577]">Assign a new duty allocation for team execution.</p>
         </div>
         <button
-          className="flex h-8 w-8 min-h-0 items-center justify-center rounded-xl bg-white/45 text-[#6B7280] hover:bg-white/70"
+          className="flex h-8 w-8 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
           onClick={onClose}
           aria-label="Close new task modal"
         >
@@ -450,38 +386,38 @@ function NewTaskModal({ open, onClose, onCreateTask }) {
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         <div>
-          <label className="text-xs font-semibold text-[#9CA3AF]">Task Title</label>
+          <label className="text-xs font-semibold text-[#8E99A8]">Task Title</label>
           <input
             type="text"
             required
             placeholder="e.g. Setup VIP Lounge & Stage Monitors"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 h-10 w-full rounded-xl border border-white/35 bg-white/30 px-3.5 text-xs font-semibold text-[#111827] outline-none placeholder:text-[#9CA3AF]"
+            className="mt-1 h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
           />
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-[#9CA3AF]">Description</label>
+          <label className="text-xs font-semibold text-[#8E99A8]">Description</label>
           <textarea
             rows={3}
             placeholder="Task scope details, location and deliverables..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-white/35 bg-white/30 p-3 text-xs font-medium text-[#111827] outline-none placeholder:text-[#9CA3AF]"
+            className="mt-1 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] p-3.5 text-xs font-medium text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-semibold text-[#9CA3AF]">Department</label>
+            <label className="text-xs font-semibold text-[#8E99A8]">Team</label>
             <select
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
-              className="mt-1 h-9 w-full rounded-xl border border-white/35 bg-white/30 px-2.5 text-xs font-semibold text-[#111827] outline-none cursor-pointer"
+              className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none cursor-pointer"
             >
-              {departments.slice(1).map((d) => (
-                <option key={d} value={d} className="bg-[#111827] text-white">
+              {teams.slice(1).map((d) => (
+                <option key={d} value={d} className="bg-white text-[#1A1D23]">
                   {d}
                 </option>
               ))}
@@ -489,36 +425,26 @@ function NewTaskModal({ open, onClose, onCreateTask }) {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#9CA3AF]">Priority</label>
+            <label className="text-xs font-semibold text-[#8E99A8]">Priority</label>
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
-              className="mt-1 h-9 w-full rounded-xl border border-white/35 bg-white/30 px-2.5 text-xs font-semibold text-[#111827] outline-none cursor-pointer"
+              className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none cursor-pointer"
             >
               {priorities.slice(1).map((p) => (
-                <option key={p} value={p} className="bg-[#111827] text-white">
+                <option key={p} value={p} className="bg-white text-[#1A1D23]">
                   {p}
                 </option>
               ))}
             </select>
           </div>
-
-          <div>
-            <label className="text-xs font-semibold text-[#9CA3AF]">Due Time</label>
-            <input
-              type="text"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="mt-1 h-9 w-full rounded-xl border border-white/35 bg-white/30 px-2.5 text-xs font-semibold text-[#111827] outline-none"
-            />
-          </div>
         </div>
 
         <div className="mt-6 flex justify-end gap-3 pt-2">
-          <GlassButton type="button" onClick={onClose} className="h-9 text-xs">
+          <GlassButton type="button" onClick={onClose} className="h-9 text-xs rounded-full">
             Cancel
           </GlassButton>
-          <GlassButton type="submit" variant="primary" icon={<Plus size={15} />} className="h-9 text-xs">
+          <GlassButton type="submit" variant="primary" icon={<Plus size={15} />} className="h-9 text-xs rounded-full">
             Create Task
           </GlassButton>
         </div>
@@ -528,56 +454,51 @@ function NewTaskModal({ open, onClose, onCreateTask }) {
 }
 
 export function TasksPage() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasksList, setTasksList] = useState(initialTasks);
   const [search, setSearch] = useState("");
-  const [department, setDepartment] = useState("All Departments");
+  const [department, setDepartment] = useState("All Teams");
   const [priority, setPriority] = useState("All Priorities");
   const [status, setStatus] = useState("All Statuses");
   const [assignee, setAssignee] = useState("All Assignees");
-  const [view, setView] = useState("list"); // "list" | "board"
+  const [view, setView] = useState("list");
   const [selectedTask, setSelectedTask] = useState(null);
   const [newTaskOpen, setNewTaskOpen] = useState(false);
   const [loading] = useState(false);
 
+  const role = useAppStore((state) => state.role);
+  const isLead = role === "lead";
+
   const assigneeOptions = useMemo(() => {
-    return ["All Assignees", ...Array.from(new Set(tasks.map((t) => t.assignee.name)))];
-  }, [tasks]);
+    return ["All Assignees", ...Array.from(new Set(tasksList.map((t) => t.assignee.name)))];
+  }, [tasksList]);
 
   const filteredTasks = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return tasks.filter((task) => {
+    return tasksList.filter((task) => {
+      // In Team Member view, strictly show only tasks assigned to the current member (e.g. Diya Shah)
+      if (!isLead && task.assignee.name !== "Diya Shah") {
+        return false;
+      }
+
       const matchesSearch =
         !query ||
         task.title.toLowerCase().includes(query) ||
         task.department.toLowerCase().includes(query) ||
-        task.assignee.name.toLowerCase().includes(query) ||
-        task.id.toLowerCase().includes(query);
+        task.assignee.name.toLowerCase().includes(query);
 
       return (
         matchesSearch &&
-        (department === "All Departments" || task.department === department) &&
+        (department === "All Teams" || task.department === department) &&
         (priority === "All Priorities" || task.priority === priority) &&
         (status === "All Statuses" || task.status === status) &&
         (assignee === "All Assignees" || task.assignee.name === assignee)
       );
     });
-  }, [assignee, department, priority, search, status, tasks]);
-
-  const totalTasks = tasks.length;
-  const completedToday = tasks.filter((t) => t.completedToday || t.status === "Completed").length;
-  const overdueTasks = tasks.filter((t) => t.status === "Blocked" || t.priority === "Critical").length;
-  const highPriorityTasks = tasks.filter((t) => t.priority === "Critical" || t.priority === "High").length;
-
-  const metrics = [
-    { label: "Total Tasks", value: String(totalTasks), detail: "Active operational workload", icon: Users, tone: "info" },
-    { label: "Completed Today", value: String(completedToday), detail: "High execution rate", icon: CheckCircle2, tone: "success" },
-    { label: "Overdue / Critical", value: String(overdueTasks), detail: "Requires immediate focus", icon: AlertTriangle, tone: "error" },
-    { label: "High Priority", value: String(highPriorityTasks), detail: "Key event deliverables", icon: Zap, tone: "gold" }
-  ];
+  }, [assignee, department, isLead, priority, search, status, tasksList]);
 
   const handleToggleComplete = (e, taskId) => {
     e.stopPropagation();
-    setTasks((prev) =>
+    setTasksList((prev) =>
       prev.map((t) => {
         if (t.id === taskId) {
           const nextStatus = t.status === "Completed" ? "In Progress" : "Completed";
@@ -589,12 +510,12 @@ export function TasksPage() {
   };
 
   const handleUpdateTask = (updatedTask) => {
-    setTasks((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+    setTasksList((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
     setSelectedTask(updatedTask);
   };
 
   const handleCreateTask = (newTask) => {
-    setTasks((prev) => [newTask, ...prev]);
+    setTasksList((prev) => [newTask, ...prev]);
   };
 
   const handleDuplicateTask = (taskToDup) => {
@@ -606,84 +527,85 @@ export function TasksPage() {
       completedToday: false,
       activity: [{ id: `act-${Date.now()}`, user: "Aman Goel", action: "duplicated task", timestamp: "Just now" }]
     };
-    setTasks((prev) => [duplicated, ...prev]);
+    setTasksList((prev) => [duplicated, ...prev]);
     setSelectedTask(duplicated);
   };
 
   const handleArchiveTask = (taskId) => {
-    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    setTasksList((prev) => prev.filter((t) => t.id !== taskId));
     setSelectedTask(null);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
       {/* Header */}
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-        <PageHeader title="Tasks" description="Assign, monitor and complete operational work." />
-        <div className="flex flex-wrap items-center gap-3">
-          <GlassButton variant="success" icon={<Plus size={17} strokeWidth={1.75} />} onClick={() => setNewTaskOpen(true)}>
-            New Task
-          </GlassButton>
-          <GlassButton icon={<Users size={17} strokeWidth={1.75} />}>Bulk Assign</GlassButton>
-          <GlassButton icon={<Download size={17} strokeWidth={1.75} />}>Export</GlassButton>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-[#1A1D23] md:text-3xl">Tasks</h1>
+          <p className="mt-1 text-sm text-[#5A6577] font-medium">Assign, monitor and complete operational work.</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          {isLead && (
+            <>
+              <GlassButton variant="primary" icon={<Plus size={16} strokeWidth={2} />} onClick={() => setNewTaskOpen(true)} className="rounded-full">
+                New Task
+              </GlassButton>
+              <GlassButton variant="secondary" icon={<Users size={16} strokeWidth={2} />} className="rounded-full">Bulk Assign</GlassButton>
+            </>
+          )}
+          <GlassButton variant="secondary" icon={<Download size={16} strokeWidth={2} />} className="rounded-full">Export</GlassButton>
         </div>
       </div>
 
-      {/* Metrics */}
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Task metrics">
-        {metrics.map((metric) => (
-          <MetricCard key={metric.label} metric={metric} />
-        ))}
-      </section>
-
       {/* Toolbar */}
-      <GlassCard className="p-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
-            <GlassInput
-              className="h-9 min-w-[220px] max-w-sm flex-1 bg-white/48 text-xs"
-              leftIcon={<Search size={15} strokeWidth={1.75} />}
-              placeholder="Search by task title, department, assignee..."
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-0">
+          <div className="flex h-9 min-w-[220px] max-w-sm flex-1 items-center gap-2 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-medium text-[#1A1D23] focus-within:ring-1 focus-within:ring-[#3B6FD4]">
+            <Search size={15} strokeWidth={2} className="text-[#8E99A8] shrink-0" />
+            <input
+              type="text"
+              placeholder="Search tasks by title, team, assignee..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-transparent outline-none text-xs font-medium text-[#1A1D23] placeholder:text-[#8E99A8]"
               aria-label="Search tasks"
             />
-            <SelectFilter label="Department" value={department} onChange={setDepartment} options={departments} />
-            <SelectFilter label="Priority" value={priority} onChange={setPriority} options={priorities} />
-            <SelectFilter label="Status" value={status} onChange={setStatus} options={statuses} />
-            <SelectFilter label="Assignee" value={assignee} onChange={setAssignee} options={assigneeOptions} />
           </div>
-
-          {/* View Toggle */}
-          <div className="glass-surface flex items-center rounded-xl border border-white/20 p-1 shrink-0">
-            <button
-              onClick={() => setView("list")}
-              className={cn(
-                "flex h-7 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-all min-h-0 cursor-pointer",
-                view === "list"
-                  ? "bg-[#F6C445] text-[#111827] shadow-[0_4px_14px_rgba(246,196,69,0.3)]"
-                  : "text-[#6B7280] hover:text-[#111827] hover:bg-white/20"
-              )}
-            >
-              <LayoutList size={14} /> List
-            </button>
-            <button
-              onClick={() => setView("board")}
-              className={cn(
-                "flex h-7 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-all min-h-0 cursor-pointer",
-                view === "board"
-                  ? "bg-[#F6C445] text-[#111827] shadow-[0_4px_14px_rgba(246,196,69,0.3)]"
-                  : "text-[#6B7280] hover:text-[#111827] hover:bg-white/20"
-              )}
-            >
-              <Kanban size={14} /> Board
-            </button>
-          </div>
+          <SelectFilter label="Team" value={department} onChange={setDepartment} options={teams} />
+          <SelectFilter label="Priority" value={priority} onChange={setPriority} options={priorities} />
+          <SelectFilter label="Status" value={status} onChange={setStatus} options={statuses} />
+          <SelectFilter label="Assigned To" value={assignee} onChange={setAssignee} options={assigneeOptions} />
         </div>
-      </GlassCard>
+
+        {/* View Toggle */}
+        <div className="flex items-center rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] p-1 shrink-0">
+          <button
+            onClick={() => setView("list")}
+            className={cn(
+              "flex h-7 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold transition-all min-h-0 cursor-pointer",
+              view === "list"
+                ? "bg-[#3B6FD4] text-white font-bold"
+                : "text-[#5A6577] hover:text-[#1A1D23]"
+            )}
+          >
+            <LayoutList size={14} /> List
+          </button>
+          <button
+            onClick={() => setView("board")}
+            className={cn(
+              "flex h-7 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold transition-all min-h-0 cursor-pointer",
+              view === "board"
+                ? "bg-[#3B6FD4] text-white font-bold"
+                : "text-[#5A6577] hover:text-[#1A1D23]"
+            )}
+          >
+            <Kanban size={14} /> Board
+          </button>
+        </div>
+      </div>
 
       {/* Task Workspace (List / Board) */}
-      <GlassCard padding="none" className="overflow-hidden min-h-[500px]">
+      <div className="overflow-hidden rounded-2xl border border-[rgba(0,0,0,0.08)] bg-white min-h-[500px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         {loading ? (
           <div className="space-y-3 p-4">
             {Array.from({ length: 7 }).map((_, i) => (
@@ -700,92 +622,68 @@ export function TasksPage() {
             />
           </div>
         ) : view === "list" ? (
-          /* Linear-inspired List View */
+          /* List View */
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] border-separate border-spacing-0 text-left">
-              <thead className="sticky top-0 z-10 bg-slate-900/90 text-[#9CA3AF] border-b border-white/10 backdrop-blur-2xl">
-                <tr className="text-[11px] font-bold uppercase tracking-wider">
-                  <th className="px-4 py-3">Priority</th>
-                  <th className="px-4 py-3">Task Title</th>
-                  <th className="px-4 py-3">Department</th>
-                  <th className="px-4 py-3">Assignee</th>
-                  <th className="px-4 py-3">Due Time</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Done</th>
+            <table className="w-full min-w-[800px] border-separate border-spacing-0 text-left">
+              <thead className="sticky top-0 z-10 bg-[#F7F8FA] text-[#5A6577] font-bold text-xs uppercase border-b border-[rgba(0,0,0,0.06)]">
+                <tr>
+                  <th className="px-4 py-3 text-[11px] tracking-wider">Priority</th>
+                  <th className="px-4 py-3 text-[11px] tracking-wider">Task Title</th>
+                  <th className="px-4 py-3 text-[11px] tracking-wider">Team</th>
+                  <th className="px-4 py-3 text-[11px] tracking-wider">Assigned To</th>
+                  <th className="px-4 py-3 text-[11px] tracking-wider">Status</th>
+                  <th className="px-4 py-3 text-right text-[11px] tracking-wider">Done</th>
                 </tr>
               </thead>
-              <tbody>
-                {filteredTasks.map((task, index) => (
-                  <motion.tr
+              <tbody className="divide-y divide-[rgba(0,0,0,0.05)]">
+                {filteredTasks.map((task) => (
+                  <tr
                     key={task.id}
-                    className="group cursor-pointer border-b border-white/35 transition-all hover:bg-white/45 hover:shadow-sm"
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.015, type: "spring", stiffness: 300, damping: 28 }}
-                    whileHover={{ y: -1, scale: 1.002 }}
+                    className="group cursor-pointer transition-colors hover:bg-[#F7F8FA]"
                     onClick={() => setSelectedTask(task)}
                   >
-                    {/* Priority */}
-                    <td className="border-b border-white/35 px-4 py-3">
+                    <td className="px-4 py-3">
                       <PriorityBadge priority={task.priority} />
                     </td>
 
-                    {/* Task Title */}
-                    <td className="border-b border-white/35 px-4 py-3">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-[11px] font-mono font-semibold text-[#9CA3AF] shrink-0">{task.id}</span>
-                        <p className={cn("text-xs font-bold transition-colors", task.status === "Completed" ? "line-through text-[#9CA3AF]" : "text-[#111827]")}>
-                          {task.title}
-                        </p>
-                      </div>
+                    <td className="px-4 py-3">
+                      <p className={cn("text-xs font-bold transition-colors", task.status === "Completed" ? "line-through text-[#8E99A8]" : "text-[#1A1D23]")}>
+                        {task.title}
+                      </p>
                     </td>
 
-                    {/* Department */}
-                    <td className="border-b border-white/35 px-4 py-3">
-                      <span className="inline-flex rounded-full border border-white/30 bg-white/20 px-2.5 py-0.5 text-[11px] font-semibold text-[#6B7280]">
+                    <td className="px-4 py-3">
+                      <span className="text-xs font-semibold text-[#5A6577]">
                         {task.department}
                       </span>
                     </td>
 
-                    {/* Assignee */}
-                    <td className="border-b border-white/35 px-4 py-3">
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-6 w-6 text-[10px]" />
-                        <span className="text-xs font-semibold text-[#111827]">{task.assignee.name}</span>
+                        <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-6 w-6 text-[10px] bg-[#EBF0FA] text-[#3B6FD4]" />
+                        <span className="text-xs font-semibold text-[#1A1D23]">{task.assignee.name}</span>
                       </div>
                     </td>
 
-                    {/* Due Time */}
-                    <td className="border-b border-white/35 px-4 py-3">
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#6B7280]">
-                        <Clock size={13} strokeWidth={1.75} className="text-[#9CA3AF]" />
-                        {task.dueDate}
-                      </span>
-                    </td>
-
-                    {/* Status */}
-                    <td className="border-b border-white/35 px-4 py-3">
+                    <td className="px-4 py-3">
                       <StatusBadge status={task.status} />
                     </td>
 
-                    {/* Quick Complete */}
-                    <td className="border-b border-white/35 px-4 py-3 text-right">
-                      <motion.button
+                    <td className="px-4 py-3 text-right">
+                      <button
                         className={cn(
                           "inline-flex h-6 w-6 min-h-0 items-center justify-center rounded-full transition-colors",
                           task.status === "Completed"
-                            ? "bg-[#34C759] text-white"
-                            : "bg-white/60 text-[#34C759] hover:bg-white border border-white/50"
+                            ? "bg-[#22A65E] text-white"
+                            : "bg-[#F0F2F5] text-[#22A65E] hover:bg-[#E8ECF1]"
                         )}
                         onClick={(e) => handleToggleComplete(e, task.id)}
-                        whileHover={{ scale: 1.15 }}
-                        whileTap={{ scale: 0.9 }}
                         aria-label={`Toggle complete ${task.title}`}
                       >
-                        <Check size={13} strokeWidth={2.2} />
-                      </motion.button>
+                        <Check size={13} strokeWidth={2.5} />
+                      </button>
                     </td>
-                  </motion.tr>
+                  </tr>
                 ))}
               </tbody>
             </table>
@@ -796,46 +694,43 @@ export function TasksPage() {
             {["Todo", "In Progress", "Blocked", "Completed"].map((columnStatus) => {
               const columnTasks = filteredTasks.filter((t) => t.status === columnStatus);
               return (
-                <div key={columnStatus} className="glass-surface rounded-2xl border border-white/30 p-3.5 flex flex-col min-h-[480px]">
+                <div key={columnStatus} className="rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5 flex flex-col min-h-[480px]">
                   {/* Column Header */}
-                  <div className="mb-3 flex items-center justify-between border-b border-white/20 pb-2.5 px-1">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#111827]">{columnStatus}</span>
-                    <span className="inline-flex h-5 px-2 items-center justify-center rounded-full bg-white/30 text-[11px] font-bold text-[#111827] border border-white/30">
+                  <div className="mb-3 flex items-center justify-between border-b border-[rgba(0,0,0,0.06)] pb-2.5 px-1">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#1A1D23]">{columnStatus}</span>
+                    <span className="inline-flex h-5 px-2 items-center justify-center rounded-full bg-[#E8ECF1] text-[11px] font-bold text-[#1A1D23]">
                       {columnTasks.length}
                     </span>
                   </div>
 
                   {/* Column Task Cards */}
-                  <div className="flex-1 space-y-2.5 overflow-y-auto pr-0.5">
+                  <div className="flex-1 space-y-2 overflow-y-auto pr-0.5">
                     {columnTasks.map((task) => (
-                      <motion.div
+                      <div
                         key={task.id}
-                        className="group cursor-pointer rounded-xl border border-white/45 bg-white/45 p-3.5 shadow-sm transition-all hover:border-white/70 hover:bg-white/65 hover:shadow-md"
-                        whileHover={{ y: -2, scale: 1.01 }}
+                        className="group cursor-pointer rounded-2xl bg-white border border-[rgba(0,0,0,0.08)] p-3.5 transition-all hover:border-[rgba(0,0,0,0.15)] shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
                         onClick={() => setSelectedTask(task)}
                       >
                         <div className="flex items-center justify-between gap-2">
                           <PriorityBadge priority={task.priority} />
-                          <span className="text-[10px] font-mono font-semibold text-[#9CA3AF]">{task.id}</span>
                         </div>
-                        <p className="mt-2 text-xs font-bold text-[#111827] line-clamp-2">{task.title}</p>
-                        <div className="mt-3 flex items-center justify-between border-t border-white/20 pt-2 text-[11px]">
+                        <p className="mt-2 text-xs font-bold text-[#1A1D23] line-clamp-2">{task.title}</p>
+                        <div className="mt-3 flex items-center justify-between border-t border-[rgba(0,0,0,0.06)] pt-2 text-[11px]">
                           <div className="flex items-center gap-1.5">
-                            <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-5 w-5 text-[9px]" />
-                            <span className="font-semibold text-[#6B7280] truncate max-w-[90px]">{task.assignee.name}</span>
+                            <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-5 w-5 text-[9px] bg-[#EBF0FA] text-[#3B6FD4]" />
+                            <span className="font-semibold text-[#5A6577] truncate max-w-[90px]">{task.assignee.name}</span>
                           </div>
-                          <motion.button
+                          <button
                             className={cn(
                               "flex h-5 w-5 min-h-0 items-center justify-center rounded-full transition-colors",
-                              task.status === "Completed" ? "bg-[#34C759] text-white" : "bg-white/70 text-[#34C759] hover:bg-white"
+                              task.status === "Completed" ? "bg-[#22A65E] text-white" : "bg-[#F0F2F5] text-[#22A65E] hover:bg-[#E8ECF1]"
                             )}
                             onClick={(e) => handleToggleComplete(e, task.id)}
-                            whileTap={{ scale: 0.9 }}
                           >
-                            <Check size={11} strokeWidth={2} />
-                          </motion.button>
+                            <Check size={11} strokeWidth={2.5} />
+                          </button>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -843,7 +738,7 @@ export function TasksPage() {
             })}
           </div>
         )}
-      </GlassCard>
+      </div>
 
       {/* Task Drawer */}
       <TaskDrawer
@@ -859,3 +754,4 @@ export function TasksPage() {
     </div>
   );
 }
+

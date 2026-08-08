@@ -1,5 +1,4 @@
-import { GlassCard } from "@/components/ui/GlassCard";
-import { ShieldAlert, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 export function IssuesPage() {
   const issues = [
@@ -9,30 +8,30 @@ export function IssuesPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-bold text-[#111827]">Issue Dispatch</h2>
-        <p className="text-sm font-medium text-[#6B7280]">
+    <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-[#1A1D23] md:text-3xl">Issue Dispatch</h1>
+        <p className="mt-1 text-sm text-[#5A6577] font-medium">
           Report and track operational incidents during event execution.
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {issues.map((iss, idx) => (
-          <GlassCard key={idx} className="flex items-center justify-between p-5">
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/15 text-rose-600">
-                <AlertCircle size={20} />
+          <div key={idx} className="flex items-center justify-between rounded-2xl bg-white border border-[rgba(0,0,0,0.08)] p-4.5 transition-colors hover:bg-[#F7F8FA] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#D6453D]/10 text-[#D6453D]">
+                <AlertCircle size={20} strokeWidth={2} />
               </div>
-              <div>
-                <h4 className="text-base font-bold text-[#111827]">{iss.title}</h4>
-                <p className="text-xs text-[#9CA3AF]">Reported by {iss.reporter} • Priority: {iss.priority}</p>
+              <div className="min-w-0">
+                <h4 className="text-sm font-bold text-[#1A1D23] truncate">{iss.title}</h4>
+                <p className="text-xs font-medium text-[#8E99A8] mt-0.5">Reported by {iss.reporter} • Priority: {iss.priority}</p>
               </div>
             </div>
-            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
+            <span className="rounded-full bg-[#F0F2F5] px-3 py-1 text-xs font-bold text-[#1A1D23] shrink-0 border border-[rgba(0,0,0,0.08)]">
               {iss.status}
             </span>
-          </GlassCard>
+          </div>
         ))}
       </div>
     </div>

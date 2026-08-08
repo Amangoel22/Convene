@@ -6,7 +6,6 @@ import {
   ChevronDown,
   Cpu,
   DollarSign,
-  ExternalLink,
   HeartHandshake,
   LayoutList,
   Megaphone,
@@ -23,10 +22,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
-import { PageHeader } from "@/components/common/PageHeader";
 import { GlassButton } from "@/components/glass/GlassButton";
-import { GlassCard } from "@/components/glass/GlassCard";
-import { GlassInput } from "@/components/glass/GlassInput";
 import { GlassModal } from "@/components/glass/GlassModal";
 import { initialTeams } from "@/data/teams";
 import { cn } from "@/lib/utils";
@@ -47,20 +43,20 @@ const iconMap = {
 
 function SelectFilter({ value, onChange, options, label }) {
   return (
-    <label className="glass-surface flex h-10 shrink-0 items-center gap-2 rounded-2xl px-3 text-xs font-semibold text-[#6B7280]">
+    <label className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#5A6577]">
       <span className="sr-only">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="cursor-pointer bg-transparent text-xs font-medium text-[#111827] outline-none pr-1"
+        className="cursor-pointer bg-transparent text-xs font-semibold text-[#1A1D23] outline-none pr-1"
       >
         {options.map((option) => (
-          <option key={option} className="bg-[#111827] text-white">
+          <option key={option} value={option} className="bg-white text-[#1A1D23]">
             {option}
           </option>
         ))}
       </select>
-      <ChevronDown size={14} strokeWidth={1.75} className="shrink-0 text-[#9CA3AF]" />
+      <ChevronDown size={13} strokeWidth={2} className="shrink-0 text-[#8E99A8]" />
     </label>
   );
 }
@@ -80,36 +76,36 @@ function TeamDrawer({ team, onClose }) {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-40 bg-[#111827]/20 backdrop-blur-[4px]"
+        className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       />
       <motion.aside
-        className="glass-surface fixed bottom-4 right-4 top-4 z-50 flex w-[min(540px,calc(100vw-32px))] flex-col overflow-hidden rounded-[32px] p-7 shadow-[0_24px_70px_rgba(31,41,55,0.25)]"
+        className="fixed bottom-4 right-4 top-4 z-50 flex w-[min(540px,calc(100vw-32px))] flex-col overflow-hidden rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-7 shadow-xl text-[#1A1D23]"
         initial={{ x: 600, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 600, opacity: 0 }}
         transition={{ type: "spring", stiffness: 320, damping: 30 }}
       >
         {/* Drawer Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-white/20 pb-5">
+        <div className="flex items-start justify-between gap-4 border-b border-[rgba(0,0,0,0.06)] pb-5">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F6C445]/20 text-[#F6C445] border border-[#F6C445]/40 shadow-inner">
-              <TeamIcon size={24} strokeWidth={1.75} />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EBF0FA] text-[#3B6FD4]">
+              <TeamIcon size={24} strokeWidth={2} />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-[#111827]">{team.name}</h2>
-              <p className="mt-0.5 text-xs font-semibold text-[#9CA3AF]">{team.members.length} Team Members</p>
+              <h2 className="text-2xl font-bold text-[#1A1D23]">{team.name}</h2>
+              <p className="mt-0.5 text-xs font-semibold text-[#8E99A8]">{team.members.length} Team Members</p>
             </div>
           </div>
           <button
-            className="flex h-9 w-9 min-h-0 items-center justify-center rounded-2xl bg-white/45 text-[#6B7280] hover:bg-white/70"
+            className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
             onClick={onClose}
             aria-label="Close team drawer"
           >
-            <X size={18} strokeWidth={1.75} />
+            <X size={18} strokeWidth={2} />
           </button>
         </div>
 
@@ -117,41 +113,41 @@ function TeamDrawer({ team, onClose }) {
         <div className="flex-1 overflow-y-auto py-6 space-y-7 pr-1">
           {/* Team Lead */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#9CA3AF]">Team Lead</h3>
-            <div className="mt-3 flex items-center justify-between rounded-2xl border border-white/35 bg-white/30 p-4 shadow-sm">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Team Lead</h3>
+            <div className="mt-3 flex items-center justify-between rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-4">
               <div className="flex items-center gap-3.5">
-                <UserAvatar initials={team.lead.initials} image={team.lead.avatar} className="h-11 w-11 text-xs" />
+                <UserAvatar initials={team.lead.initials} image={team.lead.avatar} className="h-11 w-11 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />
                 <div>
-                  <p className="text-base font-bold text-[#111827]">{team.lead.name}</p>
-                  <p className="text-xs font-medium text-[#6B7280]">{team.lead.role}</p>
+                  <p className="text-base font-bold text-[#1A1D23]">{team.lead.name}</p>
+                  <p className="text-xs font-medium text-[#5A6577]">{team.lead.role}</p>
                 </div>
               </div>
-              <div className="text-right text-xs font-medium text-[#6B7280]">
+              <div className="text-right text-xs font-medium text-[#5A6577]">
                 <p>{team.lead.email}</p>
-                <p className="mt-0.5 text-[11px] text-[#9CA3AF]">{team.lead.phone}</p>
+                <p className="mt-0.5 text-[11px] text-[#8E99A8]">{team.lead.phone}</p>
               </div>
             </div>
           </div>
 
           {/* Members List */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#9CA3AF]">Team Members ({team.members.length})</h3>
-            <div className="mt-3 space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Team Members ({team.members.length})</h3>
+            <div className="mt-3 space-y-2">
               {team.members.map((member) => (
                 <div
                   key={member.email}
-                  className="flex items-center justify-between rounded-2xl border border-white/35 bg-white/30 p-3.5 text-xs transition-colors hover:bg-white/45"
+                  className="flex items-center justify-between rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5 text-xs transition-colors hover:bg-[#F0F2F5]"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <UserAvatar initials={member.initials} image={member.avatar} className="h-9 w-9 text-[10px]" />
+                    <UserAvatar initials={member.initials} image={member.avatar} className="h-9 w-9 text-[10px] bg-[#EBF0FA] text-[#3B6FD4]" />
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-[#111827] truncate">{member.name}</p>
-                      <p className="text-xs font-medium text-[#9CA3AF] truncate">{member.role}</p>
+                      <p className="text-sm font-bold text-[#1A1D23] truncate">{member.name}</p>
+                      <p className="text-xs font-medium text-[#8E99A8] truncate">{member.role}</p>
                     </div>
                   </div>
-                  <div className="text-right shrink-0 font-medium text-[#6B7280]">
+                  <div className="text-right shrink-0 font-medium text-[#5A6577]">
                     <p>{member.email}</p>
-                    <p className="text-[11px] text-[#9CA3AF]">{member.phone}</p>
+                    <p className="text-[11px] text-[#8E99A8]">{member.phone}</p>
                   </div>
                 </div>
               ))}
@@ -161,11 +157,11 @@ function TeamDrawer({ team, onClose }) {
           {/* Responsibilities */}
           {team.responsibilities && team.responsibilities.length > 0 && (
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#9CA3AF]">Responsibilities</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Responsibilities</h3>
               <div className="mt-3 space-y-2">
                 {team.responsibilities.map((resp, i) => (
-                  <div key={i} className="flex items-center gap-3 rounded-2xl border border-white/35 bg-white/25 px-4 py-2.5 text-xs font-semibold text-[#111827]">
-                    <CheckCircle2 size={16} className="text-[#34C759] shrink-0" />
+                  <div key={i} className="flex items-center gap-3 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] px-4 py-2.5 text-xs font-semibold text-[#1A1D23]">
+                    <CheckCircle2 size={16} className="text-[#22A65E] shrink-0" />
                     <span>{resp}</span>
                   </div>
                 ))}
@@ -175,12 +171,12 @@ function TeamDrawer({ team, onClose }) {
         </div>
 
         {/* Drawer Footer CTA */}
-        <div className="border-t border-white/20 pt-5">
+        <div className="border-t border-[rgba(0,0,0,0.06)] pt-5">
           <GlassButton
             onClick={handleNavigateToTasks}
-            variant="info"
+            variant="primary"
             icon={<LayoutList size={16} />}
-            className="w-full h-11 text-xs justify-center font-bold"
+            className="w-full h-10 text-xs justify-center font-bold rounded-full"
           >
             Open Team Tasks
           </GlassButton>
@@ -225,14 +221,14 @@ function CreateTeamModal({ open, onClose, onCreateTeam }) {
   };
 
   return (
-    <GlassModal open={open} className="w-[min(480px,calc(100vw-32px))] max-w-none">
+    <GlassModal open={open} className="w-[min(480px,calc(100vw-32px))] max-w-none bg-white border border-[rgba(0,0,0,0.08)] rounded-3xl p-6 text-[#1A1D23]">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-[#111827]">Create Team</h2>
-          <p className="mt-1 text-xs font-medium text-[#6B7280]">Add a new organizing team to the directory.</p>
+          <h2 className="text-xl font-bold text-[#1A1D23]">Create Team</h2>
+          <p className="mt-1 text-xs font-medium text-[#5A6577]">Add a new organizing team to the directory.</p>
         </div>
         <button
-          className="flex h-8 w-8 min-h-0 items-center justify-center rounded-xl bg-white/45 text-[#6B7280] hover:bg-white/70"
+          className="flex h-8 w-8 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
           onClick={onClose}
           aria-label="Close create team modal"
         >
@@ -242,33 +238,33 @@ function CreateTeamModal({ open, onClose, onCreateTeam }) {
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         <div>
-          <label className="text-xs font-semibold text-[#9CA3AF]">Team Name</label>
+          <label className="text-xs font-semibold text-[#8E99A8]">Team Name</label>
           <input
             type="text"
             required
             placeholder="e.g. Design Team"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1 h-10 w-full rounded-xl border border-white/35 bg-white/30 px-3.5 text-xs font-semibold text-[#111827] outline-none placeholder:text-[#9CA3AF]"
+            className="mt-1 h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
           />
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-[#9CA3AF]">Team Lead Name</label>
+          <label className="text-xs font-semibold text-[#8E99A8]">Team Lead Name</label>
           <input
             type="text"
             placeholder="e.g. Sara Sethi"
             value={leadName}
             onChange={(e) => setLeadName(e.target.value)}
-            className="mt-1 h-10 w-full rounded-xl border border-white/35 bg-white/30 px-3.5 text-xs font-semibold text-[#111827] outline-none placeholder:text-[#9CA3AF]"
+            className="mt-1 h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
           />
         </div>
 
         <div className="mt-6 flex justify-end gap-3 pt-2">
-          <GlassButton type="button" onClick={onClose} className="h-9 text-xs">
+          <GlassButton type="button" onClick={onClose} className="h-9 text-xs rounded-full">
             Cancel
           </GlassButton>
-          <GlassButton type="submit" variant="info" icon={<Plus size={15} />} className="h-9 text-xs">
+          <GlassButton type="submit" variant="primary" icon={<Plus size={15} />} className="h-9 text-xs rounded-full">
             Create Team
           </GlassButton>
         </div>
@@ -285,6 +281,9 @@ export function TeamsPage() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [loading] = useState(false);
 
+  const role = useAppStore((state) => state.role);
+  const isLead = role === "lead";
+
   const leadOptions = useMemo(() => {
     return ["All Leads", ...Array.from(new Set(teams.map((t) => t.lead.name)))];
   }, [teams]);
@@ -292,6 +291,11 @@ export function TeamsPage() {
   const filteredTeams = useMemo(() => {
     const query = search.trim().toLowerCase();
     return teams.filter((team) => {
+      // In Team Member view, strictly show only the team that the member belongs to (e.g., Registration Team)
+      if (!isLead && !team.members.some((m) => m.name === "Diya Shah")) {
+        return false;
+      }
+
       const matchesSearch =
         !query ||
         team.name.toLowerCase().includes(query) ||
@@ -302,110 +306,109 @@ export function TeamsPage() {
 
       return matchesSearch && matchesLead;
     });
-  }, [leadFilter, search, teams]);
+  }, [isLead, leadFilter, search, teams]);
 
   const handleCreateTeam = (newTeam) => {
     setTeams((prev) => [newTeam, ...prev]);
   };
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
       {/* Page Header */}
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-        <PageHeader title="Teams" description="Coordinate organizing teams and monitor responsibilities." />
-        <div className="flex items-center gap-3">
-          <GlassButton variant="info" icon={<Plus size={17} strokeWidth={1.75} />} onClick={() => setCreateModalOpen(true)}>
-            Create Team
-          </GlassButton>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-[#1A1D23] md:text-3xl">Teams</h1>
+          <p className="mt-1 text-sm text-[#5A6577] font-medium">Coordinate organizing teams and monitor responsibilities.</p>
         </div>
+        {isLead && (
+          <div className="flex items-center gap-3">
+            <GlassButton variant="primary" icon={<Plus size={16} strokeWidth={2} />} onClick={() => setCreateModalOpen(true)} className="rounded-full">
+              Create Team
+            </GlassButton>
+          </div>
+        )}
       </div>
 
-      {/* Search Bar & Optional Lead Filter */}
-      <GlassCard className="p-3">
-        <div className="flex flex-wrap items-center gap-3 lg:flex-nowrap">
-          <GlassInput
-            className="h-10 min-w-[240px] flex-1 bg-white/48 text-xs"
-            leftIcon={<Search size={16} strokeWidth={1.75} />}
+      {/* Search Bar & Lead Filter */}
+      <div className="flex flex-wrap items-center gap-3 lg:flex-nowrap">
+        <div className="flex h-9 min-w-[240px] flex-1 items-center gap-2 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-medium text-[#1A1D23] focus-within:ring-1 focus-within:ring-[#3B6FD4]">
+          <Search size={15} strokeWidth={2} className="text-[#8E99A8] shrink-0" />
+          <input
+            type="text"
             placeholder="Search by team name, lead, or member name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-transparent outline-none text-xs font-medium text-[#1A1D23] placeholder:text-[#8E99A8]"
             aria-label="Search teams"
           />
-          <SelectFilter label="Lead" value={leadFilter} onChange={setLeadFilter} options={leadOptions} />
         </div>
-      </GlassCard>
+        <SelectFilter label="Lead" value={leadFilter} onChange={setLeadFilter} options={leadOptions} />
+      </div>
 
       {/* Minimal Team Cards Grid */}
       {loading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <LoadingSkeleton key={i} className="h-44 rounded-[28px]" />
+            <LoadingSkeleton key={i} className="h-44 rounded-3xl" />
           ))}
         </div>
       ) : filteredTeams.length === 0 ? (
-        <GlassCard className="p-10 text-center">
+        <div className="p-10 text-center rounded-2xl border border-[rgba(0,0,0,0.08)] bg-white">
           <EmptyState
             title="No teams created."
             description="No organizing teams match your search. Create a team to build your directory."
             actionLabel="Create Team"
             onAction={() => setCreateModalOpen(true)}
           />
-        </GlassCard>
+        </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredTeams.map((team, index) => {
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredTeams.map((team) => {
             const TeamIcon = iconMap[team.iconName] ?? Users;
             const visibleMembers = team.members.slice(0, 5);
             const remainingCount = team.members.length - visibleMembers.length;
 
             return (
-              <motion.div
+              <div
                 key={team.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.02, type: "spring", stiffness: 300, damping: 28 }}
-                whileHover={{ y: -3, scale: 1.01 }}
+                className="group relative flex flex-col justify-between h-full rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 transition-colors hover:bg-[#F7F8FA] cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+                onClick={() => setSelectedTeam(team)}
               >
-                <GlassCard
-                  className="group relative flex flex-col justify-between h-full rounded-[28px] p-6 transition-all hover:bg-white/55 hover:border-white/70 hover:shadow-xl cursor-pointer"
-                  onClick={() => setSelectedTeam(team)}
-                >
-                  {/* Team Icon & Name */}
-                  <div className="flex items-center gap-3.5">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F6C445]/20 text-[#F6C445] border border-[#F6C445]/40 transition-transform group-hover:scale-105 shadow-inner">
-                      <TeamIcon size={22} strokeWidth={1.75} />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-lg font-bold text-[#111827] truncate group-hover:text-[#F6C445] transition-colors">
-                        {team.name}
-                      </h3>
-                      <p className="text-xs font-semibold text-[#9CA3AF] truncate">
-                        Lead: <span className="text-[#111827]">{team.lead.name}</span>
-                      </p>
-                    </div>
+                {/* Team Icon & Name */}
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#EBF0FA] text-[#3B6FD4]">
+                    <TeamIcon size={20} strokeWidth={2} />
                   </div>
+                  <div className="min-w-0">
+                    <h3 className="text-base font-bold text-[#1A1D23] truncate">
+                      {team.name}
+                    </h3>
+                    <p className="text-xs font-semibold text-[#8E99A8] truncate mt-0.5">
+                      Lead: <span className="text-[#5A6577]">{team.lead.name}</span>
+                    </p>
+                  </div>
+                </div>
 
-                  {/* Member Avatar Stack */}
-                  <div className="mt-8 flex items-center justify-between border-t border-white/20 pt-4">
-                    <span className="text-xs font-semibold text-[#9CA3AF]">Members ({team.members.length})</span>
-                    <div className="flex items-center -space-x-2">
-                      {visibleMembers.map((m) => (
-                        <div key={m.email} className="ring-2 ring-white/60 rounded-full" title={`${m.name} (${m.role})`}>
-                          <UserAvatar initials={m.initials} image={m.avatar} className="h-7 w-7 text-[10px]" />
-                        </div>
-                      ))}
-                      {remainingCount > 0 && (
-                        <span
-                          className="flex h-7 w-7 items-center justify-center rounded-full bg-white/50 text-[10px] font-bold text-[#111827] ring-2 ring-white/60"
-                          title={`${remainingCount} more members`}
-                        >
-                          +{remainingCount}
-                        </span>
-                      )}
-                    </div>
+                {/* Member Avatar Stack */}
+                <div className="mt-8 flex items-center justify-between border-t border-[rgba(0,0,0,0.06)] pt-4">
+                  <span className="text-xs font-semibold text-[#8E99A8]">Members ({team.members.length})</span>
+                  <div className="flex items-center -space-x-2">
+                    {visibleMembers.map((m) => (
+                      <div key={m.email} className="ring-2 ring-white rounded-full" title={`${m.name} (${m.role})`}>
+                        <UserAvatar initials={m.initials} image={m.avatar} className="h-7 w-7 text-[10px] bg-[#EBF0FA] text-[#3B6FD4]" />
+                      </div>
+                    ))}
+                    {remainingCount > 0 && (
+                      <span
+                        className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EBF0FA] text-[10px] font-bold text-[#3B6FD4] ring-2 ring-white"
+                        title={`${remainingCount} more members`}
+                      >
+                        +{remainingCount}
+                      </span>
+                    )}
                   </div>
-                </GlassCard>
-              </motion.div>
+                </div>
+              </div>
             );
           })}
         </div>

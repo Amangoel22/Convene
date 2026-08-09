@@ -5,6 +5,7 @@ import {
   Flag,
   LayoutDashboard,
   Library,
+  LogOut,
   Settings,
   ShieldAlert,
   UserCheck,
@@ -12,7 +13,7 @@ import {
   Waypoints
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -45,37 +46,45 @@ const navSections = [
   {
     title: "SETUP",
     items: [
-      { label: "Onboarding Flow", href: "/onboarding", icon: Flag },
       { label: "Settings", href: "/settings", icon: Settings }
     ]
   }
 ];
 
 export function Sidebar() {
+  const navigate = useNavigate();
   const role = useAppStore((state) => state.role);
   const toggleRole = useAppStore((state) => state.toggleRole);
+  const currentUser = useAppStore((state) => state.currentUser);
+  const clearSession = useAppStore((state) => state.clearSession);
   const isLead = role === "lead";
 
+  const handleLogout = () => {
+    clearSession();
+    navigate("/login");
+  };
+
   return (
-    <aside className="sticky top-4 hidden h-[calc(100vh-32px)] w-60 shrink-0 overflow-y-auto bg-white border-r border-[rgba(0,0,0,0.08)] py-2 px-1 lg:flex lg:flex-col" aria-label="Primary navigation">
+    <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 flex-col bg-white border-r border-[rgba(0,0,0,0.08)] px-5 py-6 font-sans lg:flex">
       {/* Brand Header */}
-      <div className="flex h-14 items-center gap-3 px-3 mb-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#3B6FD4] text-white shadow-sm">
-          <Flag size={18} strokeWidth={2} />
+      <div className="flex items-center gap-3 px-2 mb-8">
+        <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#3B6FD4] text-white shadow-md">
+          <Flag size={18} strokeWidth={2.5} />
         </div>
         <div>
-          <h1 className="text-lg font-extrabold tracking-tight text-[#1A1D23]">Convene</h1>
+          <h1 className="text-lg font-extrabold tracking-tight text-[#1A1D23] leading-none">Convene</h1>
+          <p className="text-[10px] font-medium text-[#8E99A8] mt-0.5">Event Command Portal</p>
         </div>
       </div>
 
-      {/* Nav Sections */}
+      {/* Navigation Links */}
       <nav className="flex-1 space-y-6 overflow-y-auto pr-1">
         {navSections.map((section) => (
-          <div key={section.title} className="space-y-1">
-            <p className="px-4 py-1 text-[11px] font-bold uppercase tracking-wider text-[#8E99A8]">
+          <div key={section.title}>
+            <p className="px-4 text-[10px] font-bold uppercase tracking-wider text-[#8E99A8] mb-2">
               {section.title}
             </p>
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {section.items.map((item) => (
                 <NavLink
                   key={item.label}
@@ -101,14 +110,28 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Footer Profile */}
-      <div className="pt-4 border-t border-[rgba(0,0,0,0.08)]">
-        <div className="flex h-11 items-center gap-3 rounded-full px-3 hover:bg-[#F0F2F5] transition-colors cursor-pointer" onClick={toggleRole}>
-          <UserAvatar initials={isLead ? "AG" : "TM"} className="h-8 w-8 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />
-          <div className="min-w-0">
-            <p className="truncate text-xs font-bold text-[#1A1D23]">{isLead ? "Aman Goel" : "Team Member"}</p>
-            <p className="truncate text-[10px] font-medium text-[#8E99A8]">{isLead ? "Lead Organizer" : "Team Member"}</p>
+      {/* Footer Profile & Logout */}
+      <div className="pt-4 border-t border-[rgba(0,0,0,0.08)] space-y-2">
+        <div className="flex items-center justify-between gap-2 rounded-2xl px-2 py-1.5 hover:bg-[#F0F2F5] transition-colors">
+          <div className="flex items-center gap-2.5 min-w-0 cursor-pointer" onClick={toggleRole} title="Click to switch role view">
+            <UserAvatar
+              name={currentUser?.name}
+              initials={currentUser?.name ? currentUser.name.split(" ").map(n => n[0]).join("") : (isLead ? "AG" : "TM")}
+              className="h-8 w-8 text-xs bg-[#EBF0FA] text-[#3B6FD4] shrink-0"
+            />
+            <div className="min-w-0">
+              <p className="truncate text-xs font-bold text-[#1A1D23]">{currentUser?.name || (isLead ? "Aman Goel" : "Team Member")}</p>
+              <p className="truncate text-[10px] font-medium text-[#8E99A8]">{isLead ? "Lead Organizer" : "Team Member"}</p>
+            </div>
           </div>
+
+          <button
+            onClick={handleLogout}
+            title="Log Out"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#D6453D]/10 hover:text-[#D6453D] transition-colors"
+          >
+            <LogOut size={15} />
+          </button>
         </div>
       </div>
     </aside>

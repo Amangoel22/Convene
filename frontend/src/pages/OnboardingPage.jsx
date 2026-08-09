@@ -20,7 +20,7 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/store/useAppStore";
-import { cn } from "@/lib/utils";
+import { cn, formatTimeString } from "@/lib/utils";
 
 const eventTypes = [
   "Hackathon",
@@ -73,7 +73,7 @@ export function OnboardingPage() {
   const [endDate, setEndDate] = useState(new Date().toISOString().split("T")[0]);
   const [endTime, setEndTime] = useState("21:00");
   const [duration, setDuration] = useState("12 Hours");
-  const [location, setLocation] = useState("Main Auditorium & Labs A–D");
+  const [location, setLocation] = useState("");
 
   // Auto-calculate event duration dynamically from Start & End Date/Time
   useEffect(() => {
@@ -137,33 +137,28 @@ export function OnboardingPage() {
     e.preventDefault();
     if (!eventName.trim()) return;
 
-    // Load default template timeline stages based on selected event type
-    const template = defaultStagesForType[eventType] || defaultStagesForType.Default;
-    const initialFormattedStages = template.map((stg, idx) => ({
-      id: `stg-${Date.now()}-${idx}`,
-      order: idx + 1,
-      title: stg.title,
-      timeWindow: `${stg.startTime} – ${stg.endTime}`,
-      timeDisplay: stg.startTime,
-      location: stg.location,
-      owner: stg.owner,
-      status: stg.status,
-      description: `${stg.title} scheduled at ${stg.location}.`,
-      milestones: [{ label: `Initialize ${stg.title}`, completed: stg.status === "Completed" }]
-    }));
+    // Automatically sync event date to timeline start and end dates
+    if (eventDate) {
+      setStartDate(eventDate);
+      setEndDate(eventDate);
+    }
 
-    setStagesList(initialFormattedStages);
+    setStagesList([]);
     setStep(4);
   };
 
   const handleAddStage = () => {
     if (!stageTitle.trim()) return;
+
+    const formattedStart = formatTimeString(stageStart) || "09:00 AM";
+    const formattedEnd = formatTimeString(stageEnd) || "10:00 AM";
+
     const newStageObj = {
       id: `stg-${Date.now()}`,
       order: stagesList.length + 1,
       title: stageTitle.trim(),
-      timeWindow: `${stageStart} – ${stageEnd}`,
-      timeDisplay: stageStart,
+      timeWindow: `${formattedStart} – ${formattedEnd}`,
+      timeDisplay: formattedStart,
       location: stageVenue.trim() || location,
       owner: "Organizing Team",
       status: stagesList.length === 0 ? "LIVE" : "Upcoming",
@@ -178,9 +173,54 @@ export function OnboardingPage() {
     setStagesList(stagesList.filter((s) => s.id !== id).map((s, i) => ({ ...s, order: i + 1 })));
   };
 
-  const handleFinalLaunch = (e) => {
+  const handleFinalLaunch = async (e) => {
     e.preventDefault();
 
+    const token = localStorage.getItem("convene_token");
+    const payload = {
+      name: eventName.trim(),
+      type: eventType,
+      startDate: startDate || new Date().toISOString().split("T")[0],
+      endDate: endDate || startDate || new Date().toISOString().split("T")[0],
+      startTime,
+      endTime,
+      durationDisplay: duration || "24 Hours",
+      primaryLocation: location.trim() || undefined,
+      stages: stagesList
+    };
+
+    try {
+      if (token) {
+        const res = await fetch("http://localhost:8000/api/events", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const createdDbEvent = {
+            ...data.event,
+            role: "Organizing Team Lead",
+            duration: data.event.durationDisplay || duration || "24 Hours",
+            location: data.event.primaryLocation || location.trim(),
+            stages: data.event.stages || stagesList
+          };
+          addEvent(createdDbEvent);
+          setActiveEvent(createdDbEvent);
+          setRole("lead");
+          navigate("/dashboard");
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("Backend event sync notice:", err.message);
+    }
+
+    // Fallback store dispatch
     const newEvent = {
       id: `evt-${Date.now()}`,
       name: eventName.trim(),
@@ -191,12 +231,13 @@ export function OnboardingPage() {
       startTime,
       endTime,
       duration: duration || "24 Hours",
-      location: location || "Main Auditorium & Labs A–D",
+      location: location.trim() || undefined,
       role: "Organizing Team Lead",
       stages: stagesList
     };
 
     addEvent(newEvent);
+    setActiveEvent(newEvent);
     setRole("lead");
     navigate("/dashboard");
   };

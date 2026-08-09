@@ -2,79 +2,16 @@ import { useState, useMemo } from "react";
 import { Plus, Search, MapPin, Clock, Users, UserCheck, Shield, ChevronDown } from "lucide-react";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
+import { EmptyState } from "@/components/common/EmptyState";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
-import { initialTeams } from "@/data/teams";
 import { cn } from "@/lib/utils";
 
 // Initial duties seed
-const initialDuties = [
-  {
-    id: "duty-1",
-    title: "Guest Welcome & Escort",
-    time: "08:30 AM – 10:30 AM",
-    location: "Main Gate & VIP Lobby",
-    assignedTo: "Team Member",
-    assignedToRole: "Organizing Team",
-    assignedToInitials: "TM",
-    teamName: "Hospitality Team",
-    notes: "Receive VIP speakers at main gate and guide to VIP lounge."
-  },
-  {
-    id: "duty-2",
-    title: "Registration Desk Scanning Shift 1",
-    time: "08:00 AM – 12:00 PM",
-    location: "Registration Counter 1",
-    assignedTo: "Team Member",
-    assignedToRole: "Desk Operator",
-    assignedToInitials: "TM",
-    teamName: "Registration Team",
-    notes: "Scan QR codes and distribute badge lanyards."
-  },
-  {
-    id: "duty-3",
-    title: "Main Stage Audio Check & Mic Host",
-    time: "09:00 AM – 11:30 AM",
-    location: "Main Auditorium Stage",
-    assignedTo: "Aarav Kapoor",
-    assignedToRole: "Stage Operator",
-    assignedToInitials: "AK",
-    teamName: "Stage Team",
-    notes: "Ensure mic batteries are replaced and podium light is configured."
-  },
-  {
-    id: "duty-4",
-    title: "Lunch Catering & Mentor Meal Setup",
-    time: "12:30 PM – 02:30 PM",
-    location: "Faculty Dining Hall",
-    assignedTo: "Meera Menon",
-    assignedToRole: "Food Logistics",
-    assignedToInitials: "MM",
-    teamName: "Hospitality Team",
-    notes: "Verify dietary restriction labels and restock water baskets."
-  },
-  {
-    id: "duty-5",
-    title: "Lab C WiFi & Power Outlet Monitoring",
-    time: "02:00 PM – 06:00 PM",
-    location: "Lab C (Floor 2)",
-    assignedTo: "Rohan Nair",
-    assignedToRole: "Tech Crew",
-    assignedToInitials: "RN",
-    teamName: "Tech Team",
-    notes: "Keep extra ethernet cables and backup routers ready."
-  }
-];
+const initialDuties = [];
 
-// Extract available members from initialTeams
-const allTeamMembers = initialTeams.flatMap((t) =>
-  t.members.map((m) => ({
-    name: m.name,
-    role: m.role || "Team Member",
-    team: t.name,
-    initials: m.initials || m.name.substring(0, 2).toUpperCase()
-  }))
-);
+// Available members list
+const allTeamMembers = [];
 
 // Ensure generic "Team Member" option is always selectable
 const selectableMembers = [
@@ -119,7 +56,7 @@ export function DutiesPage() {
   };
 
   const teamOptions = useMemo(() => {
-    return ["All Teams", ...Array.from(new Set(initialTeams.map((t) => t.name)))];
+    return ["All Teams"];
   }, []);
 
   const filteredDuties = useMemo(() => {
@@ -230,64 +167,74 @@ export function DutiesPage() {
       </div>
 
       {/* Duties Display Cards Grid */}
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredDuties.map((duty) => {
-          const assigneesList = Array.isArray(duty.assignees) ? duty.assignees : [{ name: duty.assignedTo, role: duty.assignedToRole, initials: duty.assignedToInitials }];
+      {filteredDuties.length === 0 ? (
+        <EmptyState
+          icon={UserCheck}
+          title="No shift duties assigned"
+          description="Create and assign ground shift duties (e.g. Guest Welcome, Desk Duty) to organizing team members."
+          actionLabel={isLead ? "Assign New Duty" : undefined}
+          onAction={isLead ? () => setCreateModalOpen(true) : undefined}
+        />
+      ) : (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredDuties.map((duty) => {
+            const assigneesList = Array.isArray(duty.assignees) ? duty.assignees : [{ name: duty.assignedTo, role: duty.assignedToRole, initials: duty.assignedToInitials }];
 
-          return (
-            <div
-              key={duty.id}
-              onClick={() => setViewingDuty(duty)}
-              className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-[#3B6FD4]/40 transition-all flex flex-col justify-between cursor-pointer group"
-            >
-              <div>
-                {/* Header Badge & Team */}
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#3B6FD4] bg-[#EBF0FA] px-2.5 py-1 rounded-full">
-                    {duty.teamName}
-                  </span>
-                  <span className="text-[11px] font-bold font-mono text-[#5A6577] flex items-center gap-1">
-                    <Clock size={12} className="text-[#3B6FD4]" /> {duty.time}
-                  </span>
-                </div>
-
-                {/* Duty Title */}
-                <h3 className="mt-3.5 text-base font-bold text-[#1A1D23] leading-snug group-hover:text-[#3B6FD4] transition-colors">{duty.title}</h3>
-
-                {/* Location Venue */}
-                <div className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-[#5A6577]">
-                  <MapPin size={14} className="text-[#3B6FD4] shrink-0" />
-                  <span className="truncate">{duty.location}</span>
-                </div>
-
-                {/* Notes */}
-                {duty.notes && (
-                  <div className="mt-3.5 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3 text-xs font-medium text-[#5A6577] line-clamp-2">
-                    {duty.notes}
+            return (
+              <div
+                key={duty.id}
+                onClick={() => setViewingDuty(duty)}
+                className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-[#3B6FD4]/40 transition-all flex flex-col justify-between cursor-pointer group"
+              >
+                <div>
+                  {/* Header Badge & Team */}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#3B6FD4] bg-[#EBF0FA] px-2.5 py-1 rounded-full">
+                      {duty.teamName}
+                    </span>
+                    <span className="text-[11px] font-bold font-mono text-[#5A6577] flex items-center gap-1">
+                      <Clock size={12} className="text-[#3B6FD4]" /> {duty.time}
+                    </span>
                   </div>
-                )}
-              </div>
 
-              {/* Assigned Members Pill (Multi-assignee Support) */}
-              <div className="mt-5 pt-3.5 border-t border-[rgba(0,0,0,0.06)] flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#8E99A8]">
-                  {assigneesList.length > 1 ? `${assigneesList.length} Assigned` : "Assigned To"}
-                </span>
-                <div className="flex items-center gap-1.5">
-                  <div className="flex -space-x-2">
-                    {assigneesList.slice(0, 3).map((a, idx) => (
-                      <UserAvatar key={idx} initials={a.initials || a.name.substring(0, 2).toUpperCase()} className="h-7 w-7 text-[10px] bg-[#EBF0FA] text-[#3B6FD4] ring-2 ring-white" />
-                    ))}
+                  {/* Duty Title */}
+                  <h3 className="mt-3.5 text-base font-bold text-[#1A1D23] leading-snug group-hover:text-[#3B6FD4] transition-colors">{duty.title}</h3>
+
+                  {/* Location Venue */}
+                  <div className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-[#5A6577]">
+                    <MapPin size={14} className="text-[#3B6FD4] shrink-0" />
+                    <span className="truncate">{duty.location}</span>
                   </div>
-                  <span className="text-xs font-bold text-[#1A1D23]">
-                    {assigneesList.length === 1 ? assigneesList[0].name : `${assigneesList[0].name} +${assigneesList.length - 1}`}
+
+                  {/* Notes */}
+                  {duty.notes && (
+                    <div className="mt-3.5 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3 text-xs font-medium text-[#5A6577] line-clamp-2">
+                      {duty.notes}
+                    </div>
+                  )}
+                </div>
+
+                {/* Assigned Members Pill (Multi-assignee Support) */}
+                <div className="mt-5 pt-3.5 border-t border-[rgba(0,0,0,0.06)] flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#8E99A8]">
+                    {assigneesList.length > 1 ? `${assigneesList.length} Assigned` : "Assigned To"}
                   </span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex -space-x-2">
+                      {assigneesList.slice(0, 3).map((a, idx) => (
+                        <UserAvatar key={idx} initials={a.initials || a.name.substring(0, 2).toUpperCase()} className="h-7 w-7 text-[10px] bg-[#EBF0FA] text-[#3B6FD4] ring-2 ring-white" />
+                      ))}
+                    </div>
+                    <span className="text-xs font-bold text-[#1A1D23]">
+                      {assigneesList.length === 1 ? assigneesList[0].name : `${assigneesList[0].name} +${assigneesList.length - 1}`}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* VIEW DUTY DETAIL MODAL */}
       <GlassModal open={Boolean(viewingDuty)} onClose={() => setViewingDuty(null)} title="Duty Information">

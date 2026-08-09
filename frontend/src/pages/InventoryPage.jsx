@@ -3,14 +3,9 @@ import { AlertTriangle, Boxes, Edit2, PackageCheck, Plus, X, Wrench } from "luci
 import { useState } from "react";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
+import { EmptyState } from "@/components/common/EmptyState";
 
-const initialInventory = [
-  { id: "inv-1", name: "HDMI 2.0 Cables (10m)", totalNeeded: 30, available: 12, defective: 2 },
-  { id: "inv-2", name: "Extension Power Strip 6-Socket", totalNeeded: 45, available: 15, defective: 1 },
-  { id: "inv-3", name: "4K Laser Projector", totalNeeded: 8, available: 2, defective: 0 },
-  { id: "inv-4", name: "Wireless Lapel Microphones", totalNeeded: 15, available: 6, defective: 3 },
-  { id: "inv-5", name: "Walkie-Talkie Sets", totalNeeded: 25, available: 0, defective: 4 }
-];
+const initialInventory = [];
 
 import { useEffect } from "react";
 
@@ -192,48 +187,51 @@ export function InventoryPage() {
         )}
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {inventory.map((item) => (
-          <div
-            key={item.id}
-            className="group relative flex flex-col justify-between rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 transition-colors hover:border-[rgba(0,0,0,0.14)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
-          >
-            <div>
-              <div className="flex items-start justify-between">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#EBF0FA] text-[#3B6FD4]">
-                  <Boxes size={20} strokeWidth={2} />
+      {inventory.length === 0 ? (
+        <EmptyState
+          icon={Boxes}
+          title="No hardware inventory added"
+          description="Add physical equipment, cables, projectors, and hardware assets required for your event."
+          actionLabel={isLead ? "Add Equipment" : undefined}
+          onAction={isLead ? handleOpenAdd : undefined}
+        />
+      ) : (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {inventory.map((item) => (
+            <div key={item.id} className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+              <div>
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-base font-bold text-[#1A1D23] leading-snug">{item.name}</h3>
+                  {isLead && (
+                    <button
+                      onClick={() => handleOpenEdit(item)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23] shrink-0"
+                      aria-label={`Edit ${item.name}`}
+                    >
+                      <Edit2 size={14} strokeWidth={2} />
+                    </button>
+                  )}
                 </div>
-                {isLead && (
-                  <button
-                    onClick={() => handleOpenEdit(item)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23] transition-colors"
-                    aria-label={`Edit ${item.name}`}
-                  >
-                    <Edit2 size={14} />
-                  </button>
-                )}
-              </div>
 
-              <h3 className="mt-4 text-base font-bold text-[#1A1D23]">{item.name}</h3>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-[rgba(0,0,0,0.06)] grid grid-cols-3 gap-2 text-center">
-              <div className="rounded-2xl bg-[#F7F8FA] p-2.5">
-                <span className="text-[11px] font-semibold text-[#8E99A8] block">Total Needed</span>
-                <span className="text-sm font-extrabold text-[#1A1D23] block mt-0.5">{item.totalNeeded}</span>
-              </div>
-              <div className="rounded-2xl bg-[#22A65E]/10 p-2.5">
-                <span className="text-[11px] font-semibold text-[#22A65E] block">Available</span>
-                <span className="text-sm font-extrabold text-[#22A65E] block mt-0.5">{item.available}</span>
-              </div>
-              <div className="rounded-2xl bg-[#D6453D]/10 p-2.5">
-                <span className="text-[11px] font-semibold text-[#D6453D] block">Defective</span>
-                <span className="text-sm font-extrabold text-[#D6453D] block mt-0.5">{item.defective}</span>
+                <div className="mt-5 grid grid-cols-3 gap-2 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3 text-center">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8] block">Needed</span>
+                    <span className="text-sm font-extrabold text-[#1A1D23] block mt-0.5 font-mono">{item.totalNeeded}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#22A65E] block">Available</span>
+                    <span className="text-sm font-extrabold text-[#22A65E] block mt-0.5 font-mono">{item.available}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#D6453D] block">Defective</span>
+                    <span className="text-sm font-extrabold text-[#D6453D] block mt-0.5 font-mono">{item.defective}</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <EditItemModal
         open={modalOpen}

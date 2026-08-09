@@ -1,45 +1,22 @@
 import { create } from "zustand";
-import { initialStages } from "@/data/runOfShow";
 
-export const initialEvents = [
-  {
-    id: "evt-1",
-    name: "HackFest 2026",
-    type: "Hackathon",
-    date: "2026-08-15",
-    startTime: "08:00 AM",
-    endTime: "08:00 PM",
-    duration: "12 Hours",
-    location: "Main Campus Auditorium & Labs A–D",
-    role: "Organizing Team Lead",
-    stages: initialStages
-  },
-  {
-    id: "evt-2",
-    name: "Inter-College Debate Championship",
-    type: "Debate",
-    date: "2026-09-02",
-    startTime: "09:00 AM",
-    endTime: "05:00 PM",
-    duration: "8 Hours",
-    location: "Seminar Hall B & Open Amphitheatre",
-    role: "Organizing Team Lead",
-    stages: [
-      { id: "stg-d1", order: 1, title: "Debater Orientation & Motion Release", timeWindow: "09:00 AM – 10:00 AM", timeDisplay: "09:00 AM", location: "Seminar Hall B", owner: "Debate Society Lead", status: "Completed", description: "Motion announcements & rulebook distribution.", milestones: [{ label: "Distribute motion papers", completed: true }] },
-      { id: "stg-d2", order: 2, title: "Preliminary Rounds", timeWindow: "10:15 AM – 01:00 PM", timeDisplay: "10:15 AM", location: "Rooms 101–108", owner: "Logistics Lead", status: "LIVE", description: "3 concurrent debating streams.", milestones: [{ label: "Confirm judge scoring sheets", completed: false }] },
-      { id: "stg-d3", order: 3, title: "Finals & Award Ceremony", timeWindow: "02:00 PM – 05:00 PM", timeDisplay: "02:00 PM", location: "Amphitheatre", owner: "Stage Lead", status: "Upcoming", description: "Grand finale debate and trophy distribution.", milestones: [{ label: "Setup stage audio", completed: false }] }
-    ]
-  }
-];
+export const initialEvents = [];
 
 export const useAppStore = create((set) => ({
+  currentUser: null,
+  token: null,
   sidebarExpanded: true,
   theme: "light",
   role: "lead", // "lead" | "member"
-  events: initialEvents,
-  activeEvent: initialEvents[0],
-  hasOnboarded: true,
+  events: [],
+  activeEvent: null,
+  hasOnboarded: false,
 
+  setUserSession: (user, token) => set({ currentUser: user, token }),
+  clearSession: () => {
+    localStorage.removeItem("convene_token");
+    set({ currentUser: null, token: null, events: [], activeEvent: null });
+  },
   setRole: (role) => set({ role }),
   toggleRole: () => set((state) => ({ role: state.role === "lead" ? "member" : "lead" })),
   setActiveEvent: (event) => set({ activeEvent: event }),

@@ -16,14 +16,13 @@ import {
   Users,
   X
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
-import { initialStages } from "@/data/runOfShow";
-import { cn } from "@/lib/utils";
+import { cn, formatTimeString, parseTimeString } from "@/lib/utils";
 
 const statusStyles = {
   LIVE: "bg-[#22A65E]/10 text-[#22A65E]",
@@ -109,7 +108,6 @@ function StageDrawer({ stage, onClose, onUpdateStatus }) {
               <span className="text-xs font-bold text-[#8E99A8]">Stage {stage.order} of 6</span>
             </div>
             <h2 className="mt-2 text-2xl font-bold text-[#1A1D23]">{stage.title}</h2>
-            <p className="mt-1 text-xs font-medium text-[#5A6577]">{stage.description}</p>
           </div>
           <button
             className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
@@ -190,30 +188,21 @@ function StageDrawer({ stage, onClose, onUpdateStatus }) {
 
 function StageModal({ open, onClose, stage, onSave }) {
   const [title, setTitle] = useState(stage ? stage.title : "");
-  const [description, setDescription] = useState(stage ? stage.description : "");
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:30");
   const [location, setLocation] = useState(stage ? stage.location : "");
-  const [owner, setOwner] = useState(stage ? stage.owner : "");
 
-  // Helper to format 24h time string (e.g. 09:00) into 12h format (e.g. 09:00 AM)
+  // Helper to format 24h or manual time string (e.g. 09:00, 2:30 pm) into 12h format (e.g. 02:30 PM)
   const format12h = (tStr) => {
     if (!tStr) return "";
-    const [h, m] = tStr.split(":");
-    let hNum = parseInt(h, 10);
-    const ampm = hNum >= 12 ? "PM" : "AM";
-    hNum = hNum % 12 || 12;
-    return `${String(hNum).padStart(2, "0")}:${m} ${ampm}`;
+    return formatTimeString(tStr);
   };
 
   // Sync state if editing target stage changes
   useMemo(() => {
     setTitle(stage ? stage.title : "");
-    setDescription(stage ? stage.description : "");
     setLocation(stage ? stage.location : "");
-    setOwner(stage ? stage.owner : "");
     if (stage && stage.timeWindow) {
-      // Basic parse attempt or keep default times
       setStartTime("09:00");
       setEndTime("10:30");
     }
@@ -229,12 +218,9 @@ function StageModal({ open, onClose, stage, onSave }) {
       id: stage ? stage.id : `stg-${Date.now()}`,
       order: stage ? stage.order : 99,
       title: title.trim(),
-      description: description.trim() || "Timeline stage event details.",
       timeWindow: formattedWindow,
-      location: location.trim() || "Main Stage",
-      owner: owner.trim() || "Stage Lead",
-      status: stage ? stage.status : "Upcoming",
-      milestones: stage ? stage.milestones : [{ label: "Stage setup & audio check", completed: false }]
+      location: location.trim() || "",
+      status: stage ? stage.status : "Upcoming"
     });
     onClose();
   };
@@ -251,17 +237,6 @@ function StageModal({ open, onClose, stage, onSave }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="mt-1 h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
-          />
-        </div>
-
-        <div>
-          <label className="text-xs font-semibold text-[#8E99A8]">Description</label>
-          <textarea
-            rows={2}
-            placeholder="Key activities and execution notes..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 w-full rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.08)] p-3.5 text-xs font-medium text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
           />
         </div>
 
@@ -301,17 +276,6 @@ function StageModal({ open, onClose, stage, onSave }) {
               className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
             />
           </div>
-
-          <div>
-            <label className="text-xs font-semibold text-[#8E99A8]">Stage Owner / Lead</label>
-            <input
-              type="text"
-              placeholder="e.g. Aarav Sharma"
-              value={owner}
-              onChange={(e) => setOwner(e.target.value)}
-              className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
-            />
-          </div>
         </div>
 
         <div className="mt-6 flex justify-end gap-3 pt-2">
@@ -335,14 +299,49 @@ export function RunOfShowPage() {
   const role = useAppStore((state) => state.role);
   const isLead = role === "lead";
 
-  const stages = activeEvent?.stages || initialStages;
+  const rawStages = activeEvent?.stages || [];
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Statuses");
   const [selectedStage, setSelectedStage] = useState(null);
+  const [now, setNow] = useState(new Date());
+
+  // Tick every second to evaluate live time window
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Edit / Create Stage Modal State
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingStage, setEditingStage] = useState(null);
+
+  // Evaluate stages dynamically based on current time window, preserving manual overrides
+  const stages = useMemo(() => {
+    return rawStages.map((s) => {
+      let status = s.status || "Upcoming";
+
+      if (s.timeWindow) {
+        const parts = s.timeWindow.split("–");
+        const startStr = parts[0]?.trim();
+        const endStr = parts[1]?.trim();
+
+        const startDateObj = parseTimeString(startStr, now);
+        const endDateObj = parseTimeString(endStr, now);
+
+        if (startDateObj && endDateObj) {
+          if (now >= endDateObj) {
+            status = "Completed";
+          } else if (now >= startDateObj && now < endDateObj) {
+            status = "LIVE";
+          } else if (now < startDateObj) {
+            status = "Upcoming";
+          }
+        }
+      }
+
+      return { ...s, status };
+    });
+  }, [rawStages, now]);
 
   const filteredStages = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -350,8 +349,7 @@ export function RunOfShowPage() {
       const matchesSearch =
         !query ||
         stage.title.toLowerCase().includes(query) ||
-        (stage.location && stage.location.toLowerCase().includes(query)) ||
-        (stage.owner && stage.owner.toLowerCase().includes(query));
+        (stage.location && stage.location.toLowerCase().includes(query));
 
       const matchesStatus = statusFilter === "All Statuses" || stage.status === statusFilter;
 
@@ -359,20 +357,89 @@ export function RunOfShowPage() {
     });
   }, [search, statusFilter, stages]);
 
-  const handleUpdateStatus = (stageId, newStatus) => {
+  const handleUpdateStatus = async (stageId, newStatus) => {
     updateActiveEventStages(stageId, newStatus);
     setSelectedStage((prev) => (prev ? { ...prev, status: newStatus } : null));
+
+    const token = localStorage.getItem("convene_token");
+    if (token && stageId && !stageId.startsWith("stg-")) {
+      try {
+        await fetch(`http://localhost:8000/api/stages/${stageId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ status: newStatus })
+        });
+      } catch (err) {
+        console.warn("Backend status sync warning:", err.message);
+      }
+    }
   };
 
-  const handleSaveStage = (stageData) => {
+  const handleSaveStage = async (stageData) => {
+    const token = localStorage.getItem("convene_token");
+
     if (editingStage) {
       updateStageDetails(stageData.id, stageData);
+      if (token && stageData.id && !stageData.id.startsWith("stg-")) {
+        try {
+          await fetch(`http://localhost:8000/api/stages/${stageData.id}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              title: stageData.title,
+              timeWindow: stageData.timeWindow,
+              location: stageData.location
+            })
+          });
+        } catch (err) {
+          console.warn("Backend stage update warning:", err.message);
+        }
+      }
     } else {
-      addStageToActiveEvent({
+      let createdStage = {
         ...stageData,
         order: stages.length + 1
-      });
+      };
+
+      if (token && activeEvent?.id) {
+        try {
+          const res = await fetch(`http://localhost:8000/api/events/${activeEvent.id}/stages`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              title: stageData.title,
+              timeWindow: stageData.timeWindow,
+              location: stageData.location,
+              stageOrder: stages.length + 1
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.stage) {
+              createdStage = {
+                ...createdStage,
+                id: data.stage.id,
+                order: data.stage.stageOrder
+              };
+            }
+          }
+        } catch (err) {
+          console.warn("Backend stage create warning:", err.message);
+        }
+      }
+
+      addStageToActiveEvent(createdStage);
     }
+
     setEditModalOpen(false);
     setEditingStage(null);
   };
@@ -427,91 +494,102 @@ export function RunOfShowPage() {
       </div>
 
       {/* Timeline stages list */}
-      <div className="space-y-4">
-        {filteredStages.map((stg, idx) => {
-          const isLive = stg.status === "LIVE";
-          const displayIndex = String(stg.order || idx + 1).padStart(2, "0");
+      {filteredStages.length === 0 ? (
+        <EmptyState
+          icon={CalendarClock}
+          title="No timeline stages configured"
+          description="Create timeline stages to track live event progression, venues, and stage leads."
+          actionLabel={isLead ? "Add Stage" : undefined}
+          onAction={isLead ? () => { setEditingStage(null); setEditModalOpen(true); } : undefined}
+        />
+      ) : (
+        <div className="space-y-4">
+          {filteredStages.map((stg, idx) => {
+            const isLive = stg.status === "LIVE";
+            const displayIndex = String(stg.order || idx + 1).padStart(2, "0");
 
-          return (
-            <div
-              key={stg.id}
-              className={cn(
-                "group relative flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-3xl border p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]",
-                isLive
-                  ? "bg-white border-[#3B6FD4]/40 ring-1 ring-[#3B6FD4]/20"
-                  : "bg-white border-[rgba(0,0,0,0.08)]"
-              )}
-            >
-              <div className="flex items-start gap-4 min-w-0 flex-1">
-                <div
-                  className={cn(
-                    "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl font-mono text-sm font-bold",
-                    isLive ? "bg-[#EBF0FA] text-[#3B6FD4]" : "bg-[#F0F2F5] text-[#5A6577]"
-                  )}
-                >
-                  {displayIndex}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-base font-bold text-[#1A1D23] truncate">{stg.title}</h3>
-                    <StatusBadge status={stg.status} />
+            return (
+              <div
+                key={stg.id}
+                className={cn(
+                  "group relative flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-3xl border p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]",
+                  isLive
+                    ? "bg-white border-[#3B6FD4]/40 ring-1 ring-[#3B6FD4]/20"
+                    : "bg-white border-[rgba(0,0,0,0.08)]"
+                )}
+              >
+                <div className="flex items-start gap-4 min-w-0 flex-1">
+                  <div
+                    className={cn(
+                      "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl font-mono text-sm font-bold",
+                      isLive ? "bg-[#EBF0FA] text-[#3B6FD4]" : "bg-[#F0F2F5] text-[#5A6577]"
+                    )}
+                  >
+                    {displayIndex}
                   </div>
-                  <p className="text-xs font-medium text-[#5A6577] mt-1 truncate">{stg.description}</p>
-                  <div className="flex flex-wrap items-center gap-4 mt-3 text-xs font-medium text-[#8E99A8]">
-                    <span className="inline-flex items-center gap-1 font-mono font-bold text-[#3B6FD4]">
-                      <Clock size={13} /> {stg.timeWindow}
-                    </span>
-                    <span>•</span>
-                    <span className="inline-flex items-center gap-1 text-[#5A6577]">
-                      <MapPin size={13} /> {stg.location}
-                    </span>
-                    <span>•</span>
-                    <span>Lead: {stg.owner}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-base font-bold text-[#1A1D23] truncate">{stg.title}</h3>
+                      <StatusBadge status={stg.status} />
+                    </div>
+                    <div className="flex flex-wrap items-center gap-4 mt-2.5 text-xs font-medium text-[#8E99A8]">
+                      <span className="inline-flex items-center gap-1 font-mono font-bold text-[#3B6FD4]">
+                        <Clock size={13} /> {stg.timeWindow}
+                      </span>
+                      {stg.location && (
+                        <>
+                          <span>•</span>
+                          <span className="inline-flex items-center gap-1 text-[#5A6577]">
+                            <MapPin size={13} /> {stg.location}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {isLead && (
+                  <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+                    {stg.status !== "Completed" && (
+                      <GlassButton
+                        variant="secondary"
+                        icon={<Edit size={14} />}
+                        onClick={() => {
+                          setEditingStage(stg);
+                          setEditModalOpen(true);
+                        }}
+                        className="h-8 px-3 text-xs font-semibold rounded-full min-h-0 text-[#5A6577] hover:text-[#1A1D23]"
+                      >
+                        Edit Stage
+                      </GlassButton>
+                    )}
+                    {!isLive && stg.status !== "Completed" && (
+                      <GlassButton
+                        variant="primary"
+                        icon={<Radio size={14} />}
+                        onClick={() => handleUpdateStatus(stg.id, "LIVE")}
+                        className="h-8 px-3.5 text-xs font-bold rounded-full min-h-0"
+                      >
+                        Set LIVE
+                      </GlassButton>
+                    )}
+                    {isLive && (
+                      <GlassButton
+                        variant="secondary"
+                        icon={<Check size={14} />}
+                        onClick={() => handleUpdateStatus(stg.id, "Completed")}
+                        className="h-8 px-3.5 text-xs font-bold rounded-full min-h-0 text-[#22A65E]"
+                      >
+                        Mark Completed
+                      </GlassButton>
+                    )}
+                  </div>
+                )}
               </div>
-
-              {isLead && (
-                <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
-                  {stg.status !== "Completed" && (
-                    <GlassButton
-                      variant="secondary"
-                      icon={<Edit size={14} />}
-                      onClick={() => {
-                        setEditingStage(stg);
-                        setEditModalOpen(true);
-                      }}
-                      className="h-8 px-3 text-xs font-semibold rounded-full min-h-0 text-[#5A6577] hover:text-[#1A1D23]"
-                    >
-                      Edit Stage
-                    </GlassButton>
-                  )}
-                  {!isLive && stg.status !== "Completed" && (
-                    <GlassButton
-                      variant="primary"
-                      icon={<Radio size={14} />}
-                      onClick={() => handleUpdateStatus(stg.id, "LIVE")}
-                      className="h-8 px-3.5 text-xs font-bold rounded-full min-h-0"
-                    >
-                      Set LIVE
-                    </GlassButton>
-                  )}
-                  {isLive && (
-                    <GlassButton
-                      variant="secondary"
-                      icon={<Check size={14} />}
-                      onClick={() => handleUpdateStatus(stg.id, "Completed")}
-                      className="h-8 px-3.5 text-xs font-bold rounded-full min-h-0 text-[#22A65E]"
-                    >
-                      Mark Completed
-                    </GlassButton>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       <StageDrawer
         stage={selectedStage}

@@ -24,7 +24,6 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
-import { initialTeams } from "@/data/teams";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
@@ -275,7 +274,7 @@ function CreateTeamModal({ open, onClose, onCreateTeam }) {
 }
 
 export function TeamsPage() {
-  const [teams, setTeams] = useState(initialTeams);
+  const [teams, setTeams] = useState([]);
   const [search, setSearch] = useState("");
   const [leadFilter, setLeadFilter] = useState("All Leads");
   const [selectedTeam, setSelectedTeam] = useState(null);

@@ -19,7 +19,6 @@ import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
-import { initialTasks } from "@/data/tasks";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
@@ -301,7 +300,7 @@ function NewTaskModal({ open, onClose, onCreateTask }) {
 }
 
 export function TasksPage() {
-  const [tasksList, setTasksList] = useState(initialTasks);
+  const [tasksList, setTasksList] = useState([]);
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("All Teams");
   const [status, setStatus] = useState("All Statuses");

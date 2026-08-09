@@ -1,14 +1,11 @@
 import { useState } from "react";
-import { AlertCircle, CheckCircle2, Plus, X, MessageSquare } from "lucide-react";
+import { AlertCircle, CheckCircle2, Plus, X, MessageSquare, ShieldAlert } from "lucide-react";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
+import { EmptyState } from "@/components/common/EmptyState";
 import { cn } from "@/lib/utils";
 
-const initialIssues = [
-  { id: "iss-1", title: "Main Hall Wi-Fi Speed Drop", priority: "High", status: "In Progress", reporter: "Tech Team", notes: "Latency spiking in Lab C.", resolutionFeedback: "" },
-  { id: "iss-2", title: "Lab 3 Projector HDMI Flicker", priority: "Medium", status: "Open", reporter: "Stage Team", notes: "Requires replacement adapter.", resolutionFeedback: "" },
-  { id: "iss-3", title: "Team 42 Badge Re-print Requested", priority: "Low", status: "Resolved", reporter: "Registration", notes: "Original lanyard damaged.", resolutionFeedback: "Re-printed badge at desk 2." }
-];
+const initialIssues = [];
 
 export function IssuesPage() {
   const [issues, setIssues] = useState(initialIssues);
@@ -86,67 +83,78 @@ export function IssuesPage() {
         </GlassButton>
       </div>
 
-      <div className="space-y-3">
-        {issues.map((iss) => (
-          <div
-            key={iss.id}
-            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
-          >
-            <div className="flex items-start gap-4 min-w-0">
-              <div
-                className={cn(
-                  "flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl",
-                  iss.status === "Resolved"
-                    ? "bg-[#22A65E]/10 text-[#22A65E]"
-                    : "bg-[#D6453D]/10 text-[#D6453D]"
-                )}
-              >
-                {iss.status === "Resolved" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-              </div>
-              <div className="min-w-0 space-y-1">
-                <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-bold text-[#1A1D23] truncate">{iss.title}</h4>
-                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#F0F2F5] text-[#5A6577]">
-                    {iss.priority}
-                  </span>
-                </div>
-                <p className="text-xs font-medium text-[#8E99A8]">
-                  Reported by <span className="font-bold text-[#1A1D23]">{iss.reporter}</span>
-                </p>
-                {iss.resolutionFeedback && (
-                  <p className="text-xs font-medium text-[#22A65E] bg-[#22A65E]/10 p-2 rounded-xl mt-1">
-                    <span className="font-bold">Resolution Note:</span> {iss.resolutionFeedback}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-              <span
-                className={cn(
-                  "rounded-full px-3 py-1 text-xs font-bold border",
-                  iss.status === "Resolved"
-                    ? "bg-[#22A65E]/10 text-[#22A65E] border-[#22A65E]/20"
-                    : "bg-[#F0F2F5] text-[#1A1D23] border-[rgba(0,0,0,0.08)]"
-                )}
-              >
-                {iss.status}
-              </span>
-
-              {iss.status !== "Resolved" && (
-                <GlassButton
-                  variant="success"
-                  icon={<CheckCircle2 size={14} />}
-                  onClick={() => handleOpenResolve(iss)}
-                  className="h-8 px-3.5 text-xs font-bold rounded-full min-h-0"
+      {issues.length === 0 ? (
+        <EmptyState
+          icon={ShieldAlert}
+          title="No operational issues reported"
+          description="Log equipment glitches, power drops, or floor incidents. Anyone can report an incident."
+          actionLabel="Report Issue"
+          onAction={() => setCreateModalOpen(true)}
+        />
+      ) : (
+        <div className="space-y-3">
+          {issues.map((iss) => (
+            <div
+              key={iss.id}
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+            >
+              <div className="flex items-start gap-4 min-w-0">
+                <div
+                  className={cn(
+                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl",
+                    iss.status === "Resolved"
+                      ? "bg-[#22A65E]/10 text-[#22A65E]"
+                      : "bg-[#D6453D]/10 text-[#D6453D]"
+                  )}
                 >
-                  Resolve
-                </GlassButton>
-              )}
+                  {iss.status === "Resolved" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                </div>
+                <div className="min-w-0 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-bold text-[#1A1D23] truncate">{iss.title}</h4>
+                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#F0F2F5] text-[#5A6577]">
+                      {iss.priority}
+                    </span>
+                  </div>
+                  <p className="text-xs font-medium text-[#8E99A8]">
+                    Reported by <span className="font-bold text-[#1A1D23]">{iss.reporter}</span>
+                  </p>
+                  {iss.notes && <p className="text-xs font-medium text-[#5A6577]">{iss.notes}</p>}
+                  {iss.status === "Resolved" && iss.resolutionFeedback && (
+                    <p className="text-xs font-medium text-[#22A65E] bg-[#22A65E]/10 p-2 rounded-xl mt-1">
+                      <span className="font-bold">Resolution Note:</span> {iss.resolutionFeedback}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+                <span
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-bold border",
+                    iss.status === "Resolved"
+                      ? "bg-[#22A65E]/10 text-[#22A65E] border-[#22A65E]/20"
+                      : "bg-[#F0F2F5] text-[#1A1D23] border-[rgba(0,0,0,0.08)]"
+                  )}
+                >
+                  {iss.status}
+                </span>
+
+                {iss.status !== "Resolved" && (
+                  <GlassButton
+                    variant="success"
+                    icon={<CheckCircle2 size={14} />}
+                    onClick={() => handleOpenResolve(iss)}
+                    className="h-8 px-3.5 text-xs font-bold rounded-full min-h-0"
+                  >
+                    Resolve
+                  </GlassButton>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* CREATE ISSUE MODAL */}
       <GlassModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} title="Report Operational Issue">

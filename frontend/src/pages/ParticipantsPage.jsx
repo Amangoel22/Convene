@@ -17,7 +17,6 @@ import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
-import { participantTeams } from "@/data/participants";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
@@ -25,7 +24,7 @@ import { useAppStore } from "@/store/useAppStore";
 const filterOptions = {
   department: ["All Departments", "Registration", "Hospitality", "Operations", "Tech", "Stage", "Logistics"],
   status: ["All Statuses", "Unconfirmed", "Confirmed", "Checked In", "Rejected"],
-  college: ["All Colleges", ...Array.from(new Set(participantTeams.map((team) => team.college)))]
+  college: ["All Colleges"]
 };
 
 function SelectFilter({ value, onChange, options, label }) {
@@ -213,7 +212,7 @@ function ParticipantDrawer({ team, member, onClose, isLead, onUpdateStatus }) {
 }
 
 function ImportModal({ open, onClose }) {
-  const previewRows = participantTeams.slice(0, 4);
+  const previewRows = [];
   return (
     <GlassModal open={open} className="w-[min(720px,calc(100vw-32px))] max-w-none bg-white border border-[rgba(0,0,0,0.08)] rounded-3xl p-6 text-[#1A1D23]">
       <div className="flex items-start justify-between gap-4">
@@ -481,7 +480,7 @@ function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
 }
 
 export function ParticipantsPage() {
-  const [teams, setTeams] = useState(participantTeams);
+  const [teams, setTeams] = useState([]);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search);
   const [status, setStatus] = useState("All Statuses");

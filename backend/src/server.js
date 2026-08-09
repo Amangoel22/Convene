@@ -1,8 +1,10 @@
-import { createApp } from "./app.js";
+import dotenv from "dotenv";
+dotenv.config();
 
-const port = Number.parseInt(process.env.PORT ?? "4000", 10);
-const app = createApp();
+import app from "./app.js";
 
-app.listen(port, () => {
-  console.log(`Convene backend shell listening on http://localhost:${port}`);
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Convene Backend API running on port ${PORT}`);
 });

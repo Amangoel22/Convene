@@ -1,21 +1,39 @@
-import cors from "cors";
 import express from "express";
+import cors from "cors";
 import helmet from "helmet";
+import authRoutes from "./routes/authRoutes.js";
+import qrRoutes from "./routes/qrRoutes.js";
 
-export function createApp() {
-  const app = express();
+const app = express();
 
-  app.use(helmet());
-  app.use(cors());
-  app.use(express.json());
+// Global Middlewares
+app.use(helmet());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true
+  })
+);
+app.use(express.json());
 
-  app.get("/health", (_request, response) => {
-    response.status(200).json({
-      name: "convene-backend",
-      status: "ok",
-      scope: "Sprint 1 infrastructure only"
-    });
-  });
+// Health Check Endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
 
-  return app;
-}
+// Mounting API Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/qr", qrRoutes);
+
+// Global 404 Handler
+app.use((req, res) => {
+  res.status(404).json({ error: `Route ${req.method} ${req.url} not found.` });
+});
+
+// Global Error Handler
+app.use((err, req, res, _next) => {
+  console.error("Unhandled Error:", err);
+  res.status(500).json({ error: "Internal Server Error", details: err.message });
+});
+
+export default app;

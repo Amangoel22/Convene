@@ -27,6 +27,7 @@ import { GlassModal } from "@/components/glass/GlassModal";
 import { initialTeams } from "@/data/teams";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import { useAppStore } from "@/store/useAppStore";
 
 const iconMap = {
   UserCheck,
@@ -291,11 +292,6 @@ export function TeamsPage() {
   const filteredTeams = useMemo(() => {
     const query = search.trim().toLowerCase();
     return teams.filter((team) => {
-      // In Team Member view, strictly show only the team that the member belongs to (e.g., Registration Team)
-      if (!isLead && !team.members.some((m) => m.name === "Diya Shah")) {
-        return false;
-      }
-
       const matchesSearch =
         !query ||
         team.name.toLowerCase().includes(query) ||
@@ -329,7 +325,7 @@ export function TeamsPage() {
         )}
       </div>
 
-      {/* Search Bar & Lead Filter */}
+      {/* Search Bar */}
       <div className="flex flex-wrap items-center gap-3 lg:flex-nowrap">
         <div className="flex h-9 min-w-[240px] flex-1 items-center gap-2 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-medium text-[#1A1D23] focus-within:ring-1 focus-within:ring-[#3B6FD4]">
           <Search size={15} strokeWidth={2} className="text-[#8E99A8] shrink-0" />
@@ -342,7 +338,6 @@ export function TeamsPage() {
             aria-label="Search teams"
           />
         </div>
-        <SelectFilter label="Lead" value={leadFilter} onChange={setLeadFilter} options={leadOptions} />
       </div>
 
       {/* Minimal Team Cards Grid */}

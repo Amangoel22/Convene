@@ -8,7 +8,7 @@ const statusTextStyles = {
   Unconfirmed: "text-[#D4930E]",
   Registered: "text-[#D4930E]",
   Confirmed: "text-[#22A65E]",
-  "Checked In": "text-[#22A65E]",
+  "Checked In": "text-[#3B6FD4]",
   Rejected: "text-[#D6453D]",
   Completed: "text-[#22A65E]",
   LIVE: "text-[#22A65E]",

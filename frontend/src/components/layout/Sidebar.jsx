@@ -7,6 +7,7 @@ import {
   Library,
   Settings,
   ShieldAlert,
+  UserCheck,
   Users,
   Waypoints
 } from "lucide-react";
@@ -28,6 +29,7 @@ const navSections = [
     items: [
       { label: "Participants", href: "/participants", icon: Users },
       { label: "Tasks", href: "/tasks", icon: ClipboardCheck },
+      { label: "Duties", href: "/duties", icon: UserCheck },
       { label: "Teams", href: "/teams", icon: Waypoints },
       { label: "Run of Show", href: "/run-of-show", icon: CalendarClock }
     ]
@@ -41,8 +43,9 @@ const navSections = [
     ]
   },
   {
-    title: "SETTINGS",
+    title: "SETUP",
     items: [
+      { label: "Onboarding Flow", href: "/onboarding", icon: Flag },
       { label: "Settings", href: "/settings", icon: Settings }
     ]
   }
@@ -101,9 +104,9 @@ export function Sidebar() {
       {/* Footer Profile */}
       <div className="pt-4 border-t border-[rgba(0,0,0,0.08)]">
         <div className="flex h-11 items-center gap-3 rounded-full px-3 hover:bg-[#F0F2F5] transition-colors cursor-pointer" onClick={toggleRole}>
-          <UserAvatar initials={isLead ? "AG" : "DS"} className="h-8 w-8 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />
+          <UserAvatar initials={isLead ? "AG" : "TM"} className="h-8 w-8 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />
           <div className="min-w-0">
-            <p className="truncate text-xs font-bold text-[#1A1D23]">{isLead ? "Aman Goel" : "Diya Shah"}</p>
+            <p className="truncate text-xs font-bold text-[#1A1D23]">{isLead ? "Aman Goel" : "Team Member"}</p>
             <p className="truncate text-[10px] font-medium text-[#8E99A8]">{isLead ? "Lead Organizer" : "Team Member"}</p>
           </div>
         </div>

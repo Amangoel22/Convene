@@ -10,16 +10,20 @@ import { InventoryPage } from "@/pages/InventoryPage";
 import { ResourcesPage } from "@/pages/ResourcesPage";
 import { IssuesPage } from "@/pages/IssuesPage";
 import { SettingsPage } from "@/pages/SettingsPage";
+import { OnboardingPage } from "@/pages/OnboardingPage";
+import { DutiesPage } from "@/pages/DutiesPage";
 
 export function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/onboarding" element={<OnboardingPage />} />
         <Route element={<AppShell />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<MissionControlPage />} />
           <Route path="/participants" element={<ParticipantsPage />} />
           <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/duties" element={<DutiesPage />} />
           <Route path="/teams" element={<TeamsPage />} />
           <Route path="/departments" element={<Navigate to="/teams" replace />} />
           <Route path="/run-of-show" element={<RunOfShowPage />} />

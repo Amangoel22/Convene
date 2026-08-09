@@ -4,16 +4,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
-
-const stagesProgress = [
-  { name: "Event Prep", time: "Days Prior", status: "completed" },
-  { name: "Registration", time: "09:00 AM", status: "completed" },
-  { name: "Opening", time: "10:00 AM", status: "completed" },
-  { name: "Hackathon", time: "12:30 PM", status: "completed" },
-  { name: "Mentoring", time: "03:00 PM", status: "current" },
-  { name: "Judging", time: "05:30 PM", status: "upcoming" },
-  { name: "Closing", time: "08:00 PM", status: "upcoming" }
-];
+import { useAppStore } from "@/store/useAppStore";
 
 const initialOrganizerDuties = [
   { id: "d1", title: "Mentor Support in Room 1", time: "10:30 AM", location: "Labs A–D", area: "Mentorship", priority: "High", status: "In Progress", completed: false },
@@ -30,12 +21,13 @@ const initialOrganizerTasks = [
 ];
 
 export function MissionControlPage() {
+  const activeEvent = useAppStore((state) => state.activeEvent);
   const [duties, setDuties] = useState(initialOrganizerDuties);
   const [tasks, setTasks] = useState(initialOrganizerTasks);
-  const [hasUrgentIssue, setHasUrgentIssue] = useState(true);
+  const [hasUrgentIssue] = useState(true);
 
   // Live countdown timer in JavaScript (ticks down every 1 second)
-  const [secondsRemaining, setSecondsRemaining] = useState(6138); // 01:42:18 initial
+  const [secondsRemaining, setSecondsRemaining] = useState(6138);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -63,6 +55,21 @@ export function MissionControlPage() {
     );
   };
 
+  // Derive dynamic stage rail from activeEvent or fallback
+  const rawStages = activeEvent?.stages || [
+    { title: "Registration", timeWindow: "08:00 AM", status: "Completed" },
+    { title: "Opening", timeWindow: "09:30 AM", status: "Completed" },
+    { title: "Hacking Launch", timeWindow: "10:15 AM", status: "Completed" },
+    { title: "Mentoring Round", timeWindow: "03:00 PM", status: "LIVE" },
+    { title: "Judging", timeWindow: "05:30 PM", status: "Upcoming" },
+    { title: "Closing Ceremony", timeWindow: "07:30 PM", status: "Upcoming" }
+  ];
+
+  const liveStage = rawStages.find((s) => s.status === "LIVE") || rawStages[0];
+  const upcomingStage = rawStages.find((s) => s.status === "Upcoming") || rawStages[rawStages.length - 1];
+  const completedCount = rawStages.filter((s) => s.status === "Completed" || s.status === "completed").length;
+  const progressPercent = Math.round((completedCount / rawStages.length) * 100);
+
   return (
     <div className="space-y-9 w-full max-w-[1360px] mx-auto pb-16 pt-2">
       {/* Header */}
@@ -71,57 +78,63 @@ export function MissionControlPage() {
           Good morning, Aman
         </h1>
         <p className="mt-2 text-base text-[#5A6577] font-medium">
-          Here is what requires your operational focus for HackFest 2026 today.
+          Here is what requires your operational focus for <span className="font-bold text-[#3B6FD4]">{activeEvent?.name || "HackFest 2026"}</span> today.
         </p>
       </div>
 
       {/* Hero Surface */}
-      <section aria-label="Current event status" className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-7 md:p-9 space-y-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)]">
+      <section aria-label="Current event status" className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-7 md:p-9 space-y-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden">
         {/* Top Split: Left Event Info & Right Next Stage / Countdown */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           {/* Left Zone: Active Stage Details */}
           <div className="space-y-4 max-w-2xl">
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-[#8E99A8] uppercase tracking-widest">
-                HackFest 2026
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-xs font-extrabold text-[#3B6FD4] bg-[#EBF0FA] px-3 py-1 rounded-full uppercase tracking-wider">
+                {activeEvent?.name || "HackFest 2026"} • {activeEvent?.type || "Hackathon"}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22A65E]/10 border border-[#22A65E]/25 px-2.5 py-0.5 text-xs font-semibold text-[#22A65E]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#22A65E] animate-pulse" />
-                LIVE
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22A65E]/10 border border-[#22A65E]/25 px-3 py-1 text-xs font-extrabold text-[#22A65E]">
+                <span className="h-2 w-2 rounded-full bg-[#22A65E] animate-pulse" />
+                LIVE STAGE
               </span>
             </div>
 
             <div>
               <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1D23] tracking-tight">
-                Mentoring Round
+                {liveStage.title}
               </h2>
-              <div className="mt-1.5 flex items-center gap-2 text-base font-semibold text-[#5A6577]">
-                <MapPin size={16} className="text-[#3B6FD4]" />
-                <span>Labs A–D</span>
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-sm font-semibold text-[#5A6577]">
+                <span className="inline-flex items-center gap-1.5 bg-[#F0F2F5] px-3 py-1 rounded-full text-xs font-bold text-[#1A1D23]">
+                  <MapPin size={14} className="text-[#3B6FD4]" />
+                  <span>{liveStage.location || activeEvent?.location || "Main Auditorium & Labs A–D"}</span>
+                </span>
+                {activeEvent?.duration && (
+                  <span className="inline-flex items-center gap-1.5 bg-[#EBF0FA] px-3 py-1 rounded-full text-xs font-bold text-[#3B6FD4] font-mono">
+                    <Clock size={14} /> {activeEvent.duration} ({activeEvent.startTime || "09:00"} – {activeEvent.endTime || "21:00"})
+                  </span>
+                )}
               </div>
             </div>
 
-            <p className="text-base leading-relaxed text-[#5A6577] font-medium">
-              Mentoring is currently in progress across four labs. Keep floor leads visible and ensure mentor handovers remain on schedule before Judging begins.
+            <p className="text-sm md:text-base leading-relaxed text-[#5A6577] font-medium">
+              {liveStage.description || `${liveStage.title} is currently in progress. Floor leads are dispatched and shift handovers remain on schedule.`}
             </p>
           </div>
 
           {/* Right Zone: Next Stage & Live Countdown Timer */}
           <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-between gap-4 shrink-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-[rgba(0,0,0,0.06)]">
-            <div className="text-left lg:text-right">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8E99A8] block">
-                NEXT STAGE
+            <div className="text-left lg:text-right rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5 w-full sm:w-auto lg:w-56">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8] block">
+                UPCOMING STAGE
               </span>
-              <span className="text-base font-bold text-[#1A1D23] block mt-0.5">
-                Judging
+              <span className="text-sm font-extrabold text-[#1A1D23] block mt-0.5 truncate">
+                {upcomingStage.title}
               </span>
-            </div>
-
-            <div className="text-left lg:text-right">
-              <span className="text-xs font-medium text-[#8E99A8] block">Starts in</span>
-              <span className="text-2xl md:text-3xl font-mono font-bold text-[#3B6FD4] tracking-tight block">
-                {formatCountdown(secondsRemaining)}
-              </span>
+              <div className="mt-2 pt-2 border-t border-[rgba(0,0,0,0.06)] flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-[#8E99A8]">Starts in</span>
+                <span className="text-base font-mono font-extrabold text-[#3B6FD4]">
+                  {formatCountdown(secondsRemaining)}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -133,23 +146,23 @@ export function MissionControlPage() {
               Run of Show Progress
             </span>
             <span className="text-[#5A6577] text-xs font-medium">
-              Stage 5 of 7 · 71% through event schedule
+              {completedCount} of {rawStages.length} completed · {progressPercent}% through event schedule
             </span>
           </div>
 
           {/* Horizontal Stage Rail */}
           <div className="relative pt-2 pb-1">
-            <div className="grid grid-cols-7 gap-2 text-center relative z-10">
-              {stagesProgress.map((stg) => {
-                const isCurrent = stg.status === "current";
-                const isCompleted = stg.status === "completed";
+            <div className="flex items-center justify-between text-center relative z-10 gap-2">
+              {rawStages.map((stg, i) => {
+                const isCurrent = stg.status === "LIVE" || stg.status === "current";
+                const isCompleted = stg.status === "Completed" || stg.status === "completed";
 
                 return (
-                  <div key={stg.name} className="flex flex-col items-center gap-2 group cursor-pointer">
+                  <div key={stg.id || i} className="flex flex-col items-center gap-2 group cursor-pointer flex-1 min-w-0">
                     {/* Node Circle */}
                     <div
                       className={cn(
-                        "h-4 w-4 rounded-full transition-all flex items-center justify-center border-2",
+                        "h-4 w-4 rounded-full transition-all flex items-center justify-center border-2 shrink-0",
                         isCurrent
                           ? "bg-[#3B6FD4] border-[#3B6FD4] ring-4 ring-[#3B6FD4]/20 shadow-[0_0_12px_rgba(59,111,212,0.3)]"
                           : isCompleted
@@ -163,7 +176,7 @@ export function MissionControlPage() {
                     {/* Stage Name */}
                     <span
                       className={cn(
-                        "text-xs font-semibold truncate w-full",
+                        "text-xs font-semibold truncate w-full text-center",
                         isCurrent
                           ? "text-[#3B6FD4] font-bold"
                           : isCompleted
@@ -171,13 +184,13 @@ export function MissionControlPage() {
                           : "text-[#8E99A8]"
                       )}
                     >
-                      {stg.name}
+                      {stg.title || stg.name}
                     </span>
 
                     {/* Event Timing Below Name */}
                     <span
                       className={cn(
-                        "text-[11px] font-mono font-medium truncate w-full",
+                        "text-[11px] font-mono font-medium truncate w-full text-center",
                         isCurrent
                           ? "text-[#3B6FD4] font-bold"
                           : isCompleted
@@ -185,7 +198,7 @@ export function MissionControlPage() {
                           : "text-[#B5BCC7]"
                       )}
                     >
-                      {stg.time}
+                      {stg.timeWindow || stg.timeDisplay || stg.time}
                     </span>
                   </div>
                 );
@@ -193,8 +206,8 @@ export function MissionControlPage() {
             </div>
 
             {/* Connecting Line */}
-            <div className="absolute top-[17px] left-[7%] right-[7%] h-0.5 bg-[#E8ECF1] -z-0">
-              <div className="h-full bg-[#22A65E] w-[71%] transition-all duration-300" />
+            <div className="absolute top-[17px] left-[5%] right-[5%] h-0.5 bg-[#E8ECF1] -z-0">
+              <div className="h-full bg-[#22A65E] transition-all duration-300" style={{ width: `${progressPercent}%` }} />
             </div>
           </div>
         </div>

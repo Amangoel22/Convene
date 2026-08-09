@@ -21,7 +21,7 @@ const projects = [
 ];
 
 const departments = ["Registration", "Hospitality", "Operations", "Tech", "Stage", "Logistics"];
-const statuses = ["Unconfirmed", "Confirmed", "Checked In", "Rejected", "Completed"];
+const statuses = ["Unconfirmed", "Confirmed", "Checked In", "Rejected"];
 const firstNames = ["Aarav", "Diya", "Kabir", "Meera", "Rohan", "Tara", "Ishaan", "Anika", "Vihaan", "Prisha", "Reyansh", "Sara"];
 const lastNames = ["Kapoor", "Shah", "Nair", "Menon", "Rao", "Iyer", "Mehta", "Bose", "Singh", "Gupta", "Ahuja", "Sethi"];
 const roles = ["Leader", "Frontend", "Backend", "Design", "Hardware"];

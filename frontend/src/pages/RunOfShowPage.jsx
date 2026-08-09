@@ -143,17 +143,19 @@ function StageDrawer({ stage, onClose, onUpdateStatus }) {
           </div>
 
           {/* Key Checklist Milestones */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Stage Milestones</h3>
-            <div className="mt-3 space-y-2">
-              {stage.milestones.map((m, idx) => (
-                <div key={idx} className="flex items-center gap-3 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3 text-xs font-medium text-[#1A1D23]">
-                  <CheckCircle2 size={16} className={cn(m.completed ? "text-[#22A65E]" : "text-[#8E99A8]")} />
-                  <span className={cn(m.completed && "line-through text-[#8E99A8]")}>{m.label}</span>
-                </div>
-              ))}
+          {stage.milestones && stage.milestones.length > 0 && (
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Stage Milestones</h3>
+              <div className="mt-3 space-y-2">
+                {stage.milestones.map((m, idx) => (
+                  <div key={idx} className="flex items-center gap-3 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3 text-xs font-medium text-[#1A1D23]">
+                    <CheckCircle2 size={16} className={cn(m.completed ? "text-[#22A65E]" : "text-[#8E99A8]")} />
+                    <span className={cn(m.completed && "line-through text-[#8E99A8]")}>{m.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Quick Action Footer */}
@@ -186,11 +188,161 @@ function StageDrawer({ stage, onClose, onUpdateStatus }) {
   );
 }
 
+function StageModal({ open, onClose, stage, onSave }) {
+  const [title, setTitle] = useState(stage ? stage.title : "");
+  const [description, setDescription] = useState(stage ? stage.description : "");
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("10:30");
+  const [location, setLocation] = useState(stage ? stage.location : "");
+  const [owner, setOwner] = useState(stage ? stage.owner : "");
+
+  // Helper to format 24h time string (e.g. 09:00) into 12h format (e.g. 09:00 AM)
+  const format12h = (tStr) => {
+    if (!tStr) return "";
+    const [h, m] = tStr.split(":");
+    let hNum = parseInt(h, 10);
+    const ampm = hNum >= 12 ? "PM" : "AM";
+    hNum = hNum % 12 || 12;
+    return `${String(hNum).padStart(2, "0")}:${m} ${ampm}`;
+  };
+
+  // Sync state if editing target stage changes
+  useMemo(() => {
+    setTitle(stage ? stage.title : "");
+    setDescription(stage ? stage.description : "");
+    setLocation(stage ? stage.location : "");
+    setOwner(stage ? stage.owner : "");
+    if (stage && stage.timeWindow) {
+      // Basic parse attempt or keep default times
+      setStartTime("09:00");
+      setEndTime("10:30");
+    }
+  }, [stage, open]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+
+    const formattedWindow = `${format12h(startTime)} – ${format12h(endTime)}`;
+
+    onSave({
+      id: stage ? stage.id : `stg-${Date.now()}`,
+      order: stage ? stage.order : 99,
+      title: title.trim(),
+      description: description.trim() || "Timeline stage event details.",
+      timeWindow: formattedWindow,
+      location: location.trim() || "Main Stage",
+      owner: owner.trim() || "Stage Lead",
+      status: stage ? stage.status : "Upcoming",
+      milestones: stage ? stage.milestones : [{ label: "Stage setup & audio check", completed: false }]
+    });
+    onClose();
+  };
+
+  return (
+    <GlassModal open={open} onClose={onClose} title={stage ? "Edit Timeline Stage" : "Add Timeline Stage"}>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="text-xs font-semibold text-[#8E99A8]">Stage Title</label>
+          <input
+            type="text"
+            required
+            placeholder="e.g. Inauguration & Keynote Address"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="mt-1 h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
+          />
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold text-[#8E99A8]">Description</label>
+          <textarea
+            rows={2}
+            placeholder="Key activities and execution notes..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="mt-1 w-full rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.08)] p-3.5 text-xs font-medium text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
+          />
+        </div>
+
+        {/* Time Selector Inputs */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-semibold text-[#8E99A8]">Start Time</label>
+            <input
+              type="time"
+              required
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              className="mt-1 h-9 w-full cursor-pointer rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-bold text-[#1A1D23] outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-[#8E99A8]">End Time</label>
+            <input
+              type="time"
+              required
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              className="mt-1 h-9 w-full cursor-pointer rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-bold text-[#1A1D23] outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-semibold text-[#8E99A8]">Location / Hall</label>
+            <input
+              type="text"
+              placeholder="e.g. Main Auditorium"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-[#8E99A8]">Stage Owner / Lead</label>
+            <input
+              type="text"
+              placeholder="e.g. Aarav Sharma"
+              value={owner}
+              onChange={(e) => setOwner(e.target.value)}
+              className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-end gap-3 pt-2">
+          <GlassButton type="button" onClick={onClose} className="h-9 text-xs rounded-full">
+            Cancel
+          </GlassButton>
+          <GlassButton type="submit" variant="primary" icon={<Check size={15} />} className="h-9 text-xs rounded-full">
+            {stage ? "Save Changes" : "Create Stage"}
+          </GlassButton>
+        </div>
+      </form>
+    </GlassModal>
+  );
+}
+
 export function RunOfShowPage() {
-  const [stages, setStages] = useState(initialStages);
+  const activeEvent = useAppStore((state) => state.activeEvent);
+  const updateActiveEventStages = useAppStore((state) => state.updateActiveEventStages);
+  const updateStageDetails = useAppStore((state) => state.updateStageDetails);
+  const addStageToActiveEvent = useAppStore((state) => state.addStageToActiveEvent);
+  const role = useAppStore((state) => state.role);
+  const isLead = role === "lead";
+
+  const stages = activeEvent?.stages || initialStages;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Statuses");
   const [selectedStage, setSelectedStage] = useState(null);
+
+  // Edit / Create Stage Modal State
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingStage, setEditingStage] = useState(null);
 
   const filteredStages = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -198,20 +350,31 @@ export function RunOfShowPage() {
       const matchesSearch =
         !query ||
         stage.title.toLowerCase().includes(query) ||
-        stage.location.toLowerCase().includes(query) ||
-        stage.owner.toLowerCase().includes(query);
+        (stage.location && stage.location.toLowerCase().includes(query)) ||
+        (stage.owner && stage.owner.toLowerCase().includes(query));
 
       const matchesStatus = statusFilter === "All Statuses" || stage.status === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
-  }, [search, stageFilterStatus => statusFilter, stages]);
+  }, [search, statusFilter, stages]);
 
   const handleUpdateStatus = (stageId, newStatus) => {
-    setStages((prev) =>
-      prev.map((s) => (s.id === stageId ? { ...s, status: newStatus } : s))
-    );
+    updateActiveEventStages(stageId, newStatus);
     setSelectedStage((prev) => (prev ? { ...prev, status: newStatus } : null));
+  };
+
+  const handleSaveStage = (stageData) => {
+    if (editingStage) {
+      updateStageDetails(stageData.id, stageData);
+    } else {
+      addStageToActiveEvent({
+        ...stageData,
+        order: stages.length + 1
+      });
+    }
+    setEditModalOpen(false);
+    setEditingStage(null);
   };
 
   return (
@@ -223,6 +386,19 @@ export function RunOfShowPage() {
           <p className="mt-1 text-sm text-[#5A6577] font-medium">Master timeline, stage handovers, and live event progression.</p>
         </div>
         <div className="flex items-center gap-3">
+          {isLead && (
+            <GlassButton
+              variant="primary"
+              icon={<Plus size={16} strokeWidth={2} />}
+              onClick={() => {
+                setEditingStage(null);
+                setEditModalOpen(true);
+              }}
+              className="rounded-full text-xs font-bold"
+            >
+              Add Stage
+            </GlassButton>
+          )}
           <GlassButton variant="secondary" icon={<FileDown size={16} strokeWidth={2} />} className="rounded-full text-xs">
             Export Schedule
           </GlassButton>
@@ -252,30 +428,30 @@ export function RunOfShowPage() {
 
       {/* Timeline stages list */}
       <div className="space-y-4">
-        {filteredStages.map((stg) => {
+        {filteredStages.map((stg, idx) => {
           const isLive = stg.status === "LIVE";
+          const displayIndex = String(stg.order || idx + 1).padStart(2, "0");
 
           return (
             <div
               key={stg.id}
-              onClick={() => setSelectedStage(stg)}
               className={cn(
-                "group relative flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-3xl border p-6 transition-colors cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.04)]",
+                "group relative flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-3xl border p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]",
                 isLive
                   ? "bg-white border-[#3B6FD4]/40 ring-1 ring-[#3B6FD4]/20"
-                  : "bg-white border-[rgba(0,0,0,0.08)] hover:bg-[#F7F8FA]"
+                  : "bg-white border-[rgba(0,0,0,0.08)]"
               )}
             >
-              <div className="flex items-start gap-4 min-w-0">
+              <div className="flex items-start gap-4 min-w-0 flex-1">
                 <div
                   className={cn(
                     "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl font-mono text-sm font-bold",
                     isLive ? "bg-[#EBF0FA] text-[#3B6FD4]" : "bg-[#F0F2F5] text-[#5A6577]"
                   )}
                 >
-                  0{stg.order}
+                  {displayIndex}
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-3">
                     <h3 className="text-base font-bold text-[#1A1D23] truncate">{stg.title}</h3>
                     <StatusBadge status={stg.status} />
@@ -295,17 +471,43 @@ export function RunOfShowPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 shrink-0 self-end md:self-center">
-                <GlassButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedStage(stg);
-                  }}
-                  className="h-8 px-3 text-xs font-semibold rounded-full min-h-0 text-[#5A6577] hover:text-[#1A1D23]"
-                >
-                  View Details
-                </GlassButton>
-              </div>
+              {isLead && (
+                <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+                  {stg.status !== "Completed" && (
+                    <GlassButton
+                      variant="secondary"
+                      icon={<Edit size={14} />}
+                      onClick={() => {
+                        setEditingStage(stg);
+                        setEditModalOpen(true);
+                      }}
+                      className="h-8 px-3 text-xs font-semibold rounded-full min-h-0 text-[#5A6577] hover:text-[#1A1D23]"
+                    >
+                      Edit Stage
+                    </GlassButton>
+                  )}
+                  {!isLive && stg.status !== "Completed" && (
+                    <GlassButton
+                      variant="primary"
+                      icon={<Radio size={14} />}
+                      onClick={() => handleUpdateStatus(stg.id, "LIVE")}
+                      className="h-8 px-3.5 text-xs font-bold rounded-full min-h-0"
+                    >
+                      Set LIVE
+                    </GlassButton>
+                  )}
+                  {isLive && (
+                    <GlassButton
+                      variant="secondary"
+                      icon={<Check size={14} />}
+                      onClick={() => handleUpdateStatus(stg.id, "Completed")}
+                      className="h-8 px-3.5 text-xs font-bold rounded-full min-h-0 text-[#22A65E]"
+                    >
+                      Mark Completed
+                    </GlassButton>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
@@ -315,6 +517,17 @@ export function RunOfShowPage() {
         stage={selectedStage}
         onClose={() => setSelectedStage(null)}
         onUpdateStatus={handleUpdateStatus}
+      />
+
+      {/* Timeline Edit Modal */}
+      <StageModal
+        open={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setEditingStage(null);
+        }}
+        stage={editingStage}
+        onSave={handleSaveStage}
       />
     </div>
   );

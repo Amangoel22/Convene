@@ -1,13 +1,18 @@
-import { Bell, ChevronDown, Menu, Search, ShieldCheck, Sparkles } from "lucide-react";
+import { Bell, ChevronDown, Menu, Plus, Search, ShieldCheck, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { useAppStore } from "@/store/useAppStore";
+import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const role = useAppStore((state) => state.role);
   const toggleRole = useAppStore((state) => state.toggleRole);
+  const events = useAppStore((state) => state.events);
+  const activeEvent = useAppStore((state) => state.activeEvent);
+  const setActiveEvent = useAppStore((state) => state.setActiveEvent);
   const isLead = role === "lead";
 
   useEffect(() => {
@@ -44,10 +49,39 @@ export function Navbar() {
           </div>
 
           {/* Current Event Selector */}
-          <div className="hidden md:flex items-center gap-2 h-9 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-bold text-[#1A1D23] hover:bg-[#E8ECF1] cursor-pointer transition-colors">
-            <Sparkles size={14} className="text-[#D4930E] shrink-0" />
-            <span>HackFest 2026</span>
-            <ChevronDown size={13} className="text-[#8E99A8] shrink-0" />
+          <div className="relative group">
+            <div className="hidden md:flex items-center gap-2 h-9 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-bold text-[#1A1D23] hover:bg-[#E8ECF1] cursor-pointer transition-colors">
+              <span>{activeEvent?.name || "HackFest 2026"}</span>
+              <ChevronDown size={13} className="text-[#8E99A8] shrink-0" />
+            </div>
+
+            {/* Event Dropdown Menu */}
+            <div className="absolute right-0 top-full mt-2 hidden group-hover:block w-64 rounded-2xl bg-white border border-[rgba(0,0,0,0.08)] p-2 shadow-lg z-50">
+              <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">Your Events</p>
+              {events.map((evt) => (
+                <div
+                  key={evt.id}
+                  onClick={() => {
+                    setActiveEvent(evt);
+                  }}
+                  className={cn(
+                    "flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer transition-colors",
+                    evt.id === activeEvent?.id ? "bg-[#EBF0FA] text-[#3B6FD4]" : "text-[#5A6577] hover:bg-[#F0F2F5]"
+                  )}
+                >
+                  <span className="truncate">{evt.name}</span>
+                  <span className="text-[10px] text-[#8E99A8] font-normal">{evt.type}</span>
+                </div>
+              ))}
+              <div className="mt-1 pt-1 border-t border-[rgba(0,0,0,0.06)]">
+                <Link
+                  to="/onboarding"
+                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold text-[#3B6FD4] hover:bg-[#EBF0FA] transition-colors"
+                >
+                  <Plus size={14} /> Add / Switch Event
+                </Link>
+              </div>
+            </div>
           </div>
 
           {/* Notifications */}
@@ -66,7 +100,7 @@ export function Navbar() {
           </button>
 
           {/* Profile Avatar */}
-          <UserAvatar initials={isLead ? "AG" : "DS"} className="h-8 w-8 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />
+          <UserAvatar initials={isLead ? "AG" : "TM"} className="h-8 w-8 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />
         </div>
       </div>
     </header>

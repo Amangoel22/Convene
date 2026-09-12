@@ -15,6 +15,13 @@ router.post("/register", async (req, res) => {
     return res.status(400).json({ error: "Name, email, and password are required fields." });
   }
 
+  if (phone) {
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length > 10) {
+      return res.status(400).json({ error: "Phone number must not exceed 10 digits." });
+    }
+  }
+
   try {
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {

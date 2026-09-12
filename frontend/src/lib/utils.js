@@ -39,9 +39,10 @@ export function formatTimeString(inputStr) {
  */
 export function parseTimeString(timeStr, baseDate = new Date()) {
   if (!timeStr) return null;
-  const clean = timeStr.trim();
+  // Normalize dashes and spaces
+  const clean = timeStr.replace(/[–—]/g, "-").trim();
 
-  // Match 12h format e.g. "10:00 AM" or "01:30 PM"
+  // Match 12h format e.g. "10:00 AM", "01:30 PM", "9:00 AM"
   const match12 = clean.match(/^(\d{1,2}):(\d{2})\s*([AP]\.?M\.?)$/i);
   let hours = 0;
   let minutes = 0;
@@ -66,4 +67,18 @@ export function parseTimeString(timeStr, baseDate = new Date()) {
   const result = new Date(baseDate);
   result.setHours(hours, minutes, 0, 0);
   return result;
+}
+
+/**
+ * Add hours to a 12h/24h time string and return formatted 12h string (e.g., "10:00 AM" + 1hr -> "11:00 AM")
+ */
+export function addHoursToTimeString(timeStr, hoursToAdd = 1) {
+  const d = parseTimeString(timeStr);
+  if (!d) return timeStr;
+  d.setHours(d.getHours() + hoursToAdd);
+  let hours = d.getHours();
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12 || 12;
+  return `${String(hours).padStart(2, "0")}:${minutes} ${ampm}`;
 }

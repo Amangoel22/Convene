@@ -81,18 +81,16 @@ export function LoginPage() {
           <button
             type="button"
             onClick={() => { setIsRegister(false); setError(""); }}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition-colors ${
-              !isRegister ? "bg-white text-[#1A1D23] shadow-sm" : "text-[#5A6577] hover:text-[#1A1D23]"
-            }`}
+            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition-colors ${!isRegister ? "bg-white text-[#1A1D23] shadow-sm" : "text-[#5A6577] hover:text-[#1A1D23]"
+              }`}
           >
             Login
           </button>
           <button
             type="button"
             onClick={() => { setIsRegister(true); setError(""); }}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition-colors ${
-              isRegister ? "bg-white text-[#1A1D23] shadow-sm" : "text-[#5A6577] hover:text-[#1A1D23]"
-            }`}
+            className={`flex-1 py-1.5 text-xs font-bold rounded-full transition-colors ${isRegister ? "bg-white text-[#1A1D23] shadow-sm" : "text-[#5A6577] hover:text-[#1A1D23]"
+              }`}
           >
             Register
           </button>
@@ -115,7 +113,7 @@ export function LoginPage() {
                 <input
                   type="text"
                   required
-                  placeholder="Aman Goel"
+                  placeholder="Name"
                   value={regName}
                   onChange={(e) => setRegName(e.target.value)}
                   className="h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
@@ -127,7 +125,7 @@ export function LoginPage() {
                 <input
                   type="email"
                   required
-                  placeholder="user@example.com"
+                  placeholder="name@gmail.com"
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
                   className="h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
@@ -149,10 +147,11 @@ export function LoginPage() {
               <div>
                 <label className="text-xs font-bold text-[#8E99A8] uppercase tracking-wider block mb-1">Phone (Optional)</label>
                 <input
-                  type="text"
-                  placeholder="+91 9876543210"
+                  type="tel"
+                  maxLength={10}
+                  placeholder="9876543210"
                   value={regPhone}
-                  onChange={(e) => setRegPhone(e.target.value)}
+                  onChange={(e) => setRegPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
                   className="h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
                 />
               </div>

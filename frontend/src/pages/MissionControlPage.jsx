@@ -29,11 +29,10 @@ export function MissionControlPage() {
   // Evaluate dynamic status based on current real-time clock
   const evaluatedStages = useMemo(() => {
     return rawStages.map((s) => {
-      // If manually set to LIVE or Completed in DB, keep manually set status unless evaluating time range
       let calculatedStatus = s.status || "Upcoming";
 
       if (s.timeWindow) {
-        const parts = s.timeWindow.split("–");
+        const parts = s.timeWindow.split(/[–—-]/);
         const startStr = parts[0]?.trim();
         const endStr = parts[1]?.trim();
 
@@ -59,10 +58,38 @@ export function MissionControlPage() {
     });
   }, [rawStages, now]);
 
-  const liveStage = evaluatedStages.find((s) => s.calculatedStatus === "LIVE") || rawStages.find((s) => s.status === "LIVE");
-  const upcomingStage = evaluatedStages.find((s) => s.calculatedStatus === "Upcoming") || rawStages.find((s) => s.status === "Upcoming");
+  const liveStageIndex = evaluatedStages.findIndex((s) => s.calculatedStatus === "LIVE");
+  const liveStage = liveStageIndex !== -1 ? evaluatedStages[liveStageIndex] : rawStages.find((s) => s.status === "LIVE");
+  const upcomingStage = evaluatedStages.find((s) => s.calculatedStatus === "Upcoming");
   const completedCount = evaluatedStages.filter((s) => s.calculatedStatus === "Completed").length;
-  const progressPercent = evaluatedStages.length > 0 ? Math.round((completedCount / evaluatedStages.length) * 100) : 0;
+
+  // Compute continuous timeline line progress percentage across all stages
+  const lineProgressPercent = useMemo(() => {
+    if (evaluatedStages.length <= 1) return 0;
+    const totalSegments = evaluatedStages.length - 1;
+
+    if (liveStageIndex !== -1 && evaluatedStages[liveStageIndex]?.timeWindow) {
+      const parts = evaluatedStages[liveStageIndex].timeWindow.split(/[–—-]/);
+      const startStr = parts[0]?.trim();
+      const endStr = parts[1]?.trim();
+      const startDateObj = parseTimeString(startStr, now);
+      const endDateObj = parseTimeString(endStr, now);
+
+      if (startDateObj && endDateObj && endDateObj.getTime() > startDateObj.getTime()) {
+        const totalDuration = endDateObj.getTime() - startDateObj.getTime();
+        const elapsed = Math.max(0, Math.min(totalDuration, now.getTime() - startDateObj.getTime()));
+        const withinStageFraction = elapsed / totalDuration; // accurately 0.0 to 1.0 based on current time
+        const overallFraction = (liveStageIndex + withinStageFraction) / totalSegments;
+        return Math.min(100, Math.max(0, Math.round(overallFraction * 100)));
+      }
+      // If no valid timeWindow duration, progress line at least reaches current node
+      return Math.min(100, Math.round((liveStageIndex / totalSegments) * 100));
+    }
+
+    return Math.min(100, Math.round((completedCount / totalSegments) * 100));
+  }, [evaluatedStages, liveStageIndex, completedCount, now]);
+
+  const progressPercent = lineProgressPercent;
 
   // Live countdown timer in JavaScript synced with target upcoming stage / event time
   const [secondsRemaining, setSecondsRemaining] = useState(0);
@@ -72,7 +99,7 @@ export function MissionControlPage() {
       let targetTimeStr = null;
 
       if (upcomingStage?.timeWindow) {
-        targetTimeStr = upcomingStage.timeWindow.split("–")[0]?.trim();
+        targetTimeStr = upcomingStage.timeWindow.split(/[–—-]/)[0]?.trim();
       }
 
       if (!targetTimeStr && activeEvent?.startTime) {
@@ -252,9 +279,30 @@ export function MissionControlPage() {
             </div>
 
             {/* Connecting Line */}
-            <div className="absolute top-[17px] left-[5%] right-[5%] h-0.5 bg-[#E8ECF1] -z-0">
-              <div className="h-full bg-[#22A65E] transition-all duration-300" style={{ width: `${progressPercent}%` }} />
-            </div>
+            {evaluatedStages.length > 1 && (
+              <div
+                className="absolute top-[17px] h-0.5 bg-[#E8ECF1] -z-0"
+                style={{
+                  left: `${100 / (evaluatedStages.length * 2)}%`,
+                  right: `${100 / (evaluatedStages.length * 2)}%`
+                }}
+              >
+                {/* Active/Live progress line advancing forward towards next stage in blue */}
+                <div
+                  className="absolute top-0 bottom-0 left-0 bg-[#3B6FD4] transition-all duration-300"
+                  style={{
+                    width: `${lineProgressPercent}%`
+                  }}
+                />
+                {/* Past completed stages strictly in green */}
+                <div
+                  className="absolute top-0 bottom-0 left-0 bg-[#22A65E] transition-all duration-300"
+                  style={{
+                    width: `${Math.min(100, Math.round((completedCount / (evaluatedStages.length - 1)) * 100))}%`
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>

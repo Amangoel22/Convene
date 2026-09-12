@@ -20,7 +20,7 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/store/useAppStore";
-import { cn, formatTimeString } from "@/lib/utils";
+import { cn, formatTimeString, addHoursToTimeString } from "@/lib/utils";
 
 const eventTypes = [
   "Hackathon",
@@ -167,6 +167,10 @@ export function OnboardingPage() {
     };
     setStagesList([...stagesList, newStageObj]);
     setStageTitle("");
+    setStageVenue("");
+    // Chain time: next stage starts when previous ends, with default 1 hr duration
+    setStageStart(formattedEnd);
+    setStageEnd(addHoursToTimeString(formattedEnd, 1));
   };
 
   const handleRemoveStage = (id) => {

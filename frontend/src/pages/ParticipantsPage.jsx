@@ -493,7 +493,72 @@ export function ParticipantsPage() {
   const [loading] = useState(false);
 
   const role = useAppStore((state) => state.role);
+  const activeEvent = useAppStore((state) => state.activeEvent);
   const isLead = role === "lead";
+
+  useEffect(() => {
+    async function loadEventTeams() {
+      const token = localStorage.getItem("convene_token");
+      if (!activeEvent?.id) {
+        if (activeEvent?.teams) {
+          setTeams(activeEvent.teams);
+        }
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost:8000/api/events/${activeEvent.id}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const rawTeams = data.event?.participantTeams || data.event?.teams;
+          if (rawTeams) {
+            const mappedTeams = rawTeams.map((t) => {
+              const leadMember = t.members?.find((m) => m.role === "lead") || t.members?.[0];
+              const leader = leadMember?.user
+                ? {
+                    name: leadMember.user.name,
+                    email: leadMember.user.email,
+                    phone: leadMember.user.phone || "N/A",
+                    initials: leadMember.user.name ? leadMember.user.name.substring(0, 2).toUpperCase() : "U"
+                  }
+                : { name: "Team Lead", email: "lead@convene.test", phone: "N/A", initials: "TL" };
+
+              const members = (t.members || []).map((m) => ({
+                id: m.user?.id || m.id,
+                name: m.user?.name || "Participant",
+                email: m.user?.email || "participant@convene.test",
+                phone: m.user?.phone || "N/A",
+                role: m.role === "lead" ? "Team Lead" : "Member",
+                initials: m.user?.name ? m.user.name.substring(0, 2).toUpperCase() : "P"
+              }));
+
+              return {
+                id: t.id,
+                team: t.teamCode || t.name,
+                teamName: t.name,
+                college: t.description || "Convene Campus",
+                status: "Confirmed",
+                leader,
+                members
+              };
+            });
+            setTeams(mappedTeams);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch event teams from backend:", err.message);
+      }
+
+      if (activeEvent?.teams) {
+        setTeams(activeEvent.teams);
+      }
+    }
+
+    loadEventTeams();
+  }, [activeEvent]);
 
   const filteredTeams = useMemo(() => {
     const query = debouncedSearch.trim().toLowerCase();

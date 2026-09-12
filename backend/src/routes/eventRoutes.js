@@ -92,11 +92,16 @@ router.get("/:eventId", authenticate, authorizeEventMembership(), async (req, re
     const event = await prisma.event.findUnique({
       where: { id: req.params.eventId },
       include: {
-        teams: {
+        participantTeams: {
           include: {
             members: {
               include: { user: { select: { id: true, name: true, email: true, phone: true, avatarUrl: true } } }
             }
+          }
+        },
+        participants: {
+          include: {
+            user: { select: { id: true, name: true, email: true, phone: true, avatarUrl: true } }
           }
         },
         stages: { orderBy: { stageOrder: "asc" } }

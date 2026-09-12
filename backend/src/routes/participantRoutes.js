@@ -5,6 +5,75 @@ import { authenticate, authorizeEventMembership } from "../middlewares/auth.js";
 const router = express.Router();
 
 // -------------------------------------------------------------
+// POST /api/participants/:eventId/register - Register user as a participant for an event
+// -------------------------------------------------------------
+router.post("/:eventId/register", authenticate, async (req, res) => {
+  const { eventId } = req.params;
+
+  try {
+    const event = await prisma.event.findUnique({ where: { id: eventId } });
+    if (!event) {
+      return res.status(404).json({ error: "Event not found." });
+    }
+
+    // Check if user is already registered for this event
+    const existingParticipant = await prisma.eventParticipant.findUnique({
+      where: {
+        unique_event_participant: {
+          eventId,
+          userId: req.user.id
+        }
+      }
+    });
+
+    if (existingParticipant) {
+      return res.status(409).json({
+        message: "User is already registered for this event.",
+        participant: existingParticipant
+      });
+    }
+
+    // Generate unique QR token and participant code
+    const qrToken = `QR_${req.user.id.slice(0, 8)}_${eventId.slice(0, 8)}_${Date.now()}`;
+    const participantCode = `PART-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    // Create EventParticipant and EventMembership (role: participant) in a transaction
+    const [participant] = await prisma.$transaction([
+      prisma.eventParticipant.create({
+        data: {
+          eventId,
+          userId: req.user.id,
+          participantCode,
+          qrToken,
+          checkInStatus: "Confirmed"
+        },
+        include: {
+          user: { select: { id: true, name: true, email: true, phone: true, avatarUrl: true } }
+        }
+      }),
+      prisma.eventMembership.upsert({
+        where: {
+          unique_event_user: { eventId, userId: req.user.id }
+        },
+        create: {
+          eventId,
+          userId: req.user.id,
+          role: "participant"
+        },
+        update: {}
+      })
+    ]);
+
+    return res.status(201).json({
+      message: "Successfully registered for event.",
+      participant
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Event registration failed.", details: error.message });
+  }
+});
+
+// -------------------------------------------------------------
 // GET /api/events/:eventId/participants - List event participants
 // -------------------------------------------------------------
 router.get("/:eventId/participants", authenticate, authorizeEventMembership(), async (req, res) => {

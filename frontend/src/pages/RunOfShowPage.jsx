@@ -22,7 +22,7 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
-import { cn, formatTimeString, parseTimeString } from "@/lib/utils";
+import { cn, formatTimeString, parseTimeString, addHoursToTimeString } from "@/lib/utils";
 
 const statusStyles = {
   LIVE: "bg-[#22A65E]/10 text-[#22A65E]",
@@ -186,10 +186,10 @@ function StageDrawer({ stage, onClose, onUpdateStatus }) {
   );
 }
 
-function StageModal({ open, onClose, stage, onSave }) {
+function StageModal({ open, onClose, stage, onSave, lastStage }) {
   const [title, setTitle] = useState(stage ? stage.title : "");
   const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("10:30");
+  const [endTime, setEndTime] = useState("10:00");
   const [location, setLocation] = useState(stage ? stage.location : "");
 
   // Helper to format 24h or manual time string (e.g. 09:00, 2:30 pm) into 12h format (e.g. 02:30 PM)
@@ -198,15 +198,43 @@ function StageModal({ open, onClose, stage, onSave }) {
     return formatTimeString(tStr);
   };
 
-  // Sync state if editing target stage changes
-  useMemo(() => {
-    setTitle(stage ? stage.title : "");
-    setLocation(stage ? stage.location : "");
-    if (stage && stage.timeWindow) {
-      setStartTime("09:00");
-      setEndTime("10:30");
+  // Convert 12h time string (e.g. "11:00 AM") to 24h format "11:00" for <input type="time" />
+  const to24h = (tStr) => {
+    const d = parseTimeString(tStr);
+    if (!d) return "09:00";
+    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  };
+
+  // Sync state if editing target stage changes or opening for new stage
+  useEffect(() => {
+    if (!open) return;
+
+    if (stage) {
+      setTitle(stage.title || "");
+      setLocation(stage.location || "");
+      if (stage.timeWindow) {
+        const parts = stage.timeWindow.split(/[–—-]/);
+        setStartTime(to24h(parts[0]?.trim()));
+        setEndTime(to24h(parts[1]?.trim()));
+      }
+    } else {
+      // Adding new stage: clear title and location, auto-chain time from previous stage
+      setTitle("");
+      setLocation("");
+      if (lastStage && lastStage.timeWindow) {
+        const parts = lastStage.timeWindow.split(/[–—-]/);
+        const lastEnd12h = parts[1]?.trim() || "10:00 AM";
+        const nextStart24h = to24h(lastEnd12h);
+        const nextEnd12h = addHoursToTimeString(lastEnd12h, 1);
+        const nextEnd24h = to24h(nextEnd12h);
+        setStartTime(nextStart24h);
+        setEndTime(nextEnd24h);
+      } else {
+        setStartTime("09:00");
+        setEndTime("10:00");
+      }
     }
-  }, [stage, open]);
+  }, [stage, open, lastStage]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -321,7 +349,7 @@ export function RunOfShowPage() {
       let status = s.status || "Upcoming";
 
       if (s.timeWindow) {
-        const parts = s.timeWindow.split("–");
+        const parts = s.timeWindow.split(/[–—-]/);
         const startStr = parts[0]?.trim();
         const endStr = parts[1]?.trim();
 
@@ -605,6 +633,7 @@ export function RunOfShowPage() {
           setEditingStage(null);
         }}
         stage={editingStage}
+        lastStage={stages.length > 0 ? stages[stages.length - 1] : null}
         onSave={handleSaveStage}
       />
     </div>

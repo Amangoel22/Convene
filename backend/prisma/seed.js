@@ -205,8 +205,8 @@ async function main() {
         eventId: event1.id,
         stageOrder: 1,
         title: "Opening Ceremony & Keynote Address",
-        timeWindow: "09:30 AM – 10:45 AM",
-        location: "Main Auditorium",
+        startAt: new Date("2026-10-15T09:30:00Z"),
+        endAt: new Date("2026-10-15T10:45:00Z"),
         orgTeamId: techOrgTeam.id,
         status: "Completed"
       },
@@ -214,8 +214,8 @@ async function main() {
         eventId: event1.id,
         stageOrder: 2,
         title: "AI & Next-Gen Tech Panel Discussion",
-        timeWindow: "11:00 AM – 01:00 PM",
-        location: "Stage A",
+        startAt: new Date("2026-10-15T11:00:00Z"),
+        endAt: new Date("2026-10-15T13:00:00Z"),
         orgTeamId: designOrgTeam.id,
         status: "LIVE"
       },
@@ -223,8 +223,8 @@ async function main() {
         eventId: event1.id,
         stageOrder: 3,
         title: "Hackathon Final Pitching Round",
-        timeWindow: "02:30 PM – 05:00 PM",
-        location: "Grand Ballroom",
+        startAt: new Date("2026-10-15T14:30:00Z"),
+        endAt: new Date("2026-10-15T17:00:00Z"),
         orgTeamId: opsOrgTeam.id,
         status: "Upcoming"
       }
@@ -262,9 +262,9 @@ async function main() {
     data: {
       eventId: event1.id,
       title: "North Gate QR Badge Scanner Duty",
-      timeWindow: "08:00 AM – 11:30 AM",
-      location: "North Gate Entrance",
-      orgTeamId: opsOrgTeam.id,
+      startAt: new Date("2026-10-15T08:00:00Z"),
+      endAt: new Date("2026-10-15T11:30:00Z"),
+      category: "Registration",
       notes: "Verify participant QR codes on the Convene App."
     }
   });

@@ -1,4 +1,5 @@
 import express from "express";
+import crypto from "node:crypto";
 import { prisma } from "../config/prisma.js";
 import { authenticate, authorizeEventMembership } from "../middlewares/auth.js";
 
@@ -34,7 +35,7 @@ router.post("/:eventId/register", authenticate, async (req, res) => {
     }
 
     // Generate unique QR token and participant code
-    const qrToken = `QR_${req.user.id.slice(0, 8)}_${eventId.slice(0, 8)}_${Date.now()}`;
+    const qrToken = crypto.randomBytes(32).toString("hex");
     const participantCode = `PART-${Math.floor(1000 + Math.random() * 9000)}`;
 
     // Create EventParticipant and EventMembership (role: participant) in a transaction

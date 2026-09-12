@@ -119,6 +119,8 @@ model ParticipantTeam {
   name String @db.VarChar(255)
   teamCode String @map("team_code") @db.VarChar(50)
   description String?
+  status String @default("Unconfirmed") @db.VarChar(50)
+  internalNotes String? @map("internal_notes")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   members ParticipantTeamMember[]

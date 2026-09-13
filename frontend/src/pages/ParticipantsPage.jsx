@@ -955,7 +955,7 @@ export function ParticipantsPage() {
         rawParticipants.forEach((ep) => {
           const uId = ep.userId || ep.user?.id;
           if (uId) {
-            let st = ep.internalNotes || ep.checkInStatus || "Confirmed";
+            let st = ep.checkInStatus || "Confirmed";
             if (st === "Checked_In") st = "Checked In";
             participantStatusMap[uId] = st;
             participantNotesMap[uId] = ep.internalNotes || "";
@@ -1008,7 +1008,7 @@ export function ParticipantsPage() {
             teamName: t.name,
             college: t.description || "Convene Campus",
             status: t.status || "Confirmed",
-            notes: t.internalNotes || "No team notes added yet.",
+            notes: t.internalNotes || "",
             leader,
             members,
           };
@@ -1021,11 +1021,9 @@ export function ParticipantsPage() {
 
         rawParticipants.forEach((ep) => {
           if (ep.user && !teamUserIds.has(ep.user.id)) {
-            let memberStatus =
-              ep.internalNotes || ep.checkInStatus || "Confirmed";
+            let memberStatus = ep.checkInStatus || "Confirmed";
             if (memberStatus === "Checked_In") memberStatus = "Checked In";
-            const pNotes =
-              ep.internalNotes || "No participant notes added yet.";
+            const pNotes = ep.internalNotes || "";
 
             mappedTeams.push({
               id: ep.id,

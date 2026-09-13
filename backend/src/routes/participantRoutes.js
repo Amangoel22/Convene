@@ -335,11 +335,7 @@ router.get(
 // -------------------------------------------------------------
 router.patch("/:id/status", authenticate, async (req, res) => {
   const { id } = req.params;
-  const { checkInStatus } = req.body;
-
-  if (!checkInStatus) {
-    return res.status(400).json({ error: "checkInStatus is required." });
-  }
+  const { checkInStatus, internalNotes } = req.body;
 
   try {
     let participant = await prisma.eventParticipant.findUnique({
@@ -376,50 +372,34 @@ router.patch("/:id/status", authenticate, async (req, res) => {
       });
     }
 
-    let dbStatus = checkInStatus;
-    let notes = participant.internalNotes;
+    const dataToUpdate = {};
 
-    if (checkInStatus === "Checked In" || checkInStatus === "Checked_In") {
-      dbStatus = "Checked_In";
-      notes = null;
-    } else if (checkInStatus === "Confirmed") {
-      dbStatus = "Confirmed";
-      notes = null;
-    } else if (checkInStatus === "Unconfirmed") {
-      dbStatus = "Unconfirmed";
-      notes = null;
-    } else if (checkInStatus === "Rejected") {
-      dbStatus = "Rejected";
-      notes = null;
-    } else if (checkInStatus === "Absent") {
-      dbStatus = "Unconfirmed";
-      notes = "Absent";
-    } else if (checkInStatus === "Withdrawn") {
-      dbStatus = "Rejected";
-      notes = "Withdrawn";
+    if (checkInStatus !== undefined) {
+      let dbStatus = checkInStatus;
+      if (checkInStatus === "Checked In" || checkInStatus === "Checked_In") {
+        dbStatus = "Checked_In";
+      }
+      dataToUpdate.checkInStatus = dbStatus;
+    }
+
+    if (internalNotes !== undefined) {
+      dataToUpdate.internalNotes = internalNotes;
     }
 
     const updated = await prisma.eventParticipant.update({
       where: { id: participant.id },
-      data: {
-        checkInStatus: dbStatus,
-        internalNotes: notes,
-      },
+      data: dataToUpdate,
     });
 
-    return res
-      .status(200)
-      .json({
-        message: "Check-in status updated successfully.",
-        participant: updated,
-      });
+    return res.status(200).json({
+      message: "Participant updated successfully.",
+      participant: updated,
+    });
   } catch (error) {
-    return res
-      .status(500)
-      .json({
-        error: "Failed to update participant status.",
-        details: error.message,
-      });
+    return res.status(500).json({
+      error: "Failed to update participant.",
+      details: error.message,
+    });
   }
 });
 

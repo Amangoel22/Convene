@@ -196,6 +196,8 @@ enum CheckInStatus {
   Unconfirmed
   Confirmed
   Checked_In @map("Checked In")
+  Absent
+  Withdrawn
   Rejected
 }
 model EventParticipant {

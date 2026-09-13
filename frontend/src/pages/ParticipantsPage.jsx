@@ -123,7 +123,9 @@ function ParticipantDrawer({
   if (!team) return null;
 
   const isIndividual = Boolean(member);
-  const currentStatus = isIndividual ? member.status || "Confirmed" : team.status || "Confirmed";
+  const currentStatus = isIndividual
+    ? member.status || "Confirmed"
+    : team.status || "Confirmed";
   const currentNotes = isIndividual ? member.notes || "" : team.notes || "";
 
   const [isEditingNote, setIsEditingNote] = useState(false);
@@ -143,7 +145,12 @@ function ParticipantDrawer({
   };
 
   const handleSaveNoteSubmit = async () => {
-    await onSaveNotes(isIndividual ? "member" : "team", team.id, member?.id, noteText);
+    await onSaveNotes(
+      isIndividual ? "member" : "team",
+      team.id,
+      member?.id,
+      noteText,
+    );
     setIsEditingNote(false);
   };
 
@@ -194,7 +201,9 @@ function ParticipantDrawer({
         {isLead && (
           <div className="mt-5 flex items-center justify-between rounded-2xl bg-[#EBF0FA] border border-[#3B6FD4]/20 p-3.5">
             <span className="text-xs font-bold text-[#3B6FD4]">
-              {isIndividual ? "Update Participant Status" : "Update Team Status"}
+              {isIndividual
+                ? "Update Participant Status"
+                : "Update Team Status"}
             </span>
             <div className="relative inline-flex items-center">
               <select
@@ -268,7 +277,8 @@ function ParticipantDrawer({
                 key={m.id || m.email}
                 className={cn(
                   "rounded-2xl border p-3 transition-colors",
-                  isIndividual && (m.id === member.id || m.email === member.email)
+                  isIndividual &&
+                    (m.id === member.id || m.email === member.email)
                     ? "bg-[#EBF0FA] border-[#3B6FD4]/30"
                     : "bg-[#F7F8FA] border-[rgba(0,0,0,0.06)]",
                 )}
@@ -340,7 +350,9 @@ function ParticipantDrawer({
         <div className="mt-6 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-4">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold uppercase tracking-wider text-[#1A1D23]">
-              {isIndividual ? "Participant Internal Notes" : "Team Internal Notes"}
+              {isIndividual
+                ? "Participant Internal Notes"
+                : "Team Internal Notes"}
             </p>
             {!isEditingNote && isLead && (
               <button
@@ -382,7 +394,10 @@ function ParticipantDrawer({
             </div>
           ) : (
             <p className="mt-1.5 text-sm leading-relaxed text-[#5A6577] font-medium">
-              {currentNotes || (isIndividual ? "No participant notes added yet." : "No team notes added yet.")}
+              {currentNotes ||
+                (isIndividual
+                  ? "No participant notes added yet."
+                  : "No team notes added yet.")}
             </p>
           )}
         </div>
@@ -487,21 +502,54 @@ function ParticipantStatusSelect({ status, onChange }) {
   };
 
   return (
-    <div className="relative inline-flex items-center" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="relative inline-flex items-center"
+      onClick={(e) => e.stopPropagation()}
+    >
       <select
         value={status || "Confirmed"}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
           "h-7 cursor-pointer appearance-none rounded-full pl-2.5 pr-6 text-[10px] font-black uppercase tracking-wider border outline-none transition-all shadow-sm",
-          statusColors[status] || "bg-gray-100 text-gray-700 border-gray-200"
+          statusColors[status] || "bg-gray-100 text-gray-700 border-gray-200",
         )}
       >
-        <option value="Checked In" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Checked In</option>
-        <option value="Confirmed" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Confirmed</option>
-        <option value="Unconfirmed" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Unconfirmed</option>
-        <option value="Absent" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Absent</option>
-        <option value="Withdrawn" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Withdrawn</option>
-        <option value="Rejected" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Rejected</option>
+        <option
+          value="Checked In"
+          className="bg-white text-[#1A1D23] font-sans font-semibold capitalize"
+        >
+          Checked In
+        </option>
+        <option
+          value="Confirmed"
+          className="bg-white text-[#1A1D23] font-sans font-semibold capitalize"
+        >
+          Confirmed
+        </option>
+        <option
+          value="Unconfirmed"
+          className="bg-white text-[#1A1D23] font-sans font-semibold capitalize"
+        >
+          Unconfirmed
+        </option>
+        <option
+          value="Absent"
+          className="bg-white text-[#1A1D23] font-sans font-semibold capitalize"
+        >
+          Absent
+        </option>
+        <option
+          value="Withdrawn"
+          className="bg-white text-[#1A1D23] font-sans font-semibold capitalize"
+        >
+          Withdrawn
+        </option>
+        <option
+          value="Rejected"
+          className="bg-white text-[#1A1D23] font-sans font-semibold capitalize"
+        >
+          Rejected
+        </option>
       </select>
       <ChevronDown
         size={11}
@@ -590,7 +638,10 @@ function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 max-h-[70vh] overflow-y-auto pr-1"
+      >
         {/* MODE 1: Create Whole Team */}
         {mode === "newTeam" && (
           <>
@@ -678,7 +729,11 @@ function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                       placeholder="Phone Number (10 digits)"
                       value={m.phone}
                       onChange={(e) =>
-                        handleMemberChange(idx, "phone", e.target.value.replace(/\D/g, "").slice(0, 10))
+                        handleMemberChange(
+                          idx,
+                          "phone",
+                          e.target.value.replace(/\D/g, "").slice(0, 10),
+                        )
                       }
                       className="h-9 rounded-xl bg-white border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
                     />
@@ -749,7 +804,9 @@ function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                 maxLength={10}
                 placeholder="Phone Number (10 digits)"
                 value={memberPhone}
-                onChange={(e) => setMemberPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                onChange={(e) =>
+                  setMemberPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+                }
                 className="h-10 rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
               />
             </div>
@@ -799,7 +856,9 @@ function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                 maxLength={10}
                 placeholder="Phone Number (10 digits)"
                 value={memberPhone}
-                onChange={(e) => setMemberPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                onChange={(e) =>
+                  setMemberPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+                }
                 className="h-10 rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
               />
             </div>
@@ -911,7 +970,8 @@ export function ParticipantsPage() {
 
           const members = (t.members || []).map((m) => {
             const userId = m.user?.id || m.userId || m.id;
-            const memberStatus = (userId && participantStatusMap[userId]) || "Confirmed";
+            const memberStatus =
+              (userId && participantStatusMap[userId]) || "Confirmed";
             const memberNotes = (userId && participantNotesMap[userId]) || "";
 
             return {
@@ -943,14 +1003,16 @@ export function ParticipantsPage() {
 
         // Also map individual participants who aren't in team members
         const teamUserIds = new Set(
-          mappedTeams.flatMap((t) => t.members.map((m) => m.id))
+          mappedTeams.flatMap((t) => t.members.map((m) => m.id)),
         );
 
         rawParticipants.forEach((ep) => {
           if (ep.user && !teamUserIds.has(ep.user.id)) {
-            let memberStatus = ep.internalNotes || ep.checkInStatus || "Confirmed";
+            let memberStatus =
+              ep.internalNotes || ep.checkInStatus || "Confirmed";
             if (memberStatus === "Checked_In") memberStatus = "Checked In";
-            const pNotes = ep.internalNotes || "No participant notes added yet.";
+            const pNotes =
+              ep.internalNotes || "No participant notes added yet.";
 
             mappedTeams.push({
               id: ep.id,
@@ -1043,14 +1105,17 @@ export function ParticipantsPage() {
 
     const token = localStorage.getItem("convene_token");
     try {
-      await fetch(`http://localhost:8000/api/participants/teams/${teamId}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      await fetch(
+        `http://localhost:8000/api/participants/teams/${teamId}/status`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ status: newStatus }),
         },
-        body: JSON.stringify({ status: newStatus }),
-      });
+      );
     } catch (err) {
       console.warn("Failed to update team status on backend:", err.message);
     }
@@ -1061,12 +1126,15 @@ export function ParticipantsPage() {
       prev.map((t) => {
         if (t.id === teamId) {
           const updatedMembers = t.members.map((m) =>
-            m.id === memberId ? { ...m, status: newStatus } : m
+            m.id === memberId ? { ...m, status: newStatus } : m,
           );
           return { ...t, members: updatedMembers };
         }
         return t;
-      })
+      }),
+    );
+    setSelectedMember((prev) =>
+      prev && prev.id === memberId ? { ...prev, status: newStatus } : prev,
     );
 
     const token = localStorage.getItem("convene_token");
@@ -1212,42 +1280,58 @@ export function ParticipantsPage() {
         prev.map((t) => {
           if (t.id === teamId) {
             const updatedMembers = t.members.map((m) =>
-              m.id === memberId ? { ...m, notes: noteText } : m
+              m.id === memberId ? { ...m, notes: noteText } : m,
             );
             return { ...t, members: updatedMembers };
           }
           return t;
-        })
+        }),
       );
-      setSelectedMember((prev) => (prev && prev.id === memberId ? { ...prev, notes: noteText } : prev));
+      setSelectedMember((prev) =>
+        prev && prev.id === memberId ? { ...prev, notes: noteText } : prev,
+      );
 
       try {
-        await fetch(`http://localhost:8000/api/participants/${memberId}/status`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        await fetch(
+          `http://localhost:8000/api/participants/${memberId}/status`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({
+              checkInStatus: selectedMember?.status || "Confirmed",
+              internalNotes: noteText,
+            }),
           },
-          body: JSON.stringify({ checkInStatus: selectedMember?.status || "Confirmed", internalNotes: noteText }),
-        });
+        );
       } catch (err) {
-        console.warn("Failed to update participant notes on backend:", err.message);
+        console.warn(
+          "Failed to update participant notes on backend:",
+          err.message,
+        );
       }
     } else {
       setTeams((prev) =>
-        prev.map((t) => (t.id === teamId ? { ...t, notes: noteText } : t))
+        prev.map((t) => (t.id === teamId ? { ...t, notes: noteText } : t)),
       );
-      setSelectedTeam((prev) => (prev && prev.id === teamId ? { ...prev, notes: noteText } : prev));
+      setSelectedTeam((prev) =>
+        prev && prev.id === teamId ? { ...prev, notes: noteText } : prev,
+      );
 
       try {
-        await fetch(`http://localhost:8000/api/participants/teams/${teamId}/notes`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        await fetch(
+          `http://localhost:8000/api/participants/teams/${teamId}/notes`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({ internalNotes: noteText }),
           },
-          body: JSON.stringify({ internalNotes: noteText }),
-        });
+        );
       } catch (err) {
         console.warn("Failed to update team notes on backend:", err.message);
       }
@@ -1509,11 +1593,18 @@ export function ParticipantsPage() {
                       </div>
 
                       {/* Col 5: Participant Status Dropdown */}
-                      <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+                      <div
+                        className="shrink-0"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <ParticipantStatusSelect
                           status={member.status || "Confirmed"}
                           onChange={(newStatus) =>
-                            handleUpdateMemberStatus(team.id, member.id, newStatus)
+                            handleUpdateMemberStatus(
+                              team.id,
+                              member.id,
+                              newStatus,
+                            )
                           }
                         />
                       </div>

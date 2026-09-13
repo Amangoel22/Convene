@@ -1,10 +1,11 @@
 import { cn } from "@/lib/utils";
+import { COLORS } from "@/constants/colors";
 
 const priorityStyles = {
-  Critical: "text-[#D6453D] font-bold",
-  High: "text-[#D4930E] font-bold",
-  Medium: "text-[#3B6FD4] font-bold",
-  Low: "text-[#8E99A8] font-bold"
+  Critical: `text-[${COLORS.error}] font-bold`,
+  High: `text-[${COLORS.warning}] font-bold`,
+  Medium: `text-[${COLORS.primary}] font-bold`,
+  Low: `text-[${COLORS.grayMuted}] font-bold`
 };
 
 export function PriorityBadge({ priority = "Medium", className }) {

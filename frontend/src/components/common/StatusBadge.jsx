@@ -1,20 +1,21 @@
 import { cn } from "@/lib/utils";
+import { COLORS } from "@/constants/colors";
 
 const statusTextStyles = {
-  Todo: "text-[#8E99A8]",
-  "In Progress": "text-[#3B6FD4]",
-  Blocked: "text-[#D4930E]",
-  Done: "text-[#22A65E]",
-  Unconfirmed: "text-[#D4930E]",
-  Registered: "text-[#D4930E]",
-  Confirmed: "text-[#22A65E]",
-  "Checked In": "text-[#3B6FD4]",
-  Rejected: "text-[#D6453D]",
-  Completed: "text-[#22A65E]",
-  LIVE: "text-[#22A65E]",
-  current: "text-[#3B6FD4]",
-  complete: "text-[#8E99A8]",
-  upcoming: "text-[#5A6577]"
+  Todo: `text-[${COLORS.grayMuted}]`,
+  "In Progress": `text-[${COLORS.primary}]`,
+  Blocked: `text-[${COLORS.warning}]`,
+  Done: `text-[${COLORS.success}]`,
+  Unconfirmed: `text-[${COLORS.warning}]`,
+  Registered: `text-[${COLORS.warning}]`,
+  Confirmed: `text-[${COLORS.success}]`,
+  "Checked In": `text-[${COLORS.primary}]`,
+  Rejected: `text-[${COLORS.error}]`,
+  Completed: `text-[${COLORS.success}]`,
+  LIVE: `text-[${COLORS.success}]`,
+  current: `text-[${COLORS.primary}]`,
+  complete: `text-[${COLORS.grayMuted}]`,
+  upcoming: `text-[${COLORS.grayText}]`
 };
 
 export function StatusBadge({ status, children, className }) {
@@ -22,7 +23,7 @@ export function StatusBadge({ status, children, className }) {
     <span
       className={cn(
         "text-xs font-semibold whitespace-nowrap inline-block",
-        statusTextStyles[status] ?? "text-[#5A6577]",
+        statusTextStyles[status] ?? `text-[${COLORS.grayText}]`,
         className
       )}
     >

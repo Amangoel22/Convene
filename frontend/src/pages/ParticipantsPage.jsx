@@ -491,7 +491,7 @@ function StatusPill({ status }) {
   );
 }
 
-function ParticipantStatusSelect({ status, onChange }) {
+function ParticipantStatusSelect({ status, onChange, isLead = true }) {
   const statusColors = {
     Unconfirmed: "text-[#D4930E] bg-[#D4930E]/10 border-[#D4930E]/30",
     Confirmed: "text-[#22A65E] bg-[#22A65E]/10 border-[#22A65E]/30",
@@ -500,6 +500,19 @@ function ParticipantStatusSelect({ status, onChange }) {
     Withdrawn: "text-[#9333EA] bg-[#9333EA]/10 border-[#9333EA]/30",
     Rejected: "text-[#D6453D] bg-[#D6453D]/10 border-[#D6453D]/30",
   };
+
+  if (!isLead) {
+    return (
+      <span
+        className={cn(
+          "inline-flex h-7 items-center rounded-full px-2.5 text-[10px] font-black uppercase tracking-wider border",
+          statusColors[status] || "bg-gray-100 text-gray-700 border-gray-200",
+        )}
+      >
+        {status || "Confirmed"}
+      </span>
+    );
+  }
 
   return (
     <div
@@ -553,8 +566,8 @@ function ParticipantStatusSelect({ status, onChange }) {
       </select>
       <ChevronDown
         size={11}
-        strokeWidth={2.5}
-        className="absolute right-2 pointer-events-none opacity-70"
+        strokeWidth={2}
+        className="absolute right-2 text-current pointer-events-none opacity-70"
       />
     </div>
   );
@@ -1599,6 +1612,7 @@ export function ParticipantsPage() {
                       >
                         <ParticipantStatusSelect
                           status={member.status || "Confirmed"}
+                          isLead={isLead}
                           onChange={(newStatus) =>
                             handleUpdateMemberStatus(
                               team.id,

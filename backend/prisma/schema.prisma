@@ -163,6 +163,7 @@ model OrgMember {
   userId String? @map("user_id") @db.Uuid
   name String @db.VarChar(150)
   phone String? @db.VarChar(30)
+  role String @default("member") @db.VarChar(30)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
   orgTeam OrgTeam @relation(fields: [orgTeamId], references: [id], onDelete: Cascade)
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)

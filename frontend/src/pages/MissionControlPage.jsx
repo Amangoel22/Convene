@@ -25,10 +25,19 @@ export function MissionControlPage() {
 
   // Derive dynamic stage rail from activeEvent or empty array
   const rawStages = activeEvent?.stages || [];
+  const eventEndDate = activeEvent?.endDate ? new Date(activeEvent.endDate) : null;
+  const eventEndTime = eventEndDate && activeEvent?.endTime ? parseTimeString(activeEvent.endTime, eventEndDate) : null;
+  const eventIsComplete = Boolean(
+    activeEvent && (
+      (eventEndTime && now >= eventEndTime) ||
+      (rawStages.length > 0 && rawStages.every((stage) => ["Completed", "completed"].includes(stage.status)))
+    )
+  );
 
   // Evaluate dynamic status based on current real-time clock
   const evaluatedStages = useMemo(() => {
     return rawStages.map((s) => {
+      if (eventIsComplete) return { ...s, calculatedStatus: "Completed" };
       let calculatedStatus = s.status || "Upcoming";
 
       if (s.timeWindow) {
@@ -56,7 +65,7 @@ export function MissionControlPage() {
 
       return { ...s, calculatedStatus };
     });
-  }, [rawStages, now]);
+  }, [eventIsComplete, rawStages, now]);
 
   const liveStageIndex = evaluatedStages.findIndex((s) => s.calculatedStatus === "LIVE");
   const liveStage = liveStageIndex !== -1 ? evaluatedStages[liveStageIndex] : rawStages.find((s) => s.status === "LIVE");
@@ -65,6 +74,7 @@ export function MissionControlPage() {
 
   // Compute continuous timeline line progress percentage across all stages
   const lineProgressPercent = useMemo(() => {
+    if (eventIsComplete) return evaluatedStages.length > 0 ? 100 : 0;
     if (evaluatedStages.length <= 1) return 0;
     const totalSegments = evaluatedStages.length - 1;
 
@@ -87,7 +97,7 @@ export function MissionControlPage() {
     }
 
     return Math.min(100, Math.round((completedCount / totalSegments) * 100));
-  }, [evaluatedStages, liveStageIndex, completedCount, now]);
+  }, [eventIsComplete, evaluatedStages, liveStageIndex, completedCount, now]);
 
   const progressPercent = lineProgressPercent;
 
@@ -164,7 +174,11 @@ export function MissionControlPage() {
               <span className="text-xs font-extrabold text-[#3B6FD4] bg-[#EBF0FA] px-3 py-1 rounded-full uppercase tracking-wider">
                 {activeEvent?.name || "No Event Selected"} • {activeEvent?.type || "Event"}
               </span>
-              {liveStage && (
+                {eventIsComplete ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22A65E]/10 border border-[#22A65E]/25 px-3 py-1 text-xs font-extrabold text-[#22A65E]">
+                  <Check size={13} strokeWidth={3} /> COMPLETED
+                </span>
+                ) : liveStage && (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22A65E]/10 border border-[#22A65E]/25 px-3 py-1 text-xs font-extrabold text-[#22A65E]">
                   <span className="h-2 w-2 rounded-full bg-[#22A65E] animate-pulse" />
                   LIVE STAGE
@@ -174,7 +188,7 @@ export function MissionControlPage() {
 
             <div>
               <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1D23] tracking-tight">
-                {liveStage ? liveStage.title : activeEvent ? "Event In Progress" : "No Active Event"}
+                {eventIsComplete ? "Event Completed" : liveStage ? liveStage.title : activeEvent ? "Event In Progress" : "No Active Event"}
               </h2>
               <div className="mt-2 flex flex-wrap items-center gap-3 text-sm font-semibold text-[#5A6577]">
                 {(liveStage?.location || activeEvent?.location || activeEvent?.primaryLocation) && (
@@ -183,7 +197,7 @@ export function MissionControlPage() {
                     <span>{liveStage?.location || activeEvent?.location || activeEvent?.primaryLocation}</span>
                   </span>
                 )}
-                {activeEvent?.duration && (
+                {activeEvent?.duration && !eventIsComplete && (
                   <span className="inline-flex items-center gap-1.5 bg-[#EBF0FA] px-3 py-1 rounded-full text-xs font-bold text-[#3B6FD4] font-mono">
                     <Clock size={14} /> {activeEvent.duration} ({activeEvent.startTime || "09:00"} – {activeEvent.endTime || "21:00"})
                   </span>
@@ -196,15 +210,15 @@ export function MissionControlPage() {
           <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-between gap-4 shrink-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-[rgba(0,0,0,0.06)]">
             <div className="text-left lg:text-right rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5 w-full sm:w-auto lg:w-56">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8] block">
-                UPCOMING STAGE
+                {eventIsComplete ? "EVENT STATUS" : "UPCOMING STAGE"}
               </span>
               <span className="text-sm font-extrabold text-[#1A1D23] block mt-0.5 truncate">
-                {upcomingStage?.title || "No Upcoming Stages"}
+                {eventIsComplete ? "Completed" : upcomingStage?.title || "No Upcoming Stages"}
               </span>
               <div className="mt-2 pt-2 border-t border-[rgba(0,0,0,0.06)] flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-[#8E99A8]">Starts in</span>
+                <span className="text-[11px] font-semibold text-[#8E99A8]">{eventIsComplete ? "Timeline" : "Starts in"}</span>
                 <span className="text-base font-mono font-extrabold text-[#3B6FD4]">
-                  {formatCountdown(secondsRemaining)}
+                  {eventIsComplete ? "100% complete" : formatCountdown(secondsRemaining)}
                 </span>
               </div>
             </div>

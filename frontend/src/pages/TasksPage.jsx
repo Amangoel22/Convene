@@ -13,6 +13,7 @@ import {
   X
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { StatusBadge } from "@/components/common/StatusBadge";
@@ -58,12 +59,11 @@ function SelectFilter({ value, onChange, options, label }) {
           </option>
         ))}
       </select>
-      <ChevronDown size={13} strokeWidth={2} className="shrink-0 text-[#8E99A8]" />
     </label>
   );
 }
 
-function TaskDrawer({ task, onClose, onUpdateTask }) {
+function TaskDrawer({ task, onClose, onUpdateTask, teams, members, isLead }) {
   if (!task) return null;
 
   const handleStatusChange = (newStatus) => {
@@ -88,7 +88,7 @@ function TaskDrawer({ task, onClose, onUpdateTask }) {
         onClick={onClose}
       />
       <motion.aside
-        className="fixed bottom-4 right-4 top-4 z-50 flex w-[min(560px,calc(100vw-32px))] flex-col overflow-hidden rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 shadow-xl text-[#1A1D23]"
+        className="fixed bottom-2 right-4 top-2 z-50 flex max-h-[calc(100vh-1rem)] w-[min(560px,calc(100vw-32px))] min-h-0 flex-col overflow-hidden rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 shadow-xl text-[#1A1D23]"
         initial={{ x: 580, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 580, opacity: 0 }}
@@ -145,6 +145,13 @@ function TaskDrawer({ task, onClose, onUpdateTask }) {
             <span className="text-xs font-bold text-[#3B6FD4] font-mono">{task.assignee.phone || "+91 98765 40012"}</span>
           </div>
 
+          {isLead && <label className="block rounded-2xl bg-[#F7F8FA] p-3 text-[11px] font-semibold text-[#8E99A8]">Assigned To
+            <select value={task.assignedOrgMemberId || ""} onChange={(event) => { const member = members.find((item) => item.id === event.target.value); onUpdateTask({ ...task, assignedOrgMemberId: event.target.value || null, orgTeamId: member?.orgTeamId || null, department: member?.teamName || "Unassigned", assignee: member ? { ...task.assignee, name: member.name, initials: member.initials, phone: member.phone } : { name: "Unassigned", initials: "U", phone: "" } }); }} className="mt-1 h-9 w-full rounded-full bg-white px-3 pr-9 text-xs text-[#1A1D23] outline-none">
+              <option value="">Unassigned</option>{members.map((member) => <option key={member.id} value={member.id}>{member.name} — {member.teamName}</option>)}
+            </select>
+            {task.assignedOrgMemberId && <span className="mt-2 block text-[11px] font-semibold text-[#5A6577]">Team: {task.department}</span>}
+          </label>}
+
           {/* Task Description */}
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Description</h3>
@@ -159,7 +166,7 @@ function TaskDrawer({ task, onClose, onUpdateTask }) {
         </div>
 
         {/* Quick Actions Footer */}
-        <div className="border-t border-[rgba(0,0,0,0.06)] pt-4 flex items-center gap-3">
+        <div className="shrink-0 border-t border-[rgba(0,0,0,0.06)] pt-4 flex items-center gap-3">
           <GlassButton
             variant={task.status === "Completed" ? "secondary" : "success"}
             className="flex-1 h-9 text-xs justify-center rounded-full"
@@ -266,6 +273,7 @@ export function TasksPage() {
   const [newTaskOpen, setNewTaskOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchParams] = useSearchParams();
 
   const role = useAppStore((state) => state.role);
   const activeEvent = useAppStore((state) => state.activeEvent);
@@ -288,6 +296,13 @@ export function TasksPage() {
   }, [activeEvent?.id]);
 
   const teamOptions = useMemo(() => ["All Teams", ...teamsList.map((team) => team.name)], [teamsList]);
+
+  useEffect(() => {
+    const teamSlug = searchParams.get("team");
+    if (!teamSlug) return;
+    const team = teamsList.find((item) => item.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === teamSlug);
+    if (team) setDepartment(team.name);
+  }, [searchParams, teamsList]);
 
   const assigneeOptions = useMemo(() => {
     return ["All Assignees", ...Array.from(new Set(tasksList.map((t) => t.assignee?.name).filter(Boolean)))];
@@ -330,12 +345,23 @@ export function TasksPage() {
   };
 
   const handleUpdateTask = async (updatedTask) => {
-    if (updatedTask.status !== tasksList.find((task) => task.id === updatedTask.id)?.status) {
-      const token = localStorage.getItem("convene_token");
-      await fetch(`${API_BASE}/tasks/${updatedTask.id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ status: updatedTask.status }) });
+    const existingTask = tasksList.find((task) => task.id === updatedTask.id);
+    const token = localStorage.getItem("convene_token");
+    const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+    let serverTask = null;
+    if (updatedTask.status !== existingTask?.status) {
+      const res = await fetch(`${API_BASE}/tasks/${updatedTask.id}/status`, { method: "PATCH", headers, body: JSON.stringify({ status: updatedTask.status }) });
+      if (!res.ok) { const data = await res.json().catch(() => ({})); setError(data.error || "Failed to update task status."); return; }
+      serverTask = (await res.json()).task;
     }
-    setTasksList((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
-    setSelectedTask(updatedTask);
+    if (updatedTask.assignedOrgMemberId !== existingTask?.assignedOrgMemberId || updatedTask.orgTeamId !== existingTask?.orgTeamId) {
+      const res = await fetch(`${API_BASE}/tasks/${updatedTask.id}`, { method: "PATCH", headers, body: JSON.stringify({ assignedOrgMemberId: updatedTask.assignedOrgMemberId || null }) });
+      if (!res.ok) { const data = await res.json().catch(() => ({})); setError(data.error || "Failed to update task assignment."); return; }
+      serverTask = (await res.json()).task;
+    }
+    const nextTask = serverTask ? formatTask(serverTask) : updatedTask;
+    setTasksList((prev) => prev.map((t) => (t.id === updatedTask.id ? nextTask : t)));
+    setSelectedTask(nextTask);
   };
 
   const handleCreateTask = async (newTask) => {
@@ -367,7 +393,7 @@ export function TasksPage() {
       </div>
 
       {/* Onboarding-style Task Metric Overview Banner */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">Total Assigned</p>
           <p className="mt-1 text-2xl font-extrabold text-[#1A1D23] font-mono">{filteredTasks.length}</p>
@@ -380,6 +406,14 @@ export function TasksPage() {
             {filteredTasks.filter((t) => t.status === "In Progress").length}
           </p>
           <span className="text-[11px] font-medium text-[#5A6577]">Currently being executed</span>
+        </div>
+
+        <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">Todo</p>
+          <p className="mt-1 text-2xl font-extrabold text-[#5A6577] font-mono">
+            {filteredTasks.filter((t) => t.status === "Todo").length}
+          </p>
+          <span className="text-[11px] font-medium text-[#5A6577]">Awaiting execution</span>
         </div>
 
         <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
@@ -586,6 +620,9 @@ export function TasksPage() {
         task={selectedTask}
         onClose={() => setSelectedTask(null)}
         onUpdateTask={handleUpdateTask}
+        teams={teamsList}
+        members={membersList}
+        isLead={isLead}
       />
 
       {/* New Task Modal */}

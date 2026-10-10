@@ -114,7 +114,7 @@ router.post("/:eventId/register", authenticate, async (req, res) => {
           userId: user.id,
           participantCode,
           qrToken,
-          checkInStatus: "Confirmed",
+          checkInStatus: "Unconfirmed",
         },
         include: {
           user: {

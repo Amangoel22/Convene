@@ -133,11 +133,6 @@ export function ParticipantDrawer({
                   </>
                 )}
               </select>
-              <ChevronDown
-                size={13}
-                strokeWidth={2}
-                className="absolute right-2.5 text-[#8E99A8] pointer-events-none"
-              />
             </div>
           </div>
         )}

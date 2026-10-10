@@ -68,7 +68,6 @@ function SelectFilter({ value, onChange, options, label }) {
           </option>
         ))}
       </select>
-      <ChevronDown size={13} strokeWidth={2} className="shrink-0 text-[#8E99A8]" />
     </label>
   );
 }

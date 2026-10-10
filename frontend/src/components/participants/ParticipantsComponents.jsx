@@ -90,11 +90,6 @@ export function ParticipantStatusSelect({ status, onChange, isLead = true }) {
         <option value="Blocked" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Blocked</option>
         <option value="Rejected" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Rejected</option>
       </select>
-      <ChevronDown
-        size={11}
-        strokeWidth={2}
-        className="absolute right-2 text-current pointer-events-none opacity-70"
-      />
     </div>
   );
 }
@@ -114,11 +109,6 @@ export function SelectFilter({ value, onChange, options, label }) {
           </option>
         ))}
       </select>
-      <ChevronDown
-        size={13}
-        strokeWidth={2}
-        className="absolute right-3 text-[#8E99A8] pointer-events-none"
-      />
     </div>
   );
 }

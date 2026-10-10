@@ -12,11 +12,12 @@ import {
   Palette,
   Plus,
   Search,
+  Trash2,
   Truck,
   UserCheck,
   Users,
   Utensils,
-  X
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -32,15 +33,48 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
 function formatTeam(team) {
   const members = team.members || [];
-  const leadMember = members[0];
+  const leadMember =
+    members.find((member) => member.role === "leader") ||
+    members.find((member) => member.role === "co-leader") ||
+    members[0];
   const leadUser = leadMember?.user;
   const leadName = leadUser?.name || leadMember?.name || "Unassigned";
+  const leadRole = (leadMember?.role || "member").replace("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
   return {
     ...team,
     iconName: "Users",
     slug: team.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-    lead: { name: leadName, role: "Team Member", initials: leadName.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase(), email: leadUser?.email || "", phone: leadUser?.phone || leadMember?.phone || "", avatar: leadUser?.avatarUrl },
-    members: members.map((member) => { const user = member.user; const name = user?.name || member.name; return { ...member, name, role: "Team Member", initials: name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase(), email: user?.email || "", phone: user?.phone || member.phone || "", avatar: user?.avatarUrl }; })
+    lead: {
+      name: leadName,
+      role: leadRole,
+      initials: leadName
+        .split(" ")
+        .map((part) => part[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase(),
+      email: leadUser?.email || "",
+      phone: leadUser?.phone || leadMember?.phone || "",
+      avatar: leadUser?.avatarUrl,
+    },
+    members: members.map((member) => {
+      const user = member.user;
+      const name = user?.name || member.name;
+      return {
+        ...member,
+        name,
+        role: member.role || "member",
+        initials: name
+          .split(" ")
+          .map((part) => part[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase(),
+        email: user?.email || "",
+        phone: user?.phone || member.phone || "",
+        avatar: user?.avatarUrl,
+      };
+    }),
   };
 }
 
@@ -54,7 +88,7 @@ const iconMap = {
   DollarSign,
   Briefcase,
   Palette,
-  HeartHandshake
+  HeartHandshake,
 };
 
 function SelectFilter({ value, onChange, options, label }) {
@@ -67,17 +101,27 @@ function SelectFilter({ value, onChange, options, label }) {
         className="cursor-pointer bg-transparent text-xs font-semibold text-[#1A1D23] outline-none pr-1"
       >
         {options.map((option) => (
-          <option key={option} value={option} className="bg-white text-[#1A1D23]">
+          <option
+            key={option}
+            value={option}
+            className="bg-white text-[#1A1D23]"
+          >
             {option}
           </option>
         ))}
       </select>
-      <ChevronDown size={13} strokeWidth={2} className="shrink-0 text-[#8E99A8]" />
     </label>
   );
 }
 
-function TeamDrawer({ team, onClose, onEditMember, isLead }) {
+function TeamDrawer({
+  team,
+  onClose,
+  onEditMember,
+  onAddMember,
+  onRemoveMember,
+  isLead,
+}) {
   const navigate = useNavigate();
 
   if (!team) return null;
@@ -113,7 +157,9 @@ function TeamDrawer({ team, onClose, onEditMember, isLead }) {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-[#1A1D23]">{team.name}</h2>
-              <p className="mt-0.5 text-xs font-semibold text-[#8E99A8]">{team.members.length} Team Members</p>
+              <p className="mt-0.5 text-xs font-semibold text-[#8E99A8]">
+                {team.members.length} Team Members
+              </p>
             </div>
           </div>
           <button
@@ -129,43 +175,97 @@ function TeamDrawer({ team, onClose, onEditMember, isLead }) {
         <div className="flex-1 overflow-y-auto py-6 space-y-7 pr-1">
           {/* Team Lead */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Team Lead</h3>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">
+              Team Lead
+            </h3>
             <div className="mt-3 flex items-center justify-between rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-4">
               <div className="flex items-center gap-3.5">
-                <UserAvatar initials={team.lead.initials} image={team.lead.avatar} className="h-11 w-11 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />
+                <UserAvatar
+                  initials={team.lead.initials}
+                  image={team.lead.avatar}
+                  className="h-11 w-11 text-xs bg-[#EBF0FA] text-[#3B6FD4]"
+                />
                 <div>
-                  <p className="text-base font-bold text-[#1A1D23]">{team.lead.name}</p>
-                  <p className="text-xs font-medium text-[#5A6577]">{team.lead.role}</p>
+                  <p className="text-base font-bold text-[#1A1D23]">
+                    {team.lead.name}
+                  </p>
+                  <p className="text-xs font-medium text-[#5A6577]">
+                    {team.lead.role}
+                  </p>
                 </div>
               </div>
               <div className="text-right text-xs font-medium text-[#5A6577]">
-                <p>{team.lead.email}</p>
-                <p className="mt-0.5 text-[11px] text-[#8E99A8]">{team.lead.phone}</p>
+                <p className="mt-0.5 text-[11px] text-[#8E99A8]">
+                  {team.lead.phone}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Members List */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Team Members ({team.members.length})</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">
+                Team Members ({team.members.length})
+              </h3>
+              {isLead && (
+                <button
+                  type="button"
+                  onClick={() => onAddMember(team)}
+                  className="text-xs font-bold text-[#3B6FD4]"
+                >
+                  + Add member
+                </button>
+              )}
+            </div>
             <div className="mt-3 space-y-2">
               {team.members.map((member) => (
                 <div
-                  key={member.email}
+                  key={member.id || `${member.name}-${member.phone}`}
                   className="flex items-center justify-between rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5 text-xs transition-colors hover:bg-[#F0F2F5]"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <UserAvatar initials={member.initials} image={member.avatar} className="h-9 w-9 text-[10px] bg-[#EBF0FA] text-[#3B6FD4]" />
+                    <UserAvatar
+                      initials={member.initials}
+                      image={member.avatar}
+                      className="h-9 w-9 text-[10px] bg-[#EBF0FA] text-[#3B6FD4]"
+                    />
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-[#1A1D23] truncate">{member.name}</p>
-                      <p className="text-xs font-medium text-[#8E99A8] truncate">{member.role}</p>
+                      <p className="text-sm font-bold text-[#1A1D23] truncate">
+                        {member.name}
+                      </p>
+                      <p className="text-xs font-medium text-[#8E99A8] truncate">
+                        {member.role}
+                      </p>
                     </div>
                   </div>
                   <div className="text-right shrink-0 font-medium text-[#5A6577]">
-                    <p>{member.email}</p>
                     <p className="text-[11px] text-[#8E99A8]">{member.phone}</p>
                   </div>
-                  {isLead && <button type="button" onClick={(event) => { event.stopPropagation(); onEditMember(member); }} className="ml-3 text-xs font-bold text-[#3B6FD4]">Edit</button>}
+                  {isLead && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onEditMember(member);
+                        }}
+                        className="ml-3 text-xs font-bold text-[#3B6FD4]"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onRemoveMember(member);
+                        }}
+                        className="ml-2 text-xs font-bold text-[#D6453D]"
+                      >
+                        Remove
+                      </button>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -174,11 +274,19 @@ function TeamDrawer({ team, onClose, onEditMember, isLead }) {
           {/* Responsibilities */}
           {team.responsibilities && team.responsibilities.length > 0 && (
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Responsibilities</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">
+                Responsibilities
+              </h3>
               <div className="mt-3 space-y-2">
                 {team.responsibilities.map((resp, i) => (
-                  <div key={i} className="flex items-center gap-3 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] px-4 py-2.5 text-xs font-semibold text-[#1A1D23]">
-                    <CheckCircle2 size={16} className="text-[#22A65E] shrink-0" />
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] px-4 py-2.5 text-xs font-semibold text-[#1A1D23]"
+                  >
+                    <CheckCircle2
+                      size={16}
+                      className="text-[#22A65E] shrink-0"
+                    />
                     <span>{resp}</span>
                   </div>
                 ))}
@@ -205,45 +313,72 @@ function TeamDrawer({ team, onClose, onEditMember, isLead }) {
 
 function CreateTeamModal({ open, onClose, onCreateTeam }) {
   const [name, setName] = useState("");
-  const [leadName, setLeadName] = useState("");
+  const [members, setMembers] = useState([
+    { name: "", phone: "", role: "member" },
+  ]);
+  const [phoneError, setPhoneError] = useState("");
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    setMembers((current) => {
+      const sanitized = current.map((member) => ({
+        ...member,
+        phone: member.phone.replace(/\D/g, "").slice(0, 10),
+      }));
+      return sanitized.every(
+        (member, index) => member.phone === current[index].phone,
+      )
+        ? current
+        : sanitized;
+    });
+  }, [members]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) return;
+    if (
+      members.some(
+        (member) => member.name.trim() && !/^\d{10}$/.test(member.phone),
+      )
+    ) {
+      setPhoneError("Every added member must have a 10-digit phone number.");
+      return;
+    }
+    setPhoneError("");
 
-    const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const slug = name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-");
     const newTeam = {
       id: `team-${Date.now()}`,
       slug,
       name: name.trim(),
       iconName: "Users",
-      lead: {
-        name: leadName.trim() || "Aman Goel",
-        role: `${name.trim()} Lead`,
-        avatar: "https://i.pravatar.cc/96?img=33",
-        initials: "AG",
-        email: "aman.goel@convene.edu",
-        phone: "+91 98765 00099"
-      },
-      members: [
-        { name: leadName.trim() || "Aman Goel", role: "Team Lead", avatar: "https://i.pravatar.cc/96?img=33", initials: "AG", email: "aman.goel@convene.edu", phone: "+91 98765 00099" }
-      ],
-      responsibilities: ["Operational management and team oversight"]
+      members: members.filter((member) => member.name.trim()),
+      responsibilities: ["Operational management and team oversight"],
     };
 
-    onCreateTeam(newTeam);
+    const created = await onCreateTeam({ ...newTeam, members });
+    if (!created) return;
     setName("");
-    setLeadName("");
+    setMembers([{ name: "", phone: "", role: "member" }]);
+    setPhoneError("");
     onClose();
   };
 
   return (
-    <GlassModal open={open} className="w-[min(480px,calc(100vw-32px))] max-w-none bg-white border border-[rgba(0,0,0,0.08)] rounded-3xl p-6 text-[#1A1D23]">
+    <GlassModal
+      open={open}
+      className="w-[min(680px,calc(100vw-32px))] max-w-none bg-white border border-[rgba(0,0,0,0.08)] rounded-3xl p-6 text-[#1A1D23]"
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-[#1A1D23]">Create Team</h2>
-          <p className="mt-1 text-xs font-medium text-[#5A6577]">Add a new organizing team to the directory.</p>
+          <p className="mt-1 text-xs font-medium text-[#5A6577]">
+            Add a new organizing team to the directory.
+          </p>
         </div>
+
         <button
           className="flex h-8 w-8 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
           onClick={onClose}
@@ -255,7 +390,9 @@ function CreateTeamModal({ open, onClose, onCreateTeam }) {
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         <div>
-          <label className="text-xs font-semibold text-[#8E99A8]">Team Name</label>
+          <label className="text-xs font-semibold text-[#8E99A8]">
+            Team Name
+          </label>
           <input
             type="text"
             required
@@ -267,22 +404,242 @@ function CreateTeamModal({ open, onClose, onCreateTeam }) {
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-[#8E99A8]">Team Lead Name</label>
-          <input
-            type="text"
-            placeholder="e.g. Sara Sethi"
-            value={leadName}
-            onChange={(e) => setLeadName(e.target.value)}
-            className="mt-1 h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
-          />
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-semibold text-[#8E99A8]">
+              Team Members
+            </label>
+            <button
+              type="button"
+              onClick={() =>
+                setMembers((current) => [
+                  ...current,
+                  { name: "", phone: "", role: "member" },
+                ])
+              }
+              className="flex items-center gap-1 text-xs font-bold text-[#3B6FD4]"
+            >
+              <Plus size={14} /> Add member
+            </button>
+          </div>
+          <div className="mt-2 space-y-2">
+            {members.map((member, index) => (
+              <div
+                key={index}
+                className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_128px_32px] items-center gap-2"
+              >
+                <input
+                  required={index === 0}
+                  placeholder="Name"
+                  value={member.name}
+                  onChange={(e) =>
+                    setMembers((current) =>
+                      current.map((item, i) =>
+                        i === index ? { ...item, name: e.target.value } : item,
+                      ),
+                    )
+                  }
+                  className="h-9 min-w-0 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs outline-none"
+                />
+                <input
+                  placeholder="Phone"
+                  value={member.phone}
+                  onChange={(e) =>
+                    setMembers((current) =>
+                      current.map((item, i) =>
+                        i === index ? { ...item, phone: e.target.value } : item,
+                      ),
+                    )
+                  }
+                  className="h-9 min-w-0 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs outline-none"
+                />
+                <div className="relative min-w-0">
+                  <select
+                    value={member.role}
+                    onChange={(e) =>
+                      setMembers((current) =>
+                        current.map((item, i) =>
+                          i === index
+                            ? { ...item, role: e.target.value }
+                            : item,
+                        ),
+                      )
+                    }
+                    className="h-9 w-full appearance-none rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] pl-3 pr-8 text-xs outline-none"
+                  >
+                    <option value="leader">Leader</option>
+                    <option value="co-leader">Co-leader</option>
+                    <option value="member">Member</option>
+                  </select>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setMembers((current) =>
+                      current.filter((_, i) => i !== index),
+                    )
+                  }
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#8E99A8] hover:bg-[#FEF2F2] hover:text-[#D6453D]"
+                  aria-label="Remove member"
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
+        {phoneError && (
+          <p className="-mt-2 text-xs font-semibold text-[#D6453D]">
+            {phoneError}
+          </p>
+        )}
+
         <div className="mt-6 flex justify-end gap-3 pt-2">
-          <GlassButton type="button" onClick={onClose} className="h-9 text-xs rounded-full">
+          <GlassButton
+            type="button"
+            onClick={onClose}
+            className="h-9 text-xs rounded-full"
+          >
             Cancel
           </GlassButton>
-          <GlassButton type="submit" variant="primary" icon={<Plus size={15} />} className="h-9 text-xs rounded-full">
+          <GlassButton
+            type="submit"
+            variant="primary"
+            icon={<Plus size={15} />}
+            className="h-9 text-xs rounded-full"
+          >
             Create Team
+          </GlassButton>
+        </div>
+      </form>
+    </GlassModal>
+  );
+}
+
+function EditMemberModal({ member, teams, onClose, onSave }) {
+  const [name, setName] = useState(member?.name || "");
+  const [phone, setPhone] = useState(member?.phone || "");
+  const [role, setRole] = useState(member?.role || "member");
+  const [teamId, setTeamId] = useState(member?.orgTeamId || "");
+  const [errors, setErrors] = useState({});
+  useEffect(() => {
+    if (!member) return;
+    setName(member.name || "");
+    setPhone(member.phone || "");
+    setRole((member.role || "member").toLowerCase().replace(" ", "-"));
+    setTeamId(member.orgTeamId || "");
+    setErrors({});
+  }, [member]);
+  if (!member) return null;
+  return (
+    <GlassModal
+      open={Boolean(member)}
+      className="w-[min(520px,calc(100vw-32px))] max-w-none rounded-3xl bg-white p-6 text-[#1A1D23]"
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold">Edit Team Member</h2>
+          <p className="mt-1 text-xs text-[#5A6577]">
+            Update member details and assignment.
+          </p>
+        </div>
+        <button
+          onClick={onClose}
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F0F2F5]"
+        >
+          <X size={16} />
+        </button>
+      </div>
+      <form
+        className="mt-5 space-y-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const nextErrors = {
+            ...(name.trim() ? {} : { name: "Name is required." }),
+            ...(phone.match(/^\d{10}$/)
+              ? {}
+              : { phone: "Phone number is 10 digits." }),
+            ...(role ? {} : { role: "Role is required." }),
+            ...(teamId ? {} : { team: "Team is required." }),
+          };
+          setErrors(nextErrors);
+          if (!Object.keys(nextErrors).length)
+            onSave({ name, phone, role, orgTeamId: teamId });
+        }}
+      >
+        <div>
+          <input
+            value={name}
+            onChange={(event) => { setName(event.target.value); setErrors((current) => ({ ...current, name: "" })); }}
+            placeholder="Name"
+            className="h-10 w-full rounded-full bg-[#F0F2F5] px-4 text-xs outline-none"
+          />
+          {errors.name && (
+            <p className="mt-1 text-[11px] text-[#D6453D]">{errors.name}</p>
+          )}
+        </div>
+        <div>
+          <input
+            pattern="\d{10}"
+            maxLength={10}
+            inputMode="numeric"
+            value={phone}
+            onChange={(event) => { setPhone(event.target.value.replace(/\D/g, "").slice(0, 10)); setErrors((current) => ({ ...current, phone: "" })); }}
+            placeholder="10-digit phone number"
+            className="h-10 w-full rounded-full bg-[#F0F2F5] px-4 text-xs outline-none"
+          />
+          {errors.phone && (
+            <p className="mt-1 text-[11px] text-[#D6453D]">{errors.phone}</p>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <div className="relative"><select
+              value={role}
+              onChange={(event) => { setRole(event.target.value); setErrors((current) => ({ ...current, role: "" })); }}
+              className="h-10 w-full appearance-none rounded-full bg-[#F0F2F5] pl-3 pr-8 text-xs outline-none"
+            >
+              <option value="">Select role</option>
+              <option value="leader">Leader</option>
+              <option value="co-leader">Co-leader</option>
+              <option value="member">Member</option>
+            </select></div>
+            {errors.role && (
+              <p className="mt-1 text-[11px] text-[#D6453D]">{errors.role}</p>
+            )}
+          </div>
+          <div>
+            <div className="relative"><select
+              value={teamId}
+              onChange={(event) => { setTeamId(event.target.value); setErrors((current) => ({ ...current, team: "" })); }}
+              className="h-10 w-full appearance-none rounded-full bg-[#F0F2F5] pl-3 pr-8 text-xs outline-none"
+            >
+              <option value="">Select team</option>
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+            </select></div>
+            {errors.team && (
+              <p className="mt-1 text-[11px] text-[#D6453D]">{errors.team}</p>
+            )}
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 pt-3">
+          <GlassButton
+            type="button"
+            onClick={onClose}
+            className="h-9 rounded-full text-xs"
+          >
+            Cancel
+          </GlassButton>
+          <GlassButton
+            type="submit"
+            variant="primary"
+            className="h-9 rounded-full text-xs"
+          >
+            Save changes
           </GlassButton>
         </div>
       </form>
@@ -297,6 +654,9 @@ export function TeamsPage() {
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [editingMember, setEditingMember] = useState(null);
+  const [addingMember, setAddingMember] = useState(null);
 
   const role = useAppStore((state) => state.role);
   const isLead = role === "lead";
@@ -305,9 +665,13 @@ export function TeamsPage() {
   useEffect(() => {
     if (!activeEvent?.id) return;
     const token = localStorage.getItem("convene_token");
-    fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams`, { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
-      .then(({ ok, data }) => { if (ok) setTeams((data.teams || []).map(formatTeam)); })
+      .then(({ ok, data }) => {
+        if (ok) setTeams((data.teams || []).map(formatTeam));
+      })
       .finally(() => setLoading(false));
   }, [activeEvent?.id]);
 
@@ -324,39 +688,180 @@ export function TeamsPage() {
         team.lead.name.toLowerCase().includes(query) ||
         team.members.some((m) => m.name.toLowerCase().includes(query));
 
-      const matchesLead = leadFilter === "All Leads" || team.lead.name === leadFilter;
+      const matchesLead =
+        leadFilter === "All Leads" || team.lead.name === leadFilter;
 
       return matchesSearch && matchesLead;
     });
   }, [isLead, leadFilter, search, teams]);
 
   const handleCreateTeam = async (newTeam) => {
-    if (!activeEvent?.id) return;
+    if (!activeEvent?.id) {
+      setError("No active event selected.");
+      return false;
+    }
     const token = localStorage.getItem("convene_token");
-    const res = await fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ name: newTeam.name }) });
+    const res = await fetch(
+      `${API_BASE}/events/${activeEvent.id}/organizing-teams`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: newTeam.name,
+          members: newTeam.members || [],
+        }),
+      },
+    );
     const data = await res.json();
-    if (res.ok) setTeams((prev) => [formatTeam(data.team), ...prev]);
+    if (res.ok) {
+      setTeams((prev) => [formatTeam(data.team), ...prev]);
+      return true;
+    }
+    setError(data.error || "Failed to create team.");
+    return false;
   };
 
-  const handleEditMember = async (member) => {
-    const name = window.prompt("Member name", member.name);
-    if (!name?.trim()) return;
+  const handleAddMember = async (team) => {
+    setAddingMember({
+      name: "",
+      phone: "",
+      role: "member",
+      orgTeamId: team.id,
+    });
+  };
+
+  const handleSaveNewMember = async ({ name, phone, role }) => {
     const token = localStorage.getItem("convene_token");
-    const res = await fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams/${selectedTeam.id}/members/${member.id}`, { method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ name: name.trim(), phone: member.phone }) });
-    if (res.ok) setTeams((prev) => prev.map((team) => team.id === selectedTeam.id ? { ...team, members: team.members.map((item) => item.id === member.id ? { ...item, name: name.trim() } : item) } : team));
+    const res = await fetch(
+      `${API_BASE}/events/${activeEvent.id}/organizing-teams/${addingMember.orgTeamId}/members`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name, phone, role }),
+      },
+    );
+    if (!res.ok) return;
+    const data = await res.json();
+    const updated = teams.find((item) => item.id === addingMember.orgTeamId);
+    const nextTeam = formatTeam({
+      ...updated,
+      members: [...(updated?.members || []), data.member],
+    });
+    setTeams((prev) =>
+      prev.map((item) =>
+        item.id === addingMember.orgTeamId ? nextTeam : item,
+      ),
+    );
+    setSelectedTeam(nextTeam);
+    setAddingMember(null);
+  };
+
+  const handleRemoveMember = async (member) => {
+    if (!window.confirm(`Remove ${member.name} from this team?`)) return;
+    const token = localStorage.getItem("convene_token");
+    const res = await fetch(
+      `${API_BASE}/events/${activeEvent.id}/organizing-teams/${selectedTeam.id}/members/${member.id}`,
+      { method: "DELETE", headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (res.ok) {
+      const nextTeams = teams.map((team) =>
+        team.id === selectedTeam.id
+          ? formatTeam({
+              ...team,
+              members: team.members.filter((item) => item.id !== member.id),
+            })
+          : team,
+      );
+      setTeams(nextTeams);
+      setSelectedTeam(
+        nextTeams.find((team) => team.id === selectedTeam.id) || null,
+      );
+    }
+  };
+
+  const handleEditMember = (member) =>
+    setEditingMember({ ...member, orgTeamId: selectedTeam.id });
+
+  const handleSaveMember = async ({ name, phone, role, orgTeamId }) => {
+    const token = localStorage.getItem("convene_token");
+    const res = await fetch(
+      `${API_BASE}/events/${activeEvent.id}/organizing-teams/${editingMember.orgTeamId}/members/${editingMember.id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: name.trim(), phone, role, orgTeamId }),
+      },
+    );
+    if (res.ok) {
+      const moved = teams
+        .map((team) =>
+          team.id === editingMember.orgTeamId
+            ? {
+                ...team,
+                members: team.members.filter(
+                  (item) => item.id !== editingMember.id,
+                ),
+              }
+            : team,
+        )
+        .map((team) =>
+          team.id === orgTeamId
+            ? {
+                ...team,
+                members: [
+                  ...team.members,
+                  {
+                    ...editingMember,
+                    name: name.trim(),
+                    phone,
+                    role,
+                    orgTeamId,
+                  },
+                ],
+              }
+            : team,
+        )
+        .map(formatTeam);
+      setTeams(moved);
+      setSelectedTeam(moved.find((team) => team.id === orgTeamId) || null);
+      setEditingMember(null);
+    }
   };
 
   return (
     <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
+      {error && (
+        <div className="rounded-2xl border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#D6453D]">
+          {error}
+        </div>
+      )}
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#1A1D23] md:text-3xl">Teams</h1>
-          <p className="mt-1 text-sm text-[#5A6577] font-medium">Coordinate organizing teams and monitor responsibilities.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[#1A1D23] md:text-3xl">
+            Teams
+          </h1>
+          <p className="mt-1 text-sm text-[#5A6577] font-medium">
+            Coordinate organizing teams and monitor responsibilities.
+          </p>
         </div>
         {isLead && (
           <div className="flex items-center gap-3">
-            <GlassButton variant="primary" icon={<Plus size={16} strokeWidth={2} />} onClick={() => setCreateModalOpen(true)} className="rounded-full">
+            <GlassButton
+              variant="primary"
+              icon={<Plus size={16} strokeWidth={2} />}
+              onClick={() => setCreateModalOpen(true)}
+              className="rounded-full"
+            >
               Create Team
             </GlassButton>
           </div>
@@ -366,7 +871,11 @@ export function TeamsPage() {
       {/* Search Bar */}
       <div className="flex flex-wrap items-center gap-3 lg:flex-nowrap">
         <div className="flex h-9 min-w-[240px] flex-1 items-center gap-2 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-medium text-[#1A1D23] focus-within:ring-1 focus-within:ring-[#3B6FD4]">
-          <Search size={15} strokeWidth={2} className="text-[#8E99A8] shrink-0" />
+          <Search
+            size={15}
+            strokeWidth={2}
+            className="text-[#8E99A8] shrink-0"
+          />
           <input
             type="text"
             placeholder="Search by team name, lead, or member name..."
@@ -417,18 +926,29 @@ export function TeamsPage() {
                       {team.name}
                     </h3>
                     <p className="text-xs font-semibold text-[#8E99A8] truncate mt-0.5">
-                      Lead: <span className="text-[#5A6577]">{team.lead.name}</span>
+                      Lead:{" "}
+                      <span className="text-[#5A6577]">{team.lead.name}</span>
                     </p>
                   </div>
                 </div>
 
                 {/* Member Avatar Stack */}
                 <div className="mt-8 flex items-center justify-between border-t border-[rgba(0,0,0,0.06)] pt-4">
-                  <span className="text-xs font-semibold text-[#8E99A8]">Members ({team.members.length})</span>
+                  <span className="text-xs font-semibold text-[#8E99A8]">
+                    Members ({team.members.length})
+                  </span>
                   <div className="flex items-center -space-x-2">
                     {visibleMembers.map((m) => (
-                      <div key={m.email} className="ring-2 ring-white rounded-full" title={`${m.name} (${m.role})`}>
-                        <UserAvatar initials={m.initials} image={m.avatar} className="h-7 w-7 text-[10px] bg-[#EBF0FA] text-[#3B6FD4]" />
+                      <div
+                        key={m.id || `${m.name}-${m.phone}`}
+                        className="ring-2 ring-white rounded-full"
+                        title={`${m.name} (${m.role})`}
+                      >
+                        <UserAvatar
+                          initials={m.initials}
+                          image={m.avatar}
+                          className="h-7 w-7 text-[10px] bg-[#EBF0FA] text-[#3B6FD4]"
+                        />
                       </div>
                     ))}
                     {remainingCount > 0 && (
@@ -448,10 +968,33 @@ export function TeamsPage() {
       )}
 
       {/* Team Drawer */}
-      <TeamDrawer team={selectedTeam} onClose={() => setSelectedTeam(null)} onEditMember={handleEditMember} isLead={isLead} />
+      <TeamDrawer
+        team={selectedTeam}
+        onClose={() => setSelectedTeam(null)}
+        onEditMember={handleEditMember}
+        onAddMember={handleAddMember}
+        onRemoveMember={handleRemoveMember}
+        isLead={isLead}
+      />
+      <EditMemberModal
+        member={isLead ? editingMember : null}
+        teams={teams}
+        onClose={() => setEditingMember(null)}
+        onSave={handleSaveMember}
+      />
+      <EditMemberModal
+        member={isLead ? addingMember : null}
+        teams={teams}
+        onClose={() => setAddingMember(null)}
+        onSave={handleSaveNewMember}
+      />
 
       {/* Create Team Modal */}
-      <CreateTeamModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} onCreateTeam={handleCreateTeam} />
+      <CreateTeamModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onCreateTeam={handleCreateTeam}
+      />
     </div>
   );
 }

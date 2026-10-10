@@ -162,7 +162,6 @@ export function DutiesPage() {
               </option>
             ))}
           </select>
-          <ChevronDown size={13} className="text-[#8E99A8]" />
         </label>
       </div>
 

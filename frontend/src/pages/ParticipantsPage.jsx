@@ -111,7 +111,7 @@ export function ParticipantsPage() {
           const members = (t.members || []).map((m) => {
             const userId = m.user?.id || m.userId || m.id;
             const memberStatus =
-              (userId && participantStatusMap[userId]) || "Confirmed";
+              (userId && participantStatusMap[userId]) || "Unconfirmed";
             const memberNotes = (userId && participantNotesMap[userId]) || "";
 
             return {
@@ -147,7 +147,7 @@ export function ParticipantsPage() {
 
         rawParticipants.forEach((ep) => {
           if (ep.user && !teamUserIds.has(ep.user.id)) {
-            let memberStatus = ep.checkInStatus || "Confirmed";
+            let memberStatus = ep.checkInStatus || "Unconfirmed";
             if (memberStatus === "Checked_In") memberStatus = "Checked In";
             const pNotes = ep.internalNotes || "";
 
@@ -202,10 +202,7 @@ export function ParticipantsPage() {
   const teamMatchesStatus = useCallback((team, targetStatus) => {
     if (!targetStatus || targetStatus === "All Statuses") return true;
 
-    return (
-      team.status === targetStatus ||
-      team.members?.some((m) => m.status === targetStatus)
-    );
+    return team.status === targetStatus;
   }, []);
 
   const counts = useMemo(() => {

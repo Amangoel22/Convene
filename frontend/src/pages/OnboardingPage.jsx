@@ -53,9 +53,13 @@ const defaultStagesForType = {
   ]
 };
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+
 export function OnboardingPage() {
   const navigate = useNavigate();
   const { events, setActiveEvent, addEvent, setRole } = useAppStore();
+  const [launchError, setLaunchError] = useState(null);
+  const [isLaunching, setIsLaunching] = useState(false);
 
   // Step state: 1 = Role, 2 = Action, 3 = Basic Details / Select, 4 = Advanced Setup (Timeline, Timings, Duration, Location)
   const [step, setStep] = useState(1);
@@ -179,8 +183,16 @@ export function OnboardingPage() {
 
   const handleFinalLaunch = async (e) => {
     e.preventDefault();
+    setLaunchError(null);
+    setIsLaunching(true);
 
     const token = localStorage.getItem("convene_token");
+    if (!token) {
+      setLaunchError("You are not logged in. Please refresh and sign in again.");
+      setIsLaunching(false);
+      return;
+    }
+
     const payload = {
       name: eventName.trim(),
       type: eventType,
@@ -194,56 +206,39 @@ export function OnboardingPage() {
     };
 
     try {
-      if (token) {
-        const res = await fetch("http://localhost:8000/api/events", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify(payload)
-        });
+      const res = await fetch(`${API_BASE}/events`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          const createdDbEvent = {
-            ...data.event,
-            role: "Organizing Team Lead",
-            duration: data.event.durationDisplay || duration || "24 Hours",
-            location: data.event.primaryLocation || location.trim(),
-            stages: data.event.stages || stagesList
-          };
-          addEvent(createdDbEvent);
-          setActiveEvent(createdDbEvent);
-          setRole("lead");
-          navigate("/dashboard");
-          return;
-        }
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        const msg = errData.error || errData.message || `Server error (${res.status}). Please try again.`;
+        setLaunchError(msg);
+        setIsLaunching(false);
+        return;
       }
+
+      const data = await res.json();
+      const createdDbEvent = {
+        ...data.event,
+        role: "Organizing Team Lead",
+        duration: data.event.durationDisplay || duration || "24 Hours",
+        location: data.event.primaryLocation || location.trim(),
+        stages: data.event.stages || stagesList
+      };
+      addEvent(createdDbEvent);
+      setActiveEvent(createdDbEvent);
+      setRole("lead");
+      navigate("/dashboard");
     } catch (err) {
-      console.warn("Backend event sync notice:", err.message);
+      setLaunchError("Could not reach the server. Please check your connection and try again.");
+      setIsLaunching(false);
     }
-
-    // Fallback store dispatch
-    const newEvent = {
-      id: `evt-${Date.now()}`,
-      name: eventName.trim(),
-      type: eventType,
-      date: startDate || new Date().toISOString().split("T")[0],
-      startDate,
-      endDate,
-      startTime,
-      endTime,
-      duration: duration || "24 Hours",
-      location: location.trim() || undefined,
-      role: "Organizing Team Lead",
-      stages: stagesList
-    };
-
-    addEvent(newEvent);
-    setActiveEvent(newEvent);
-    setRole("lead");
-    navigate("/dashboard");
   };
 
   return (
@@ -606,13 +601,29 @@ export function OnboardingPage() {
                   </div>
                 </div>
 
-                <div className="pt-3">
+                <div className="pt-3 space-y-3">
+                  {launchError && (
+                    <div className="flex items-start gap-3 rounded-2xl bg-[#FEF2F2] border border-[#FECACA] px-4 py-3">
+                      <Zap size={16} className="text-[#D6453D] mt-0.5 shrink-0" />
+                      <p className="text-xs font-semibold text-[#D6453D] leading-relaxed">{launchError}</p>
+                    </div>
+                  )}
                   <button
                     type="submit"
-                    className="w-full flex h-11 items-center justify-center gap-2 rounded-full bg-[#3B6FD4] text-xs font-bold text-white hover:bg-[#2F5BB8] shadow-md transition-colors"
+                    disabled={isLaunching}
+                    className="w-full flex h-11 items-center justify-center gap-2 rounded-full bg-[#3B6FD4] text-xs font-bold text-white hover:bg-[#2F5BB8] shadow-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <span>Build Working Dashboard</span>
-                    <ArrowRight size={16} />
+                    {isLaunching ? (
+                      <>
+                        <Radio size={16} className="animate-pulse" />
+                        <span>Creating Event…</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Build Working Dashboard</span>
+                        <ArrowRight size={16} />
+                      </>
+                    )}
                   </button>
                 </div>
               </form>

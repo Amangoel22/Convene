@@ -65,10 +65,6 @@ model Venue {
   eventId     String   @map("event_id") @db.Uuid
   name        String   @db.VarChar(255)
   description String?
-  address     String?
-  mapUrl      String?  @map("map_url")
-  latitude    Decimal? @db.Decimal(10, 7)
-  longitude   Decimal? @db.Decimal(10, 7)
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   event         Event        @relation("EventVenues", fields: [eventId], references: [id], onDelete: Cascade)

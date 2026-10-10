@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { GlassButton } from "@/components/glass/GlassButton";
+import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
 import { ParticipantDrawer } from "@/components/participants/ParticipantDrawer";
@@ -93,19 +94,19 @@ export function ParticipantsPage() {
             t.members?.find((m) => m.role === "lead") || t.members?.[0];
           const leader = leadMember?.user
             ? {
-                name: leadMember.user.name,
-                email: leadMember.user.email,
-                phone: leadMember.user.phone || "N/A",
-                initials: leadMember.user.name
-                  ? leadMember.user.name.substring(0, 2).toUpperCase()
-                  : "U",
-              }
+              name: leadMember.user.name,
+              email: leadMember.user.email,
+              phone: leadMember.user.phone || "N/A",
+              initials: leadMember.user.name
+                ? leadMember.user.name.substring(0, 2).toUpperCase()
+                : "U",
+            }
             : {
-                name: "Team Lead",
-                email: "lead@convene.test",
-                phone: "N/A",
-                initials: "TL",
-              };
+              name: "Team Lead",
+              email: "lead@convene.test",
+              phone: "N/A",
+              initials: "TL",
+            };
 
           const members = (t.members || []).map((m) => {
             const userId = m.user?.id || m.userId || m.id;
@@ -198,6 +199,25 @@ export function ParticipantsPage() {
     loadEventTeams();
   }, [loadEventTeams]);
 
+  const teamMatchesStatus = useCallback((team, targetStatus) => {
+    if (!targetStatus || targetStatus === "All Statuses") return true;
+
+    return (
+      team.status === targetStatus ||
+      team.members?.some((m) => m.status === targetStatus)
+    );
+  }, []);
+
+  const counts = useMemo(() => {
+    return {
+      total: teams.length,
+      checkedIn: teams.filter((t) => teamMatchesStatus(t, "Checked In")).length,
+      confirmed: teams.filter((t) => teamMatchesStatus(t, "Confirmed")).length,
+      unconfirmed: teams.filter((t) => teamMatchesStatus(t, "Unconfirmed")).length,
+      rejected: teams.filter((t) => teamMatchesStatus(t, "Rejected")).length,
+    };
+  }, [teams, teamMatchesStatus]);
+
   const filteredTeams = useMemo(() => {
     const query = debouncedSearch.trim().toLowerCase();
     return teams
@@ -207,22 +227,23 @@ export function ParticipantsPage() {
           [
             team.team,
             team.teamName,
-            team.leader.name,
+            team.leader?.name,
             team.college,
             team.status,
           ].some((value) => value && value.toLowerCase().includes(query));
-        return (
-          matchesSearch &&
-          (status === "All Statuses" || team.status === status) &&
-          (college === "All Colleges" || team.college === college)
-        );
+
+        const matchesStatus = teamMatchesStatus(team, status);
+        const matchesCollege =
+          college === "All Colleges" || team.college === college;
+
+        return matchesSearch && matchesStatus && matchesCollege;
       })
       .sort((a, b) => {
         if (sort === "College") return a.college.localeCompare(b.college);
         if (sort === "Status") return a.status.localeCompare(b.status);
         return a.team.localeCompare(b.team, undefined, { numeric: true });
       });
-  }, [college, debouncedSearch, sort, status, teams]);
+  }, [college, debouncedSearch, sort, status, teams, teamMatchesStatus]);
 
   const handleCloseDrawer = () => {
     setSelectedTeam(null);
@@ -449,54 +470,91 @@ export function ParticipantsPage() {
 
       {/* Overview Banner */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
-        <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <button
+          type="button"
+          onClick={() => setStatus("All Statuses")}
+          className={cn(
+            "text-left rounded-3xl bg-white border p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all cursor-pointer hover:border-[#3B6FD4]/40",
+            status === "All Statuses"
+              ? "border-[#3B6FD4] ring-2 ring-[#3B6FD4]/20 bg-[#F8FAFC]"
+              : "border-[rgba(0,0,0,0.08)]",
+          )}
+        >
           <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">
-            {filteredTeams.every((t) => t.members.length === 1)
-              ? "Total Participants"
-              : "Total Teams"}
+            Total Teams
           </p>
           <p className="mt-1 text-2xl font-bold text-[#1A1D23]">
-            {filteredTeams.length}
+            {counts.total}
           </p>
-        </div>
-        <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        </button>
+        <button
+          type="button"
+          onClick={() => setStatus("Checked In")}
+          className={cn(
+            "text-left rounded-3xl bg-white border p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all cursor-pointer hover:border-[#22A65E]/40",
+            status === "Checked In"
+              ? "border-[#22A65E] ring-2 ring-[#22A65E]/20 bg-[#F4FBF7]"
+              : "border-[rgba(0,0,0,0.08)]",
+          )}
+        >
           <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">
             Checked In
           </p>
           <p className="mt-1 text-2xl font-bold text-[#22A65E]">
-            {
-              filteredTeams.filter(
-                (t) =>
-                  t.status === "Checked In" ||
-                  t.members.some((m) => m.status === "Checked In"),
-              ).length
-            }
+            {counts.checkedIn}
           </p>
-        </div>
-        <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        </button>
+        <button
+          type="button"
+          onClick={() => setStatus("Confirmed")}
+          className={cn(
+            "text-left rounded-3xl bg-white border p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all cursor-pointer hover:border-[#3B6FD4]/40",
+            status === "Confirmed"
+              ? "border-[#3B6FD4] ring-2 ring-[#3B6FD4]/20 bg-[#F5F8FF]"
+              : "border-[rgba(0,0,0,0.08)]",
+          )}
+        >
           <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">
             Confirmed
           </p>
           <p className="mt-1 text-2xl font-bold text-[#3B6FD4]">
-            {filteredTeams.filter((t) => t.status === "Confirmed").length}
+            {counts.confirmed}
           </p>
-        </div>
-        <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        </button>
+        <button
+          type="button"
+          onClick={() => setStatus("Unconfirmed")}
+          className={cn(
+            "text-left rounded-3xl bg-white border p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all cursor-pointer hover:border-[#D4930E]/40",
+            status === "Unconfirmed"
+              ? "border-[#D4930E] ring-2 ring-[#D4930E]/20 bg-[#FEFBF3]"
+              : "border-[rgba(0,0,0,0.08)]",
+          )}
+        >
           <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">
             Unconfirmed
           </p>
           <p className="mt-1 text-2xl font-bold text-[#D4930E]">
-            {filteredTeams.filter((t) => t.status === "Unconfirmed").length}
+            {counts.unconfirmed}
           </p>
-        </div>
-        <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        </button>
+        <button
+          type="button"
+          onClick={() => setStatus("Rejected")}
+          className={cn(
+            "text-left rounded-3xl bg-white border p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all cursor-pointer hover:border-[#E53E3E]/40",
+            status === "Rejected"
+              ? "border-[#E53E3E] ring-2 ring-[#E53E3E]/20 bg-[#FFF5F5]"
+              : "border-[rgba(0,0,0,0.08)]",
+          )}
+        >
           <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">
-            Colleges
+            Rejected
           </p>
-          <p className="mt-1 text-2xl font-bold text-[#1A1D23]">
-            {new Set(filteredTeams.map((t) => t.college)).size}
+          <p className="mt-1 text-2xl font-bold text-[#E53E3E]">
+            {counts.rejected}
           </p>
-        </div>
+        </button>
       </div>
 
       {/* Search & Filters */}

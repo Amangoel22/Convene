@@ -30,6 +30,7 @@ export function StatusPill({ status }) {
     Absent: `bg-[${COLORS.grayMuted}]/10 text-[${COLORS.grayText}] border-[${COLORS.grayMuted}]/20`,
     Withdrawn: `bg-[${COLORS.purple}]/10 text-[${COLORS.purple}] border-[${COLORS.purple}]/20`,
     Rejected: `bg-[${COLORS.error}]/10 text-[${COLORS.error}] border-[${COLORS.error}]/20`,
+    Blocked: `bg-[${COLORS.error}]/10 text-[${COLORS.error}] border-[${COLORS.error}]/20`,
   };
 
   return (
@@ -52,6 +53,7 @@ export function ParticipantStatusSelect({ status, onChange, isLead = true }) {
     Absent: `text-[${COLORS.grayText}] bg-[${COLORS.grayMuted}]/10 border-[${COLORS.grayMuted}]/30`,
     Withdrawn: `text-[${COLORS.purple}] bg-[${COLORS.purple}]/10 border-[${COLORS.purple}]/30`,
     Rejected: `text-[${COLORS.error}] bg-[${COLORS.error}]/10 border-[${COLORS.error}]/30`,
+    Blocked: `text-[${COLORS.error}] bg-[${COLORS.error}]/10 border-[${COLORS.error}]/30`,
   };
 
   if (!isLead) {
@@ -85,6 +87,7 @@ export function ParticipantStatusSelect({ status, onChange, isLead = true }) {
         <option value="Unconfirmed" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Unconfirmed</option>
         <option value="Absent" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Absent</option>
         <option value="Withdrawn" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Withdrawn</option>
+        <option value="Blocked" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Blocked</option>
         <option value="Rejected" className="bg-white text-[#1A1D23] font-sans font-semibold capitalize">Rejected</option>
       </select>
       <ChevronDown

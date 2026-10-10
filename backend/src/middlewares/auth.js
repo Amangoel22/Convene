@@ -33,7 +33,7 @@ export function authorizeOrgLead() {
     const eventId = req.eventId || req.params.eventId || req.body.eventId;
     try {
       const access = await prisma.orgAccess.findUnique({ where: { unique_event_org_access: { eventId, userId: req.user.id } } });
-      if (!access || access.accessLevel !== "lead") return res.status(403).json({ error: "Access denied. Organizing lead access is required." });
+      if ((!access || access.accessLevel !== "lead") && req.eventMembership?.role !== "organizer") return res.status(403).json({ error: "Access denied. Organizing lead access is required." });
       next();
     } catch (error) { return res.status(500).json({ error: "Organizing access check failed.", details: error.message }); }
   };

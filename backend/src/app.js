@@ -7,6 +7,7 @@ import stageRoutes from "./routes/stageRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import participantRoutes from "./routes/participantRoutes.js";
 import qrRoutes from "./routes/qrRoutes.js";
+import orgRoutes from "./routes/orgRoutes.js";
 
 const app = express();
 
@@ -180,10 +181,12 @@ app.get("/docs", (req, res) => {
 // Mounting API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/events", taskRoutes);
 app.use("/api/stages", stageRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/participants", participantRoutes);
 app.use("/api/qr", qrRoutes);
+app.use("/api/events", orgRoutes);
 
 // Global 404 Handler
 app.use((req, res) => {

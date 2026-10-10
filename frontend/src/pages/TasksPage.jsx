@@ -9,11 +9,10 @@ import {
   LayoutList,
   Plus,
   Search,
-  Send,
   Users,
   X
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { StatusBadge } from "@/components/common/StatusBadge";
@@ -23,8 +22,26 @@ import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
 
-const teams = ["All Teams", "Registration", "Hospitality", "Operations", "Tech", "Stage", "Logistics"];
 const statuses = ["All Statuses", "Todo", "In Progress", "Blocked", "Completed"];
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+
+function formatTask(task) {
+  const member = task.assignedOrgMember;
+  const team = task.orgTeam;
+  const name = member?.user?.name || member?.name || "Unassigned";
+  return {
+    ...task,
+    status: task.status === "In_Progress" ? "In Progress" : task.status,
+    department: team?.name || "Unassigned",
+    assignee: { name, initials: name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase(), avatar: member?.user?.avatarUrl, email: member?.user?.email, phone: member?.user?.phone || member?.phone },
+    activity: [],
+    checklist: [],
+    attachments: [],
+    notes: ""
+    ,lastUpdatedAt: task.updatedAt,
+    lastUpdatedBy: task.lastUpdatedByName || "Unknown"
+  };
+}
 
 function SelectFilter({ value, onChange, options, label }) {
   return (
@@ -47,24 +64,7 @@ function SelectFilter({ value, onChange, options, label }) {
 }
 
 function TaskDrawer({ task, onClose, onUpdateTask }) {
-  const [newNote, setNewNote] = useState("");
-
   if (!task) return null;
-
-  const handleAddNote = (e) => {
-    e.preventDefault();
-    if (!newNote.trim()) return;
-    const noteText = task.notes ? `${task.notes}\n\n[${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}] ${newNote.trim()}` : newNote.trim();
-    onUpdateTask({
-      ...task,
-      notes: noteText,
-      activity: [
-        { id: `act-${Date.now()}`, user: "Aman Goel", action: "added internal note", timestamp: "Just now" },
-        ...task.activity
-      ]
-    });
-    setNewNote("");
-  };
 
   const handleStatusChange = (newStatus) => {
     onUpdateTask({
@@ -153,31 +153,8 @@ function TaskDrawer({ task, onClose, onUpdateTask }) {
             </p>
           </div>
 
-          {/* Internal Notes */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Internal Operational Notes</h3>
-            <div className="mt-2 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5">
-              {task.notes ? (
-                <p className="whitespace-pre-wrap text-xs leading-relaxed text-[#5A6577] font-medium">{task.notes}</p>
-              ) : (
-                <p className="text-xs text-[#8E99A8] italic">No internal notes added yet.</p>
-              )}
-              <form onSubmit={handleAddNote} className="mt-3 flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Type an internal note..."
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  className="h-8 flex-1 rounded-full bg-white border border-[rgba(0,0,0,0.08)] px-3.5 text-xs text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
-                />
-                <button
-                  type="submit"
-                  className="flex h-8 px-3 min-h-0 items-center justify-center rounded-full bg-[#3B6FD4] text-xs font-semibold text-white hover:bg-[#2F5BB8]"
-                >
-                  <Send size={13} />
-                </button>
-              </form>
-            </div>
+          <div className="border-t border-[rgba(0,0,0,0.06)] pt-4 text-xs text-[#8E99A8]">
+            Last updated by <span className="font-bold text-[#5A6577]">{task.lastUpdatedBy}</span> at {task.lastUpdatedAt ? new Date(task.lastUpdatedAt).toLocaleString() : "—"}
           </div>
         </div>
 
@@ -197,37 +174,21 @@ function TaskDrawer({ task, onClose, onUpdateTask }) {
   );
 }
 
-function NewTaskModal({ open, onClose, onCreateTask }) {
+function NewTaskModal({ open, onClose, onCreateTask, teams, members }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [department, setDepartment] = useState("Operations");
+  const [department, setDepartment] = useState(teams[0]?.id || "");
+  const [assignedOrgMemberId, setAssignedOrgMemberId] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim()) return;
 
-    const newTask = {
-      id: `TASK-${Math.floor(100 + Math.random() * 900)}`,
-      title: title.trim(),
-      description: description.trim() || "Operational task description pending details.",
-      department,
-      status: "Todo",
-      assignee: {
-        name: "Aman Goel",
-        initials: "AG",
-        avatar: "https://i.pravatar.cc/96?img=33",
-        email: "aman.goel@convene.edu"
-      },
-      completedToday: false,
-      checklist: [{ id: "c1", title: "Initial operational setup", completed: false }],
-      attachments: [],
-      notes: "Newly created event operational task.",
-      activity: [{ id: `act-${Date.now()}`, user: "Aman Goel", action: "created task", timestamp: "Just now" }]
-    };
-
-    onCreateTask(newTask);
+    const selectedMember = members.find((member) => member.id === assignedOrgMemberId);
+    onCreateTask({ title: title.trim(), description: description.trim(), orgTeamId: selectedMember?.orgTeamId || null, assignedOrgMemberId: assignedOrgMemberId || null });
     setTitle("");
     setDescription("");
+    setAssignedOrgMemberId("");
     onClose();
   };
 
@@ -272,17 +233,10 @@ function NewTaskModal({ open, onClose, onCreateTask }) {
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-[#8E99A8]">Team / Department</label>
-          <select
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
-            className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none cursor-pointer"
-          >
-            {teams.slice(1).map((d) => (
-              <option key={d} value={d} className="bg-white text-[#1A1D23]">
-                {d}
-              </option>
-            ))}
+          <label className="text-xs font-semibold text-[#8E99A8]">Assign To</label>
+          <select value={assignedOrgMemberId} onChange={(e) => setAssignedOrgMemberId(e.target.value)} className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none cursor-pointer">
+            <option value="">Unassigned</option>
+            {members.map((member) => <option key={member.id} value={member.id}>{member.name} — {member.teamName}</option>)}
           </select>
         </div>
 
@@ -301,6 +255,8 @@ function NewTaskModal({ open, onClose, onCreateTask }) {
 
 export function TasksPage() {
   const [tasksList, setTasksList] = useState([]);
+  const [teamsList, setTeamsList] = useState([]);
+  const [membersList, setMembersList] = useState([]);
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("All Teams");
   const [status, setStatus] = useState("All Statuses");
@@ -308,13 +264,33 @@ export function TasksPage() {
   const [view, setView] = useState("list");
   const [selectedTask, setSelectedTask] = useState(null);
   const [newTaskOpen, setNewTaskOpen] = useState(false);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const role = useAppStore((state) => state.role);
+  const activeEvent = useAppStore((state) => state.activeEvent);
   const isLead = role === "lead";
 
+  useEffect(() => {
+    if (!activeEvent?.id) return;
+    const token = localStorage.getItem("convene_token");
+    const headers = { Authorization: `Bearer ${token}` };
+    setLoading(true);
+    Promise.all([
+      fetch(`${API_BASE}/events/${activeEvent.id}/tasks`, { headers }).then((res) => res.ok ? res.json() : Promise.reject(new Error("Failed to fetch tasks."))),
+      fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams`, { headers }).then((res) => res.ok ? res.json() : Promise.reject(new Error("Failed to fetch organizing teams.")))
+    ]).then(([taskData, teamData]) => {
+      setTasksList((taskData.tasks || []).map(formatTask));
+      const teams = teamData.teams || [];
+      setTeamsList(teams);
+      setMembersList(teams.flatMap((team) => team.members.map((member) => ({ ...member, orgTeamId: team.id, teamName: team.name }))));
+    }).catch((fetchError) => setError(fetchError.message)).finally(() => setLoading(false));
+  }, [activeEvent?.id]);
+
+  const teamOptions = useMemo(() => ["All Teams", ...teamsList.map((team) => team.name)], [teamsList]);
+
   const assigneeOptions = useMemo(() => {
-    return ["All Assignees", ...Array.from(new Set(tasksList.map((t) => t.assignee.name)))];
+    return ["All Assignees", ...Array.from(new Set(tasksList.map((t) => t.assignee?.name).filter(Boolean)))];
   }, [tasksList]);
 
   const filteredTasks = useMemo(() => {
@@ -347,24 +323,29 @@ export function TasksPage() {
 
   const handleToggleComplete = (e, taskId) => {
     e.stopPropagation();
-    setTasksList((prev) =>
-      prev.map((t) => {
-        if (t.id === taskId) {
-          const nextStatus = t.status === "Completed" ? "In Progress" : "Completed";
-          return { ...t, status: nextStatus, completedToday: nextStatus === "Completed" };
-        }
-        return t;
-      })
-    );
+    const task = tasksList.find((item) => item.id === taskId);
+    if (!task) return;
+    const nextStatus = task.status === "Completed" ? "In Progress" : "Completed";
+    handleUpdateTask({ ...task, status: nextStatus, completedToday: nextStatus === "Completed" });
   };
 
-  const handleUpdateTask = (updatedTask) => {
+  const handleUpdateTask = async (updatedTask) => {
+    if (updatedTask.status !== tasksList.find((task) => task.id === updatedTask.id)?.status) {
+      const token = localStorage.getItem("convene_token");
+      await fetch(`${API_BASE}/tasks/${updatedTask.id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ status: updatedTask.status }) });
+    }
     setTasksList((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
     setSelectedTask(updatedTask);
   };
 
-  const handleCreateTask = (newTask) => {
-    setTasksList((prev) => [newTask, ...prev]);
+  const handleCreateTask = async (newTask) => {
+    if (!activeEvent?.id) return;
+    const token = localStorage.getItem("convene_token");
+    const res = await fetch(`${API_BASE}/events/${activeEvent.id}/tasks`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(newTask) });
+    const data = await res.json();
+    if (!res.ok) { setError(data.error || "Failed to create task."); return; }
+    setTasksList((prev) => [formatTask(data.task), ...prev]);
+    setNewTaskOpen(false);
   };
 
   return (
@@ -432,7 +413,7 @@ export function TasksPage() {
               aria-label="Search tasks"
             />
           </div>
-          <SelectFilter label="Team" value={department} onChange={setDepartment} options={teams} />
+          <SelectFilter label="Team" value={department} onChange={setDepartment} options={teamOptions} />
           <SelectFilter label="Status" value={status} onChange={setStatus} options={statuses} />
           <SelectFilter label="Assigned To" value={assignee} onChange={setAssignee} options={assigneeOptions} />
         </div>
@@ -484,15 +465,15 @@ export function TasksPage() {
         ) : view === "list" ? (
           /* List View */
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] border-separate border-spacing-0 text-left">
+            <table className="w-full min-w-[800px] table-fixed border-separate border-spacing-0 text-left">
               <thead className="sticky top-0 z-10 bg-[#F7F8FA] text-[#5A6577] font-bold text-xs uppercase border-b border-[rgba(0,0,0,0.06)]">
                 <tr>
-                  <th className="px-4 py-3 text-[11px] tracking-wider w-16 text-center">S.No.</th>
-                  <th className="px-4 py-3 text-[11px] tracking-wider">Task Title</th>
-                  <th className="px-4 py-3 text-[11px] tracking-wider">Assigned To</th>
-                  <th className="px-4 py-3 text-[11px] tracking-wider">Team</th>
-                  <th className="px-4 py-3 text-[11px] tracking-wider">Status</th>
-                  <th className="px-4 py-3 text-right text-[11px] tracking-wider">Done</th>
+                  <th className="w-[8%] px-4 py-3 text-[11px] tracking-wider text-center">S.No.</th>
+                  <th className="w-[30%] px-4 py-3 text-[11px] tracking-wider">Task Title</th>
+                  <th className="w-[24%] px-4 py-3 text-[11px] tracking-wider">Assigned To</th>
+                  <th className="w-[18%] px-4 py-3 text-[11px] tracking-wider">Team</th>
+                  <th className="w-[14%] px-4 py-3 text-[11px] tracking-wider">Status</th>
+                  <th className="w-[6%] px-4 py-3 text-right text-[11px] tracking-wider">Done</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[rgba(0,0,0,0.05)]">
@@ -608,7 +589,8 @@ export function TasksPage() {
       />
 
       {/* New Task Modal */}
-      <NewTaskModal open={newTaskOpen} onClose={() => setNewTaskOpen(false)} onCreateTask={handleCreateTask} />
+      {error && <p className="text-sm font-semibold text-[#D6453D]">{error}</p>}
+      <NewTaskModal open={newTaskOpen} onClose={() => setNewTaskOpen(false)} onCreateTask={handleCreateTask} teams={teamsList} members={membersList} />
     </div>
   );
 }

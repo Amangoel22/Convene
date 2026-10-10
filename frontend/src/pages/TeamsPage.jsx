@@ -18,7 +18,7 @@ import {
   Utensils,
   X
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
@@ -27,6 +27,22 @@ import { GlassModal } from "@/components/glass/GlassModal";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+
+function formatTeam(team) {
+  const members = team.members || [];
+  const leadMember = members[0];
+  const leadUser = leadMember?.user;
+  const leadName = leadUser?.name || leadMember?.name || "Unassigned";
+  return {
+    ...team,
+    iconName: "Users",
+    slug: team.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    lead: { name: leadName, role: "Team Member", initials: leadName.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase(), email: leadUser?.email || "", phone: leadUser?.phone || leadMember?.phone || "", avatar: leadUser?.avatarUrl },
+    members: members.map((member) => { const user = member.user; const name = user?.name || member.name; return { ...member, name, role: "Team Member", initials: name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase(), email: user?.email || "", phone: user?.phone || member.phone || "", avatar: user?.avatarUrl }; })
+  };
+}
 
 const iconMap = {
   UserCheck,
@@ -61,7 +77,7 @@ function SelectFilter({ value, onChange, options, label }) {
   );
 }
 
-function TeamDrawer({ team, onClose }) {
+function TeamDrawer({ team, onClose, onEditMember, isLead }) {
   const navigate = useNavigate();
 
   if (!team) return null;
@@ -149,6 +165,7 @@ function TeamDrawer({ team, onClose }) {
                     <p>{member.email}</p>
                     <p className="text-[11px] text-[#8E99A8]">{member.phone}</p>
                   </div>
+                  {isLead && <button type="button" onClick={(event) => { event.stopPropagation(); onEditMember(member); }} className="ml-3 text-xs font-bold text-[#3B6FD4]">Edit</button>}
                 </div>
               ))}
             </div>
@@ -279,10 +296,20 @@ export function TeamsPage() {
   const [leadFilter, setLeadFilter] = useState("All Leads");
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const role = useAppStore((state) => state.role);
   const isLead = role === "lead";
+  const activeEvent = useAppStore((state) => state.activeEvent);
+
+  useEffect(() => {
+    if (!activeEvent?.id) return;
+    const token = localStorage.getItem("convene_token");
+    fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => { if (ok) setTeams((data.teams || []).map(formatTeam)); })
+      .finally(() => setLoading(false));
+  }, [activeEvent?.id]);
 
   const leadOptions = useMemo(() => {
     return ["All Leads", ...Array.from(new Set(teams.map((t) => t.lead.name)))];
@@ -303,8 +330,20 @@ export function TeamsPage() {
     });
   }, [isLead, leadFilter, search, teams]);
 
-  const handleCreateTeam = (newTeam) => {
-    setTeams((prev) => [newTeam, ...prev]);
+  const handleCreateTeam = async (newTeam) => {
+    if (!activeEvent?.id) return;
+    const token = localStorage.getItem("convene_token");
+    const res = await fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ name: newTeam.name }) });
+    const data = await res.json();
+    if (res.ok) setTeams((prev) => [formatTeam(data.team), ...prev]);
+  };
+
+  const handleEditMember = async (member) => {
+    const name = window.prompt("Member name", member.name);
+    if (!name?.trim()) return;
+    const token = localStorage.getItem("convene_token");
+    const res = await fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams/${selectedTeam.id}/members/${member.id}`, { method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ name: name.trim(), phone: member.phone }) });
+    if (res.ok) setTeams((prev) => prev.map((team) => team.id === selectedTeam.id ? { ...team, members: team.members.map((item) => item.id === member.id ? { ...item, name: name.trim() } : item) } : team));
   };
 
   return (
@@ -409,7 +448,7 @@ export function TeamsPage() {
       )}
 
       {/* Team Drawer */}
-      <TeamDrawer team={selectedTeam} onClose={() => setSelectedTeam(null)} />
+      <TeamDrawer team={selectedTeam} onClose={() => setSelectedTeam(null)} onEditMember={handleEditMember} isLead={isLead} />
 
       {/* Create Team Modal */}
       <CreateTeamModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} onCreateTeam={handleCreateTeam} />

@@ -275,6 +275,8 @@ model Task {
   assignedAt DateTime? @map("assigned_at") @db.Timestamptz
   dueAt DateTime? @map("due_at") @db.Timestamptz
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  lastUpdatedByName String? @map("last_updated_by_name") @db.VarChar(150)
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   orgTeam OrgTeam? @relation(fields: [orgTeamId], references: [id], onDelete: SetNull)
   assignedOrgMember OrgMember? @relation(fields: [assignedOrgMemberId], references: [id], onDelete: SetNull)

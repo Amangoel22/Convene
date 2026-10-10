@@ -16,7 +16,7 @@ function parseClock(dateValue, value) {
 
 router.get("/", authenticate, async (req, res) => {
   try {
-    const memberships = await prisma.eventMembership.findMany({ where: { userId: req.user.id }, include: { event: { include: { stages: { orderBy: { stageOrder: "asc" } }, venues: { include: { images: { orderBy: { sortOrder: "asc" } } } } } } }, orderBy: { createdAt: "desc" } });
+    const memberships = await prisma.eventMembership.findMany({ where: { userId: req.user.id }, include: { event: { include: { stages: { include: { venue: { include: { images: { orderBy: { sortOrder: "asc" } } } } }, orderBy: { stageOrder: "asc" } }, venues: { include: { images: { orderBy: { sortOrder: "asc" } } } } } } }, orderBy: { createdAt: "desc" } });
     return res.json({ events: memberships.map((membership) => ({ ...membership.event, userRole: membership.role })) });
   } catch (error) { return res.status(500).json({ error: "Failed to fetch events.", details: error.message }); }
 });

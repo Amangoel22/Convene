@@ -66,6 +66,17 @@ select::-ms-expand {
   display: none;
 }
 
+/* Compact filter pills should end shortly after their arrow. */
+.filter-chip {
+  gap: 0;
+  padding-right: 0.5rem;
+}
+
+.filter-chip select {
+  padding-right: 1.5rem;
+  background-position: right 4px center;
+}
+
 #root {
   min-height: 100vh;
   background: #F7F8FA;

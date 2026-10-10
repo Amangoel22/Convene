@@ -9,20 +9,24 @@ const router = express.Router();
 // POST /api/auth/register - Register a new user
 // -------------------------------------------------------------
 router.post("/register", async (req, res) => {
-  const { name, email, password, phone, avatarUrl } = req.body;
+  const { name, email, password, phone, avatarUrl, inviteKey: rawInviteKey } = req.body;
 
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: "Name, email, and password are required fields." });
+  if (!name || !email || !password || !phone) {
+    return res.status(400).json({ error: "Name, email, password, and phone number are required fields." });
   }
 
-  if (phone) {
-    const digits = phone.replace(/\D/g, "");
-    if (digits.length > 10) {
-      return res.status(400).json({ error: "Phone number must not exceed 10 digits." });
-    }
+  const normalizedPhone = phone.replace(/\D/g, "");
+  if (!/^\d{10}$/.test(normalizedPhone)) {
+    return res.status(400).json({ error: "Phone number must contain exactly 10 digits." });
   }
 
   try {
+    const inviteKey = rawInviteKey?.trim().toUpperCase() || null;
+    const invitedMember = inviteKey
+      ? await prisma.orgMember.findUnique({ where: { inviteKey } })
+      : null;
+    if (inviteKey && !invitedMember) return res.status(400).json({ error: "Invalid event invite key." });
+    if (invitedMember?.userId) return res.status(409).json({ error: "This event invite key has already been used." });
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(409).json({ error: "User with this email already exists." });
@@ -34,7 +38,7 @@ router.post("/register", async (req, res) => {
         name,
         email,
         passwordHash,
-        phone,
+        phone: normalizedPhone,
         avatarUrl
       },
       select: {
@@ -47,12 +51,22 @@ router.post("/register", async (req, res) => {
       }
     });
 
+    if (invitedMember) {
+      await prisma.orgMember.update({ where: { id: invitedMember.id }, data: { userId: user.id } });
+      await prisma.eventMembership.upsert({
+        where: { unique_event_user: { eventId: invitedMember.eventId, userId: user.id } },
+        update: {},
+        create: { eventId: invitedMember.eventId, userId: user.id, role: "participant" }
+      });
+    }
+
     const token = generateToken({ userId: user.id });
 
     return res.status(201).json({
       message: "User registered successfully.",
       user,
-      token
+      token,
+      joinedEventId: invitedMember?.eventId || null
     });
   } catch (error) {
     return res.status(500).json({ error: "Registration failed.", details: error.message });

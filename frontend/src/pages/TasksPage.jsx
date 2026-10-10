@@ -8,6 +8,8 @@ import {
   Kanban,
   LayoutList,
   Plus,
+  RotateCcw,
+  Save,
   Search,
   Users,
   X
@@ -46,7 +48,7 @@ function formatTask(task) {
 
 function SelectFilter({ value, onChange, options, label }) {
   return (
-    <label className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#5A6577]">
+    <label className="filter-chip flex h-9 shrink-0 items-center rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] pl-3 text-xs font-semibold text-[#5A6577]">
       <span className="sr-only">{label}</span>
       <select
         value={value}
@@ -63,11 +65,14 @@ function SelectFilter({ value, onChange, options, label }) {
   );
 }
 
-function TaskDrawer({ task, onClose, onUpdateTask, teams, members, isLead }) {
+function TaskDrawer({ task: initialTask, onClose, onUpdateTask, teams, members, isLead }) {
+  const [draftTask, setDraftTask] = useState(null);
+  useEffect(() => setDraftTask(null), [initialTask?.id, initialTask?.updatedAt]);
+  const task = draftTask || initialTask;
   if (!task) return null;
 
   const handleStatusChange = (newStatus) => {
-    onUpdateTask({
+    setDraftTask({
       ...task,
       status: newStatus,
       completedToday: newStatus === "Completed",
@@ -97,10 +102,7 @@ function TaskDrawer({ task, onClose, onUpdateTask, teams, members, isLead }) {
         {/* Drawer Header */}
         <div className="flex items-start justify-between gap-4 border-b border-[rgba(0,0,0,0.06)] pb-4">
           <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#3B6FD4] bg-[#EBF0FA] px-2.5 py-1 rounded-full">
-              {task.department}
-            </span>
-            <h2 className="mt-2 text-xl font-bold text-[#1A1D23]">{task.title}</h2>
+            <h2 className="text-xl font-bold text-[#1A1D23]">{task.title}</h2>
           </div>
           <button
             className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
@@ -120,6 +122,7 @@ function TaskDrawer({ task, onClose, onUpdateTask, teams, members, isLead }) {
               <select
                 value={task.status}
                 onChange={(e) => handleStatusChange(e.target.value)}
+                disabled={task.status === "Completed"}
                 className="mt-1 w-full bg-transparent text-xs font-bold text-[#1A1D23] outline-none cursor-pointer"
               >
                 {statuses.slice(1).map((s) => (
@@ -146,7 +149,7 @@ function TaskDrawer({ task, onClose, onUpdateTask, teams, members, isLead }) {
           </div>
 
           {isLead && <label className="block rounded-2xl bg-[#F7F8FA] p-3 text-[11px] font-semibold text-[#8E99A8]">Assigned To
-            <select value={task.assignedOrgMemberId || ""} onChange={(event) => { const member = members.find((item) => item.id === event.target.value); onUpdateTask({ ...task, assignedOrgMemberId: event.target.value || null, orgTeamId: member?.orgTeamId || null, department: member?.teamName || "Unassigned", assignee: member ? { ...task.assignee, name: member.name, initials: member.initials, phone: member.phone } : { name: "Unassigned", initials: "U", phone: "" } }); }} className="mt-1 h-9 w-full rounded-full bg-white px-3 pr-9 text-xs text-[#1A1D23] outline-none">
+            <select value={task.assignedOrgMemberId || ""} onChange={(event) => { const member = members.find((item) => item.id === event.target.value); setDraftTask({ ...task, assignedOrgMemberId: event.target.value || null, orgTeamId: member?.orgTeamId || null, department: member?.teamName || "Unassigned", assignee: member ? { ...task.assignee, name: member.name, initials: member.initials, phone: member.phone } : { name: "Unassigned", initials: "U", phone: "" } }); }} className="mt-1 h-9 w-full rounded-full bg-white px-3 pr-9 text-xs text-[#1A1D23] outline-none">
               <option value="">Unassigned</option>{members.map((member) => <option key={member.id} value={member.id}>{member.name} — {member.teamName}</option>)}
             </select>
             {task.assignedOrgMemberId && <span className="mt-2 block text-[11px] font-semibold text-[#5A6577]">Team: {task.department}</span>}
@@ -165,15 +168,22 @@ function TaskDrawer({ task, onClose, onUpdateTask, teams, members, isLead }) {
           </div>
         </div>
 
-        {/* Quick Actions Footer */}
+        {/* Save changes footer */}
         <div className="shrink-0 border-t border-[rgba(0,0,0,0.06)] pt-4 flex items-center gap-3">
           <GlassButton
-            variant={task.status === "Completed" ? "secondary" : "success"}
+            variant="primary"
             className="flex-1 h-9 text-xs justify-center rounded-full"
-            icon={<Check size={15} />}
-            onClick={() => handleStatusChange(task.status === "Completed" ? "In Progress" : "Completed")}
+            icon={task.status === "Completed" ? <RotateCcw size={15} /> : <Save size={15} />}
+            onClick={async () => {
+              if (task.status === "Completed") {
+                setDraftTask({ ...task, status: "Todo", completedToday: false });
+                return;
+              }
+              await onUpdateTask(task);
+              onClose();
+            }}
           >
-            {task.status === "Completed" ? "Reopen Task" : "Mark Completed"}
+            {task.status === "Completed" ? "Reopen Task" : "Save Changes"}
           </GlassButton>
         </div>
       </motion.aside>
@@ -276,6 +286,7 @@ export function TasksPage() {
   const [searchParams] = useSearchParams();
 
   const role = useAppStore((state) => state.role);
+  const currentUser = useAppStore((state) => state.currentUser);
   const activeEvent = useAppStore((state) => state.activeEvent);
   const isLead = role === "lead";
 
@@ -311,8 +322,8 @@ export function TasksPage() {
   const filteredTasks = useMemo(() => {
     const query = search.trim().toLowerCase();
     return tasksList.filter((task) => {
-      // In Team Member view, show tasks assigned to the member account (e.g. Diya Shah / Team Member)
-      if (!isLead && task.assignee.name !== "Diya Shah" && task.assignee.name !== "Team Member") {
+      // Members only see tasks assigned to their linked organization member record.
+      if (!isLead && task.assignedOrgMember?.userId !== currentUser?.id) {
         return false;
       }
 
@@ -334,7 +345,7 @@ export function TasksPage() {
       if (a.status !== "Completed" && b.status === "Completed") return -1;
       return 0;
     });
-  }, [assignee, department, isLead, search, status, tasksList]);
+  }, [assignee, currentUser?.id, department, isLead, search, status, tasksList]);
 
   const handleToggleComplete = (e, taskId) => {
     e.stopPropagation();
@@ -522,7 +533,7 @@ export function TasksPage() {
                     </td>
 
                     <td className="px-4 py-3">
-                      <p className={cn("text-xs font-bold transition-colors", task.status === "Completed" ? "line-through text-[#8E99A8]" : "text-[#1A1D23]")}>
+                      <p className="text-xs font-bold text-[#1A1D23] transition-colors">
                         {task.title}
                       </p>
                     </td>

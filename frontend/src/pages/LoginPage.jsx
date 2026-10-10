@@ -21,6 +21,7 @@ export function LoginPage() {
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
   const [regPhone, setRegPhone] = useState("");
+  const [regInviteKey, setRegInviteKey] = useState("");
 
   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
@@ -31,7 +32,7 @@ export function LoginPage() {
 
     const endpoint = isRegister ? `${API_BASE}/auth/register` : `${API_BASE}/auth/login`;
     const payload = isRegister
-      ? { name: regName, email: regEmail, password: regPassword, phone: regPhone }
+      ? { name: regName, email: regEmail, password: regPassword, phone: regPhone, inviteKey: regInviteKey }
       : { email: loginEmail, password: loginPassword };
 
     try {
@@ -51,8 +52,14 @@ export function LoginPage() {
       localStorage.setItem("convene_token", data.token);
       if (setUserSession) setUserSession(data.user, data.token);
 
-      // Navigate to onboarding if registering, or dashboard if logging in
-      if (isRegister) {
+      // Invite-based registration joins an existing event; otherwise begin setup.
+      if (isRegister && data.joinedEventId) {
+        const eventsRes = await fetch(`${API_BASE}/events`, { headers: { Authorization: `Bearer ${data.token}` } });
+        const eventsData = await eventsRes.json();
+        const joinedEvent = eventsData.events?.find((event) => event.id === data.joinedEventId);
+        if (joinedEvent) useAppStore.setState({ events: eventsData.events, activeEvent: joinedEvent, role: "member" });
+        navigate("/dashboard");
+      } else if (isRegister) {
         navigate("/onboarding");
       } else {
         navigate("/dashboard");
@@ -145,14 +152,28 @@ export function LoginPage() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-[#8E99A8] uppercase tracking-wider block mb-1">Phone (Optional)</label>
+                <label className="text-xs font-bold text-[#8E99A8] uppercase tracking-wider block mb-1">Phone Number</label>
                 <input
                   type="tel"
+                  required
                   maxLength={10}
+                  minLength={10}
                   placeholder="9876543210"
                   value={regPhone}
                   onChange={(e) => setRegPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
                   className="h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-[#8E99A8] uppercase tracking-wider block mb-1">Event Invite Key <span className="normal-case font-medium">(if provided)</span></label>
+                <input
+                  type="text"
+                  maxLength={10}
+                  value={regInviteKey}
+                  onChange={(e) => setRegInviteKey(e.target.value.replace(/[^a-z0-9]/gi, "").slice(0, 10).toUpperCase())}
+                  placeholder="10-character key"
+                  className="h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold uppercase tracking-wider text-[#1A1D23] outline-none placeholder:normal-case placeholder:tracking-normal placeholder:text-[#8E99A8]"
                 />
               </div>
             </>

@@ -24,7 +24,15 @@ function serializeStage(stage) {
 }
 
 async function resolveVenue(eventId, venueId, location) {
-  if (venueId) return { connect: { id: venueId } };
+  if (venueId) {
+    const venue = await prisma.venue.findFirst({ where: { id: venueId, eventId } });
+    if (!venue) {
+      const error = new Error("Venue does not belong to this event.");
+      error.statusCode = 400;
+      throw error;
+    }
+    return { connect: { id: venue.id } };
+  }
   if (!location) return undefined;
   const venue = await prisma.venue.upsert({ where: { unique_event_venue_name: { eventId, name: location } }, create: { eventId, name: location }, update: {} });
   return { connect: { id: venue.id } };
@@ -44,7 +52,7 @@ router.post("/:eventId/stages", authenticate, authorizeEventMembership(["organiz
     const event = await prisma.event.findUnique({ where: { id: req.params.eventId }, select: { startDate: true } });
     const parsed = timeWindow ? parseTimeWindow(event.startDate, timeWindow) : { startAt: new Date(startAt), endAt: new Date(endAt) };
     const venue = await resolveVenue(req.params.eventId, venueId, location);
-    const stage = await prisma.stage.create({ data: { eventId: req.params.eventId, stageOrder: stageOrder || await prisma.stage.count({ where: { eventId: req.params.eventId } }) + 1, title, startAt: parsed.startAt, endAt: parsed.endAt, ...(venue && { venue }), ...(orgTeamId && { orgTeam: { connect: { id: orgTeamId } } }) } });
+    const stage = await prisma.stage.create({ data: { eventId: req.params.eventId, stageOrder: stageOrder || await prisma.stage.count({ where: { eventId: req.params.eventId } }) + 1, title, startAt: parsed.startAt, endAt: parsed.endAt, ...(venue && { venue }), ...(orgTeamId && { orgTeam: { connect: { id: orgTeamId } } }) }, include: { venue: true } });
     return res.status(201).json({ message: "Stage created successfully.", stage: serializeStage(stage) });
   } catch (error) { return res.status(500).json({ error: "Failed to create stage.", details: error.message }); }
 });
@@ -60,7 +68,7 @@ router.patch("/:stageId", authenticate, async (req, res) => {
     const event = await prisma.event.findUnique({ where: { id: existing.eventId }, select: { startDate: true } });
     const schedule = timeWindow ? parseTimeWindow(event.startDate, timeWindow) : {};
     const venue = venueId || location ? await resolveVenue(existing.eventId, venueId, location) : undefined;
-    const stage = await prisma.stage.update({ where: { id: existing.id }, data: { ...(title && { title }), ...(startAt && { startAt: new Date(startAt) }), ...(endAt && { endAt: new Date(endAt) }), ...schedule, ...(venue && { venue }), ...(orgTeamId !== undefined && { orgTeam: orgTeamId ? { connect: { id: orgTeamId } } : { disconnect: true } }), ...(status && { status }) } });
+    const stage = await prisma.stage.update({ where: { id: existing.id }, data: { ...(title && { title }), ...(startAt && { startAt: new Date(startAt) }), ...(endAt && { endAt: new Date(endAt) }), ...schedule, ...(venue && { venue }), ...(orgTeamId !== undefined && { orgTeam: orgTeamId ? { connect: { id: orgTeamId } } : { disconnect: true } }), ...(status && { status }) }, include: { venue: true } });
     return res.json({ message: "Stage updated successfully.", stage: serializeStage(stage) });
   } catch (error) { return res.status(error.statusCode || 500).json({ error: error.message || "Failed to update stage." }); }
 });

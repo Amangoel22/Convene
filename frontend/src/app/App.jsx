@@ -62,7 +62,11 @@ function ProtectedRoute({ children }) {
                   const formattedEvents = evData.events.map((e) => ({
                     ...e,
                     duration: e.durationDisplay || "24 Hours",
-                    location: e.primaryLocation || "Main Venue"
+                    location: e.primaryLocation || "Main Venue",
+                    stages: (e.stages || []).map((stage) => ({
+                      ...stage,
+                      location: stage.location || stage.venue?.name || ""
+                    }))
                   }));
                   const targetActive = formattedEvents.find((e) => e.id === currentActiveId) || formattedEvents[0];
 

@@ -161,6 +161,7 @@ model OrgMember {
   eventId String @map("event_id") @db.Uuid
   orgTeamId String @map("org_team_id") @db.Uuid
   userId String? @map("user_id") @db.Uuid
+  inviteKey String @unique @map("invite_key") @db.VarChar(10)
   name String @db.VarChar(150)
   phone String? @db.VarChar(30)
   role String @default("member") @db.VarChar(30)

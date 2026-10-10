@@ -1,9 +1,19 @@
 import express from "express";
+import crypto from "node:crypto";
 import { prisma } from "../config/prisma.js";
 import { authenticate, authorizeEventMembership, authorizeOrgLead } from "../middlewares/auth.js";
 
 const router = express.Router();
 const memberInclude = { user: { select: { id: true, name: true, email: true, phone: true, avatarUrl: true } } };
+const inviteAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function createInviteKey() {
+  return Array.from(crypto.randomBytes(10), (byte) => inviteAlphabet[byte % inviteAlphabet.length]).join("");
+}
+
+function isCurrentUserMember(member, user) {
+  const phoneMatches = member.phone && user.phone && member.phone.replace(/\D/g, "") === user.phone.replace(/\D/g, "");
+  return Boolean(phoneMatches);
+}
 
 router.get("/:eventId/organizing-teams", authenticate, authorizeEventMembership(), async (req, res) => {
   try {
@@ -26,7 +36,7 @@ router.post("/:eventId/organizing-teams", authenticate, authorizeEventMembership
         eventId: req.params.eventId,
         name: name.trim(),
         description: description?.trim() || null,
-        members: { create: members.filter((member) => member.name?.trim()).map((member) => ({ eventId: req.params.eventId, name: member.name.trim(), phone: member.phone?.trim() || null, role: member.role || "member" })) }
+        members: { create: members.filter((member) => member.name?.trim()).map((member) => ({ eventId: req.params.eventId, userId: isCurrentUserMember(member, req.user) ? req.user.id : null, inviteKey: createInviteKey(), name: member.name.trim(), phone: member.phone?.trim() || null, role: member.role || "member" })) }
       },
       include: { members: { include: memberInclude } }
     });
@@ -44,9 +54,20 @@ router.post("/:eventId/organizing-teams/:teamId/members", authenticate, authoriz
   try {
     const team = await prisma.orgTeam.findFirst({ where: { id: req.params.teamId, eventId: req.params.eventId } });
     if (!team) return res.status(404).json({ error: "Organizing team not found." });
-    const member = await prisma.orgMember.create({ data: { eventId: req.params.eventId, orgTeamId: team.id, userId: userId || null, name: name.trim(), phone: phone?.trim() || null, role: role || "member" } });
+    const linkedUserId = userId || (isCurrentUserMember({ name, phone }, req.user) ? req.user.id : null);
+    const member = await prisma.orgMember.create({ data: { eventId: req.params.eventId, orgTeamId: team.id, userId: linkedUserId, inviteKey: createInviteKey(), name: name.trim(), phone: phone?.trim() || null, role: role || "member" } });
+    if (linkedUserId) await prisma.eventMembership.upsert({ where: { unique_event_user: { eventId: req.params.eventId, userId: linkedUserId } }, update: {}, create: { eventId: req.params.eventId, userId: linkedUserId, role: "participant" } });
     return res.status(201).json({ message: "Team member added successfully.", member });
   } catch (error) { return res.status(500).json({ error: "Failed to add team member.", details: error.message }); }
+});
+
+router.patch("/:eventId/organizing-teams/:teamId/members/:memberId/key", authenticate, authorizeEventMembership(["organizer"]), authorizeOrgLead(), async (req, res) => {
+  try {
+    const member = await prisma.orgMember.findFirst({ where: { id: req.params.memberId, orgTeamId: req.params.teamId, eventId: req.params.eventId } });
+    if (!member) return res.status(404).json({ error: "Team member not found." });
+    const updated = await prisma.orgMember.update({ where: { id: member.id }, data: { inviteKey: createInviteKey() } });
+    return res.json({ message: "Invite key regenerated.", inviteKey: updated.inviteKey });
+  } catch (error) { return res.status(500).json({ error: "Failed to regenerate invite key.", details: error.message }); }
 });
 
 router.patch("/:eventId/organizing-teams/:teamId/members/:memberId", authenticate, authorizeEventMembership(["organizer"]), authorizeOrgLead(), async (req, res) => {
@@ -55,7 +76,13 @@ router.patch("/:eventId/organizing-teams/:teamId/members/:memberId", authenticat
   if (phone && !/^\d{10}$/.test(phone)) return res.status(400).json({ error: "Phone number must contain exactly 10 digits." });
   try {
     if (orgTeamId && !(await prisma.orgTeam.findFirst({ where: { id: orgTeamId, eventId: req.params.eventId } }))) return res.status(400).json({ error: "Target team does not belong to this event." });
-    const member = await prisma.orgMember.updateMany({ where: { id: req.params.memberId, orgTeamId: req.params.teamId, eventId: req.params.eventId }, data: { name: name.trim(), phone: phone?.trim() || null, userId: userId || null, role: role || "member", ...(orgTeamId ? { orgTeamId } : {}) } });
+    const existingMember = await prisma.orgMember.findFirst({ where: { id: req.params.memberId, orgTeamId: req.params.teamId, eventId: req.params.eventId } });
+    if (!existingMember) return res.status(404).json({ error: "Team member not found." });
+    const linkedUserId = userId !== undefined
+      ? userId || null
+      : (isCurrentUserMember({ name, phone }, req.user) ? req.user.id : existingMember.userId);
+    const member = await prisma.orgMember.updateMany({ where: { id: req.params.memberId, orgTeamId: req.params.teamId, eventId: req.params.eventId }, data: { name: name.trim(), phone: phone?.trim() || null, userId: linkedUserId, role: role || "member", ...(orgTeamId ? { orgTeamId } : {}) } });
+    if (linkedUserId) await prisma.eventMembership.upsert({ where: { unique_event_user: { eventId: req.params.eventId, userId: linkedUserId } }, update: {}, create: { eventId: req.params.eventId, userId: linkedUserId, role: "participant" } });
     if (!member.count) return res.status(404).json({ error: "Team member not found." });
     return res.json({ message: "Team member updated successfully." });
   } catch (error) { return res.status(500).json({ error: "Failed to update team member.", details: error.message }); }

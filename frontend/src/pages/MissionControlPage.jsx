@@ -23,13 +23,29 @@ export function MissionControlPage() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    if (!activeEvent?.id || !currentUser?.id) return;
+    const token = localStorage.getItem("convene_token");
+    fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/events/${activeEvent.id}/tasks`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((res) => res.ok ? res.json() : Promise.reject(new Error("Failed to load tasks.")))
+      .then(({ tasks: eventTasks = [] }) => setTasks(eventTasks
+        .filter((task) => task.assignedOrgMember?.userId === currentUser.id)
+        .map((task) => ({
+          ...task,
+          completed: task.status === "Completed",
+          time: task.dueAt ? new Date(task.dueAt).toLocaleDateString() : "No due date",
+          area: task.orgTeam?.name || "Unassigned",
+          status: task.status === "In_Progress" ? "In Progress" : task.status
+        }))))
+      .catch(() => setTasks([]));
+  }, [activeEvent?.id, currentUser?.id]);
+
   // Derive dynamic stage rail from activeEvent or empty array
   const rawStages = activeEvent?.stages || [];
-  const eventEndDate = activeEvent?.endDate ? new Date(activeEvent.endDate) : null;
-  const eventEndTime = eventEndDate && activeEvent?.endTime ? parseTimeString(activeEvent.endTime, eventEndDate) : null;
   const eventIsComplete = Boolean(
     activeEvent && (
-      (eventEndTime && now >= eventEndTime) ||
       (rawStages.length > 0 && rawStages.every((stage) => ["Completed", "completed"].includes(stage.status)))
     )
   );
@@ -39,6 +55,10 @@ export function MissionControlPage() {
     return rawStages.map((s) => {
       if (eventIsComplete) return { ...s, calculatedStatus: "Completed" };
       let calculatedStatus = s.status || "Upcoming";
+
+      if (["Completed", "LIVE"].includes(s.status)) {
+        return { ...s, calculatedStatus: s.status };
+      }
 
       if (s.timeWindow) {
         const parts = s.timeWindow.split(/[–—-]/);
@@ -106,22 +126,19 @@ export function MissionControlPage() {
 
   useEffect(() => {
     function calculateTargetSeconds() {
-      let targetTimeStr = null;
+      let parsedTarget = upcomingStage?.startAt ? new Date(upcomingStage.startAt) : null;
 
-      if (upcomingStage?.timeWindow) {
-        targetTimeStr = upcomingStage.timeWindow.split(/[–—-]/)[0]?.trim();
-      }
-
-      if (!targetTimeStr && activeEvent?.startTime) {
-        targetTimeStr = activeEvent.startTime.trim();
-      }
-
-      if (targetTimeStr) {
-        const parsedTarget = parseTimeString(targetTimeStr, now);
-        if (parsedTarget) {
-          const diff = Math.floor((parsedTarget.getTime() - now.getTime()) / 1000);
-          return diff > 0 ? diff : 0;
+      if (!parsedTarget || Number.isNaN(parsedTarget.getTime())) {
+        if (activeEvent?.startDate && activeEvent?.startTime) {
+          parsedTarget = new Date(`${activeEvent.startDate}T${activeEvent.startTime}`);
+        } else if (activeEvent?.startTime) {
+          parsedTarget = parseTimeString(activeEvent.startTime.trim(), now);
         }
+      }
+
+      if (parsedTarget && !Number.isNaN(parsedTarget.getTime())) {
+        const diff = Math.floor((parsedTarget.getTime() - now.getTime()) / 1000);
+        return diff > 0 ? diff : 0;
       }
 
       return 0;

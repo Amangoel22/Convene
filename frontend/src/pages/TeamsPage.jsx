@@ -11,6 +11,8 @@ import {
   Megaphone,
   Palette,
   Plus,
+  KeyRound,
+  RefreshCw,
   Search,
   Trash2,
   Truck,
@@ -93,7 +95,7 @@ const iconMap = {
 
 function SelectFilter({ value, onChange, options, label }) {
   return (
-    <label className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#5A6577]">
+    <label className="filter-chip flex h-9 shrink-0 items-center rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] pl-3 text-xs font-semibold text-[#5A6577]">
       <span className="sr-only">{label}</span>
       <select
         value={value}
@@ -120,6 +122,7 @@ function TeamDrawer({
   onEditMember,
   onAddMember,
   onRemoveMember,
+  onViewKey,
   isLead,
 }) {
   const navigate = useNavigate();
@@ -253,6 +256,17 @@ function TeamDrawer({
                         className="ml-3 text-xs font-bold text-[#3B6FD4]"
                       >
                         Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onViewKey(member);
+                        }}
+                        className="ml-2 text-xs font-bold text-[#3B6FD4]"
+                      >
+                        <KeyRound size={13} className="mr-1 inline-block" />
+                        View Key
                       </button>
                       <button
                         type="button"
@@ -516,6 +530,25 @@ function CreateTeamModal({ open, onClose, onCreateTeam }) {
   );
 }
 
+function InviteKeyModal({ member, onClose, onRegenerate }) {
+  if (!member) return null;
+  return (
+    <GlassModal open={Boolean(member)} onClose={onClose} title="Event Invite Key">
+      <div className="space-y-5">
+        <p className="text-sm text-[#5A6577]">Share this key with {member.name}. They must enter it during registration to join this event.</p>
+        <div className="rounded-2xl border border-[#3B6FD4]/20 bg-[#EBF0FA] px-5 py-6 text-center">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#5A6577]">Invite key</p>
+          <p className="mt-2 font-mono text-2xl font-extrabold tracking-[0.2em] text-[#2C5EBF]">{member.inviteKey || "Unavailable"}</p>
+        </div>
+        <div className="flex justify-end gap-3">
+          <GlassButton type="button" onClick={onClose} className="h-9 rounded-full text-xs">Close</GlassButton>
+          <GlassButton type="button" variant="primary" icon={<RefreshCw size={14} />} onClick={() => onRegenerate(member)} className="h-9 rounded-full text-xs">Regenerate</GlassButton>
+        </div>
+      </div>
+    </GlassModal>
+  );
+}
+
 function EditMemberModal({ member, teams, onClose, onSave }) {
   const [name, setName] = useState(member?.name || "");
   const [phone, setPhone] = useState(member?.phone || "");
@@ -657,6 +690,7 @@ export function TeamsPage() {
   const [error, setError] = useState("");
   const [editingMember, setEditingMember] = useState(null);
   const [addingMember, setAddingMember] = useState(null);
+  const [viewingMemberKey, setViewingMemberKey] = useState(null);
 
   const role = useAppStore((state) => state.role);
   const isLead = role === "lead";
@@ -787,6 +821,27 @@ export function TeamsPage() {
 
   const handleEditMember = (member) =>
     setEditingMember({ ...member, orgTeamId: selectedTeam.id });
+
+  const handleRegenerateKey = async (member) => {
+    setError("");
+    const token = localStorage.getItem("convene_token");
+    const res = await fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams/${selectedTeam.id}/members/${member.id}/key`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error || "Could not regenerate the invite key.");
+      return;
+    }
+    const nextTeams = teams.map((team) => team.id === selectedTeam.id
+      ? formatTeam({ ...team, members: team.members.map((item) => item.id === member.id ? { ...item, inviteKey: data.inviteKey } : item) })
+      : team);
+    setTeams(nextTeams);
+    const nextTeam = nextTeams.find((team) => team.id === selectedTeam.id);
+    setSelectedTeam(nextTeam);
+    setViewingMemberKey(nextTeam.members.find((item) => item.id === member.id));
+  };
 
   const handleSaveMember = async ({ name, phone, role, orgTeamId }) => {
     const token = localStorage.getItem("convene_token");
@@ -974,8 +1029,10 @@ export function TeamsPage() {
         onEditMember={handleEditMember}
         onAddMember={handleAddMember}
         onRemoveMember={handleRemoveMember}
+        onViewKey={setViewingMemberKey}
         isLead={isLead}
       />
+      <InviteKeyModal member={isLead ? viewingMemberKey : null} onClose={() => setViewingMemberKey(null)} onRegenerate={handleRegenerateKey} />
       <EditMemberModal
         member={isLead ? editingMember : null}
         teams={teams}

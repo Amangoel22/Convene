@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { cn, parseTimeString } from "@/lib/utils";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { useAppStore } from "@/store/useAppStore";
 
 const initialOrganizerDuties = [];
@@ -12,8 +13,10 @@ const initialOrganizerTasks = [];
 export function MissionControlPage() {
   const activeEvent = useAppStore((state) => state.activeEvent);
   const currentUser = useAppStore((state) => state.currentUser);
+  const eventsHydrated = useAppStore((state) => state.eventsHydrated);
   const [duties, setDuties] = useState(initialOrganizerDuties);
   const [tasks, setTasks] = useState(initialOrganizerTasks);
+  const [tasksLoading, setTasksLoading] = useState(true);
   const [hasUrgentIssue] = useState(false);
   const [now, setNow] = useState(new Date());
 
@@ -24,7 +27,11 @@ export function MissionControlPage() {
   }, []);
 
   useEffect(() => {
-    if (!activeEvent?.id || !currentUser?.id) return;
+    if (!activeEvent?.id || !currentUser?.id) {
+      if (eventsHydrated) setTasksLoading(false);
+      return;
+    }
+    setTasksLoading(true);
     const token = localStorage.getItem("convene_token");
     fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/events/${activeEvent.id}/tasks`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -39,8 +46,9 @@ export function MissionControlPage() {
           area: task.orgTeam?.name || "Unassigned",
           status: task.status === "In_Progress" ? "In Progress" : task.status
         }))))
-      .catch(() => setTasks([]));
-  }, [activeEvent?.id, currentUser?.id]);
+      .catch(() => setTasks([]))
+      .finally(() => setTasksLoading(false));
+  }, [activeEvent?.id, currentUser?.id, eventsHydrated]);
 
   // Derive dynamic stage rail from activeEvent or empty array
   const rawStages = activeEvent?.stages || [];
@@ -426,7 +434,12 @@ export function MissionControlPage() {
           </div>
 
           <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-3 divide-y divide-[rgba(0,0,0,0.06)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            {tasks.length === 0 ? (
+            {tasksLoading ? (
+              <div className="space-y-3 p-5">
+                <LoadingSkeleton className="h-10" />
+                <LoadingSkeleton className="h-10" />
+              </div>
+            ) : tasks.length === 0 ? (
               <div className="p-8 text-center space-y-2">
                 <p className="text-sm font-bold text-[#1A1D23]">No tasks assigned</p>
                 <p className="text-xs text-[#8E99A8]">You currently have no tasks assigned for this event.</p>

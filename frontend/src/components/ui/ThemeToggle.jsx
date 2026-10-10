@@ -9,7 +9,7 @@ export function ThemeToggle({ compact = false, className }) {
   const label = theme === "dark" ? "Switch to light mode" : "Switch to dark mode";
 
   return (
-    <GlassButton className={className} icon={<Icon size={18} strokeWidth={1.75} />} aria-label={label} onClick={toggleTheme}>
+    <GlassButton className={className} icon={<span key={theme} className="theme-toggle-icon"><Icon size={18} strokeWidth={1.75} /></span>} aria-label={label} title={label} onClick={toggleTheme}>
       {!compact && (theme === "dark" ? "Light Mode" : "Dark Mode")}
     </GlassButton>
   );

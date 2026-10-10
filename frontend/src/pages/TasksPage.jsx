@@ -288,10 +288,14 @@ export function TasksPage() {
   const role = useAppStore((state) => state.role);
   const currentUser = useAppStore((state) => state.currentUser);
   const activeEvent = useAppStore((state) => state.activeEvent);
+  const eventsHydrated = useAppStore((state) => state.eventsHydrated);
   const isLead = role === "lead";
 
   useEffect(() => {
-    if (!activeEvent?.id) return;
+    if (!activeEvent?.id) {
+      if (eventsHydrated) setLoading(false);
+      return;
+    }
     const token = localStorage.getItem("convene_token");
     const headers = { Authorization: `Bearer ${token}` };
     setLoading(true);
@@ -304,7 +308,7 @@ export function TasksPage() {
       setTeamsList(teams);
       setMembersList(teams.flatMap((team) => team.members.map((member) => ({ ...member, orgTeamId: team.id, teamName: team.name }))));
     }).catch((fetchError) => setError(fetchError.message)).finally(() => setLoading(false));
-  }, [activeEvent?.id]);
+  }, [activeEvent?.id, eventsHydrated]);
 
   const teamOptions = useMemo(() => ["All Teams", ...teamsList.map((team) => team.name)], [teamsList]);
 

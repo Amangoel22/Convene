@@ -1,5 +1,6 @@
 import { AnimatePresence } from "framer-motion";
 import { Outlet } from "react-router";
+import { useEffect } from "react";
 import { ContentContainer } from "@/components/layout/ContentContainer";
 import { Navbar } from "@/components/layout/Navbar";
 import { PageTransition } from "@/components/layout/PageTransition";
@@ -8,6 +9,10 @@ import { useAppStore } from "@/store/useAppStore";
 
 export function AppLayout() {
   const theme = useAppStore((state) => state.theme);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   return (
     <div className="app-background min-h-screen" data-theme={theme}>

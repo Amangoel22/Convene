@@ -695,9 +695,14 @@ export function TeamsPage() {
   const role = useAppStore((state) => state.role);
   const isLead = role === "lead";
   const activeEvent = useAppStore((state) => state.activeEvent);
+  const eventsHydrated = useAppStore((state) => state.eventsHydrated);
 
   useEffect(() => {
-    if (!activeEvent?.id) return;
+    if (!activeEvent?.id) {
+      if (eventsHydrated) setLoading(false);
+      return;
+    }
+    setLoading(true);
     const token = localStorage.getItem("convene_token");
     fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -707,7 +712,7 @@ export function TeamsPage() {
         if (ok) setTeams((data.teams || []).map(formatTeam));
       })
       .finally(() => setLoading(false));
-  }, [activeEvent?.id]);
+  }, [activeEvent?.id, eventsHydrated]);
 
   const leadOptions = useMemo(() => {
     return ["All Leads", ...Array.from(new Set(teams.map((t) => t.lead.name)))];

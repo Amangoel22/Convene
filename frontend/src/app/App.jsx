@@ -57,27 +57,29 @@ function ProtectedRoute({ children }) {
               });
               if (evRes.ok) {
                 const evData = await evRes.json();
-                if (evData.events && evData.events.length > 0) {
-                  const currentActiveId = useAppStore.getState().activeEvent?.id;
-                  const formattedEvents = evData.events.map((e) => ({
-                    ...e,
-                    duration: e.durationDisplay || "24 Hours",
-                    location: e.primaryLocation || "Main Venue",
-                    stages: (e.stages || []).map((stage) => ({
-                      ...stage,
-                      location: stage.location || stage.venue?.name || ""
-                    }))
-                  }));
-                  const targetActive = formattedEvents.find((e) => e.id === currentActiveId) || formattedEvents[0];
+                const currentActiveId = useAppStore.getState().activeEvent?.id;
+                const formattedEvents = (evData.events || []).map((e) => ({
+                  ...e,
+                  duration: e.durationDisplay || "24 Hours",
+                  location: e.primaryLocation || "Main Venue",
+                  stages: (e.stages || []).map((stage) => ({
+                    ...stage,
+                    location: stage.location || stage.venue?.name || ""
+                  }))
+                }));
+                const targetActive = formattedEvents.find((e) => e.id === currentActiveId) || formattedEvents[0] || null;
 
-                  useAppStore.setState({
-                    events: formattedEvents,
-                    activeEvent: targetActive
-                  });
-                }
+                useAppStore.setState({
+                  events: formattedEvents,
+                  eventsHydrated: true,
+                  activeEvent: targetActive
+                });
+              } else {
+                useAppStore.setState({ eventsHydrated: true });
               }
             } catch (evErr) {
               console.warn("Could not sync user events:", evErr.message);
+              useAppStore.setState({ eventsHydrated: true });
             }
           }
         } else {

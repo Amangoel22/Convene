@@ -2,6 +2,7 @@ import { Bell, ChevronDown, Menu, Plus, Search, ShieldCheck, Sparkles } from "lu
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { useAppStore } from "@/store/useAppStore";
 import { cn } from "@/lib/utils";
@@ -108,6 +109,12 @@ export function Navbar() {
               </div>
             )}
           </div>
+
+          {/* Theme Toggle */}
+          <ThemeToggle
+            compact
+            className="h-9 w-9 min-h-0 px-0 text-[#5A6577] hover:text-[#1A1D23]"
+          />
 
           {/* Notifications */}
           <button className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23] transition-colors">

@@ -2,20 +2,26 @@ import { create } from "zustand";
 
 export const initialEvents = [];
 
+const getInitialTheme = () => {
+  if (typeof window === "undefined") return "light";
+  return window.localStorage.getItem("convene_theme") === "dark" ? "dark" : "light";
+};
+
 export const useAppStore = create((set) => ({
   currentUser: null,
   token: null,
   sidebarExpanded: true,
-  theme: "light",
+  theme: getInitialTheme(),
   role: "lead", // "lead" | "member"
   events: [],
+  eventsHydrated: false,
   activeEvent: null,
   hasOnboarded: false,
 
   setUserSession: (user, token) => set({ currentUser: user, token }),
   clearSession: () => {
     localStorage.removeItem("convene_token");
-    set({ currentUser: null, token: null, events: [], activeEvent: null });
+    set({ currentUser: null, token: null, events: [], eventsHydrated: false, activeEvent: null });
   },
   setRole: (role) => set({ role }),
   toggleRole: () => set((state) => ({ role: state.role === "lead" ? "member" : "lead" })),
@@ -23,6 +29,7 @@ export const useAppStore = create((set) => ({
   addEvent: (newEvent) =>
     set((state) => ({
       events: [newEvent, ...state.events],
+      eventsHydrated: true,
       activeEvent: newEvent,
       hasOnboarded: true
     })),
@@ -73,5 +80,9 @@ export const useAppStore = create((set) => ({
   completeOnboarding: () => set({ hasOnboarded: true }),
   resetOnboarding: () => set({ hasOnboarded: false }),
   setSidebarExpanded: (expanded) => set({ sidebarExpanded: expanded }),
-  toggleTheme: () => set((state) => ({ theme: state.theme === "light" ? "dark" : "light" }))
+  toggleTheme: () => set((state) => {
+    const theme = state.theme === "light" ? "dark" : "light";
+    window.localStorage.setItem("convene_theme", theme);
+    return { theme };
+  })
 }));

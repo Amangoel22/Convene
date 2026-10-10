@@ -40,13 +40,14 @@ export function ParticipantsPage() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const role = useAppStore((state) => state.role);
   const activeEvent = useAppStore((state) => state.activeEvent);
   const isLead = role === "lead";
 
   const loadEventTeams = useCallback(async () => {
+    setLoading(true);
     const token = localStorage.getItem("convene_token");
     let eventId = activeEvent?.id;
 
@@ -65,6 +66,7 @@ export function ParticipantsPage() {
 
       if (!eventId) {
         if (activeEvent?.teams) setTeams(activeEvent.teams);
+        setLoading(false);
         return;
       }
 
@@ -186,6 +188,7 @@ export function ParticipantsPage() {
         });
 
         setTeams(mappedTeams);
+        setLoading(false);
         return;
       }
     } catch (err) {
@@ -193,6 +196,7 @@ export function ParticipantsPage() {
     }
 
     if (activeEvent?.teams) setTeams(activeEvent.teams);
+    setLoading(false);
   }, [activeEvent]);
 
   useEffect(() => {
@@ -609,9 +613,9 @@ export function ParticipantsPage() {
         <div className="p-10 text-center rounded-3xl border border-[rgba(0,0,0,0.08)] bg-white">
           <EmptyState
             title="No matching participants found."
-            description="Adjust your search query or filters to view participant teams."
-            actionLabel="Import CSV"
-            onAction={() => setImportOpen(true)}
+            description="Create a participant or import a CSV to start building your event directory."
+            actionLabel={isLead ? "Create Participant" : undefined}
+            onAction={isLead ? () => setCreateModalOpen(true) : undefined}
           />
         </div>
       ) : (

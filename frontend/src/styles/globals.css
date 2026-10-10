@@ -118,3 +118,195 @@ select::-ms-expand {
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
 }
+
+/* The product uses a quiet, blue-black dark palette so operational colors
+   remain readable without turning the interface into a high-contrast theme. */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg-primary: #0E131B;
+  --color-bg-secondary: #151B25;
+  --color-sidebar: #111721;
+  --color-navbar: #111721;
+  --color-hero: #192231;
+  --color-hover: #222D3D;
+  --color-selected: #1B2A45;
+  --color-selected-text: #F3F6FB;
+  --color-border: rgba(255, 255, 255, 0.10);
+  --color-text-primary: #F3F6FB;
+  --color-text-secondary: #AEB9C9;
+  --color-text-muted: #8491A5;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] body,
+[data-theme="dark"] #root,
+[data-theme="dark"] .app-background {
+  background: var(--color-bg-primary) !important;
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .app-background {
+  transition: background-color 220ms ease, color 220ms ease;
+}
+
+[data-theme="dark"] .glass-surface,
+[data-theme="dark"] .glass-elevation-hero,
+[data-theme="dark"] .glass-elevation-main,
+[data-theme="dark"] .glass-sidebar,
+[data-theme="dark"] .glass-navbar,
+[data-theme="dark"] [class~="bg-white"] {
+  background-color: #151B25 !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+  color: #F3F6FB;
+}
+
+[data-theme="dark"] .glass-sidebar,
+[data-theme="dark"] .glass-navbar {
+  background-color: #111721 !important;
+}
+
+[data-theme="dark"] .glass-navbar.is-scrolled {
+  background: rgba(17, 23, 33, 0.92) !important;
+}
+
+[data-theme="dark"] .app-background,
+[data-theme="dark"] .app-background .glass-surface,
+[data-theme="dark"] .app-background .glass-sidebar,
+[data-theme="dark"] .app-background .glass-navbar,
+[data-theme="dark"] .app-background [class~="bg-white"],
+[data-theme="dark"] .app-background [class~="bg-[#F0F2F5]"],
+[data-theme="dark"] .app-background [class~="bg-[#F7F8FA]"] {
+  transition: background-color 220ms ease, border-color 220ms ease, color 180ms ease;
+}
+
+[data-theme="dark"] select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238491A5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* Map the existing utility colors to the same palette across every page,
+   including older screens that still use literal Tailwind color classes. */
+[data-theme="dark"] [class~="bg-[#F7F8FA]"],
+[data-theme="dark"] [class~="bg-[#F6F7FB]"],
+[data-theme="dark"] [class~="bg-[#F5F6F8]"],
+[data-theme="dark"] [class~="bg-[#FAFAFC]"],
+[data-theme="dark"] [class~="bg-[#F8FAFC]"] {
+  background-color: #0E131B !important;
+}
+
+[data-theme="dark"] [class~="bg-[#F0F2F5]"],
+[data-theme="dark"] [class~="bg-[#EEF2F7]"] {
+  background-color: #202733 !important;
+}
+
+[data-theme="dark"] [class~="bg-[#E8ECF1]"] {
+  background-color: #2A3546 !important;
+}
+
+[data-theme="dark"] [class~="bg-[#EBF0FA]"],
+[data-theme="dark"] [class~="bg-[#F5F8FF]"],
+[data-theme="dark"] [class~="bg-[#FEFBF3]"] {
+  background-color: #1B2A45 !important;
+}
+
+[data-theme="dark"] [class~="bg-[#FEF2F2]"],
+[data-theme="dark"] [class~="bg-[#FFF5F5]"] {
+  background-color: #382126 !important;
+}
+
+[data-theme="dark"] [class~="bg-[#F4FBF7]"] {
+  background-color: #172D23 !important;
+}
+
+[data-theme="dark"] [class~="to-white"],
+[data-theme="dark"] [class~="via-white"] {
+  --tw-gradient-to: #151B25 var(--tw-gradient-to-position) !important;
+  --tw-gradient-via: #151B25 var(--tw-gradient-via-position) !important;
+}
+
+[data-theme="dark"] [class~="bg-white/45"] {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] [class~="hover:bg-[#F0F2F5]"]:hover {
+  background-color: #202733 !important;
+}
+
+[data-theme="dark"] [class~="hover:bg-[#E8ECF1]"]:hover {
+  background-color: #2A3546 !important;
+}
+
+[data-theme="dark"] [class~="hover:text-[#1A1D23]"]:hover {
+  color: #F3F6FB !important;
+}
+
+[data-theme="dark"] aside nav a:not([aria-current="page"]) {
+  background-color: transparent !important;
+}
+
+[data-theme="dark"] aside nav a:not([aria-current="page"]):hover {
+  background-color: #202733 !important;
+}
+
+[data-theme="dark"] [class~="text-[#1A1D23]"],
+[data-theme="dark"] [class~="text-[#111827]"] {
+  color: #F3F6FB !important;
+}
+
+[data-theme="dark"] [class~="text-[#5A6577]"],
+[data-theme="dark"] [class~="text-[#6B7280]"] {
+  color: #AEB9C9 !important;
+}
+
+[data-theme="dark"] [class~="text-[#8E99A8]"],
+[data-theme="dark"] [class~="text-[#9CA3AF]"] {
+  color: #8491A5 !important;
+}
+
+[data-theme="dark"] [class~="text-[#2C5EBF]"],
+[data-theme="dark"] [class~="text-[#3B6FD4]"] {
+  color: #82AEFF !important;
+}
+
+[data-theme="dark"] [class~="text-[#D6453D]"],
+[data-theme="dark"] [class~="text-[#E53E3E]"] {
+  color: #FF8F89 !important;
+}
+
+[data-theme="dark"] [class~="text-[#22A65E]"],
+[data-theme="dark"] [class~="text-[#34C759]"] {
+  color: #62D694 !important;
+}
+
+[data-theme="dark"] [class~="border-[rgba(0,0,0,0.08)]"],
+[data-theme="dark"] [class~="border-[rgba(0, 0, 0, 0.08)]"],
+[data-theme="dark"] [class~="border-[rgba(0,0,0,0.06)]"],
+[data-theme="dark"] [class~="border-[rgba(0,0,0,0.04)]"] {
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  color: #F3F6FB;
+  caret-color: #82AEFF;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #8491A5;
+}
+
+.theme-toggle-icon {
+  display: inline-flex;
+  animation: theme-icon-in 220ms ease both;
+}
+
+@keyframes theme-icon-in {
+  from { opacity: 0; transform: rotate(-35deg) scale(0.72); }
+  to { opacity: 1; transform: rotate(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-icon { animation: none; }
+}

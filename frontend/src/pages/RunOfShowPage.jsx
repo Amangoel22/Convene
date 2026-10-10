@@ -335,6 +335,7 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
 }
 
 export function RunOfShowPage() {
+  const eventsHydrated = useAppStore((state) => state.eventsHydrated);
   const activeEvent = useAppStore((state) => state.activeEvent);
   const updateActiveEventStages = useAppStore((state) => state.updateActiveEventStages);
   const updateStageDetails = useAppStore((state) => state.updateStageDetails);
@@ -343,6 +344,7 @@ export function RunOfShowPage() {
   const isLead = role === "lead";
 
   const rawStages = activeEvent?.stages || [];
+  const timelineLoading = !eventsHydrated;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Statuses");
   const [selectedStage, setSelectedStage] = useState(null);
@@ -562,7 +564,7 @@ export function RunOfShowPage() {
       </div>
 
       {/* Timeline stages list */}
-      {eventIsComplete && (
+      {!timelineLoading && eventIsComplete && (
         <div className="flex items-center gap-4 rounded-3xl border border-[#22A65E]/20 bg-gradient-to-r from-[#22A65E]/10 via-white to-[#EBF0FA] px-6 py-4 shadow-[0_4px_16px_rgba(34,166,94,0.08)]">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#22A65E] text-white shadow-sm">
             <CheckCircle2 size={20} strokeWidth={2.5} />
@@ -573,13 +575,19 @@ export function RunOfShowPage() {
           </div>
         </div>
       )}
-      {filteredStages.length === 0 ? (
+      {timelineLoading ? (
+        <div className="space-y-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <LoadingSkeleton key={index} className="h-32 rounded-3xl" />
+          ))}
+        </div>
+      ) : filteredStages.length === 0 ? (
         <EmptyState
           icon={CalendarClock}
           title="No timeline stages configured"
           description="Create timeline stages to track live event progression, venues, and stage leads."
-          actionLabel={isLead ? "Add Stage" : undefined}
-          onAction={isLead ? () => { setEditingStage(null); setEditModalOpen(true); } : undefined}
+          actionLabel={isLead && activeEvent ? "Add Stage" : undefined}
+          onAction={isLead && activeEvent ? () => { setEditingStage(null); setEditModalOpen(true); } : undefined}
         />
       ) : (
         <div className="relative space-y-4 md:before:absolute md:before:bottom-8 md:before:left-[2.75rem] md:before:top-8 md:before:w-px md:before:bg-[#22A65E]/20">

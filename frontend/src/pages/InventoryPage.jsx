@@ -5,8 +5,11 @@ import { useState } from "react";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
 import { EmptyState } from "@/components/common/EmptyState";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { useAppStore } from "@/store/useAppStore";
 
 const initialInventory = [];
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
 import { useEffect } from "react";
 
@@ -33,12 +36,12 @@ function EditItemModal({ open, item, onClose, onSave }) {
 
   if (!item && !open) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
-    onSave({
+    await onSave({
       ...item,
-      id: item?.id || `inv-${Date.now()}`,
+      ...(item?.id ? { id: item.id } : {}),
       name: formData.name.trim(),
       totalNeeded: Number(formData.totalNeeded),
       available: Number(formData.available),
@@ -140,15 +143,36 @@ function EditItemModal({ open, item, onClose, onSave }) {
   );
 }
 
-import { useAppStore } from "@/store/useAppStore";
-
 export function InventoryPage() {
   const [inventory, setInventory] = useState(initialInventory);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [editingItem, setEditingItem] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const role = useAppStore((state) => state.role);
+  const token = useAppStore((state) => state.token);
+  const activeEvent = useAppStore((state) => state.activeEvent);
   const isLead = role === "lead";
+
+  // Purpose: load event inventory from the backend whenever the active event changes.
+  useEffect(() => {
+    if (!activeEvent?.id || !token) {
+      setInventory([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError("");
+    fetch(`${API_BASE}/events/${activeEvent.id}/inventory`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(async (response) => {
+        if (!response.ok) throw new Error((await response.json()).error || "Failed to load inventory.");
+        return response.json();
+      })
+      .then((payload) => setInventory(payload.inventory || []))
+      .catch((loadError) => setError(loadError.message))
+      .finally(() => setLoading(false));
+  }, [activeEvent?.id, token]);
 
   const handleOpenEdit = (item) => {
     if (!isLead) return;
@@ -162,14 +186,25 @@ export function InventoryPage() {
     setModalOpen(true);
   };
 
-  const handleSaveItem = (savedItem) => {
-    setInventory((prev) => {
-      const exists = prev.some((i) => i.id === savedItem.id);
-      if (exists) {
-        return prev.map((i) => (i.id === savedItem.id ? savedItem : i));
-      }
-      return [...prev, savedItem];
+  // Purpose: persist a new or edited inventory item and refresh the local view from its response.
+  const handleSaveItem = async (savedItem) => {
+    if (!activeEvent?.id || !token) return;
+    setError("");
+    const isExisting = Boolean(savedItem.id);
+    const endpoint = isExisting
+      ? `${API_BASE}/events/${activeEvent.id}/inventory/${savedItem.id}`
+      : `${API_BASE}/events/${activeEvent.id}/inventory`;
+    const response = await fetch(endpoint, {
+      method: isExisting ? "PATCH" : "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(savedItem)
     });
+    const payload = await response.json();
+    if (!response.ok) {
+      setError(payload.error || "Unable to save inventory item.");
+      throw new Error(payload.error || "Unable to save inventory item.");
+    }
+    setInventory((prev) => isExisting ? prev.map((item) => item.id === payload.item.id ? payload.item : item) : [...prev, payload.item]);
   };
 
   return (
@@ -188,7 +223,13 @@ export function InventoryPage() {
         )}
       </div>
 
-      {inventory.length === 0 ? (
+      {error && <div role="alert" className="rounded-2xl border border-token-error/20 bg-token-error/10 px-4 py-3 type-xs weight-semibold text-token-error">{error}</div>}
+
+      {loading ? (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, index) => <LoadingSkeleton key={index} className="h-44 rounded-3xl" />)}
+        </div>
+      ) : inventory.length === 0 ? (
         <EmptyState
           icon={Boxes}
           title="No hardware inventory added"

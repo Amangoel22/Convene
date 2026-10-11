@@ -47,6 +47,12 @@ function formatTask(task) {
   };
 }
 
+function dateInputValue(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+}
+
 function SelectFilter({ value, onChange, options, label }) {
   return (
     <label className="filter-chip flex h-9 shrink-0 items-center rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] pl-3 text-xs font-semibold text-[#5A6577]">
@@ -139,6 +145,19 @@ function TaskDrawer({ task: initialTask, onClose, onUpdateTask, teams, members, 
             </div>
           </div>
 
+          <div className="grid grid-cols-2 gap-2.5">
+            <label className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]">
+              <span className="text-[11px] font-semibold text-[#8E99A8]">Severity / Priority</span>
+              <select value={task.priority || "Medium"} onChange={(event) => setDraftTask({ ...task, priority: event.target.value })} className="mt-1 w-full bg-transparent text-xs font-bold text-[#1A1D23] outline-none">
+                {['Critical', 'High', 'Medium', 'Low'].map((value) => <option key={value} value={value}>{value}</option>)}
+              </select>
+            </label>
+            <label className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]">
+              <span className="text-[11px] font-semibold text-[#8E99A8]">Due date</span>
+              <input type="date" value={dateInputValue(task.dueAt)} onChange={(event) => setDraftTask({ ...task, dueAt: event.target.value || null })} className="mt-1 w-full bg-transparent text-xs font-bold text-[#1A1D23] outline-none" />
+            </label>
+          </div>
+
           {/* Assignee Box */}
           <div className="flex items-center gap-3 rounded-2xl bg-[#F7F8FA] p-3.5 border border-[rgba(0,0,0,0.06)]">
             <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-9 w-9 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />
@@ -197,16 +216,20 @@ function NewTaskModal({ open, onClose, onCreateTask, teams, members }) {
   const [description, setDescription] = useState("");
   const [department, setDepartment] = useState(teams[0]?.id || "");
   const [assignedOrgMemberId, setAssignedOrgMemberId] = useState("");
+  const [priority, setPriority] = useState("Medium");
+  const [dueAt, setDueAt] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim()) return;
 
     const selectedMember = members.find((member) => member.id === assignedOrgMemberId);
-    onCreateTask({ title: title.trim(), description: description.trim(), orgTeamId: selectedMember?.orgTeamId || null, assignedOrgMemberId: assignedOrgMemberId || null });
+    onCreateTask({ title: title.trim(), description: description.trim(), orgTeamId: selectedMember?.orgTeamId || null, assignedOrgMemberId: assignedOrgMemberId || null, priority, dueAt: dueAt || null });
     setTitle("");
     setDescription("");
     setAssignedOrgMemberId("");
+    setPriority("Medium");
+    setDueAt("");
     onClose();
   };
 
@@ -217,6 +240,7 @@ function NewTaskModal({ open, onClose, onCreateTask, teams, members }) {
           <h2 className="text-xl font-bold text-[#1A1D23]">Create Operational Task</h2>
           <p className="mt-1 text-xs font-medium text-[#5A6577]">Assign a new duty allocation for team execution.</p>
         </div>
+
         <button
           className="flex h-8 w-8 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
           onClick={onClose}
@@ -248,6 +272,11 @@ function NewTaskModal({ open, onClose, onCreateTask, teams, members }) {
             onChange={(e) => setDescription(e.target.value)}
             className="mt-1 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] p-3.5 text-xs font-medium text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
           />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className="text-xs font-semibold text-[#8E99A8]">Severity / Priority</label><select value={priority} onChange={(event) => setPriority(event.target.value)} className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] px-3 text-xs font-semibold text-[#1A1D23] outline-none"><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></div>
+          <div><label className="text-xs font-semibold text-[#8E99A8]">Due date</label><input type="date" value={dueAt} onChange={(event) => setDueAt(event.target.value)} className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] px-3 text-xs font-semibold text-[#1A1D23] outline-none" /></div>
         </div>
 
         <div>
@@ -370,8 +399,8 @@ export function TasksPage() {
       if (!res.ok) { const data = await res.json().catch(() => ({})); setError(data.error || "Failed to update task status."); return; }
       serverTask = (await res.json()).task;
     }
-    if (updatedTask.assignedOrgMemberId !== existingTask?.assignedOrgMemberId || updatedTask.orgTeamId !== existingTask?.orgTeamId) {
-      const res = await fetch(`${API_BASE}/tasks/${updatedTask.id}`, { method: "PATCH", headers, body: JSON.stringify({ assignedOrgMemberId: updatedTask.assignedOrgMemberId || null }) });
+    if (updatedTask.assignedOrgMemberId !== existingTask?.assignedOrgMemberId || updatedTask.orgTeamId !== existingTask?.orgTeamId || updatedTask.priority !== existingTask?.priority || dateInputValue(updatedTask.dueAt) !== dateInputValue(existingTask?.dueAt)) {
+      const res = await fetch(`${API_BASE}/tasks/${updatedTask.id}`, { method: "PATCH", headers, body: JSON.stringify({ assignedOrgMemberId: updatedTask.assignedOrgMemberId || null, priority: updatedTask.priority, dueAt: updatedTask.dueAt || null }) });
       if (!res.ok) { const data = await res.json().catch(() => ({})); setError(data.error || "Failed to update task assignment."); return; }
       serverTask = (await res.json()).task;
     }

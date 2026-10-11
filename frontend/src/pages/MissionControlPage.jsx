@@ -163,10 +163,30 @@ export function MissionControlPage() {
     );
   };
 
-  const toggleTask = (taskId) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, completed: !t.completed, status: !t.completed ? "Completed" : "In Progress" } : t))
-    );
+  const toggleTask = async (taskId) => {
+    const task = tasks.find((item) => item.id === taskId);
+    if (!task) return;
+    const nextStatus = task.status === "Completed" ? "In Progress" : "Completed";
+    const token = localStorage.getItem("convene_token");
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/tasks/${taskId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status: nextStatus })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to update task status.");
+      const updated = data.task;
+      setTasks((prev) => prev.map((item) => item.id === taskId ? {
+        ...item,
+        ...updated,
+        completed: updated.status === "Completed",
+        status: updated.status === "In_Progress" ? "In Progress" : updated.status,
+        area: updated.orgTeam?.name || item.area
+      } : item));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
 
@@ -474,7 +494,7 @@ export function MissionControlPage() {
                       <PriorityBadge priority={task.priority} />
                     </div>
                     <div className="mt-1 flex items-center justify-between text-[11px] font-medium text-[#8E99A8]">
-                      <span>{task.time} · {task.area}</span>
+                      <span>{task.time}</span>
                       <StatusBadge status={task.status} />
                     </div>
                   </div>

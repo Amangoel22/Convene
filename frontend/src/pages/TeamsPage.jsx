@@ -125,7 +125,6 @@ function TeamDrawer({
   onAddMember,
   onRemoveMember,
   onViewKey,
-  onLinkMember,
   isLead,
 }) {
   const navigate = useNavigate();
@@ -281,18 +280,6 @@ function TeamDrawer({
                       >
                         Remove
                       </button>
-                      {!member.userId && (
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            onLinkMember(member);
-                          }}
-                          className="ml-2 text-xs font-bold text-[#22A65E]"
-                        >
-                          Link me
-                        </button>
-                      )}
                     </>
                   )}
                 </div>
@@ -884,25 +871,6 @@ export function TeamsPage() {
     setViewingMemberKey(nextTeam.members.find((item) => item.id === member.id));
   };
 
-  const handleLinkMember = async (member) => {
-    if (!window.confirm(`Link ${member.name} to your account? This is the account that will receive assigned tasks.`)) return;
-    const token = localStorage.getItem("convene_token");
-    const res = await fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams/${selectedTeam.id}/members/${member.id}/link-self`, {
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error || "Could not link this member to your account.");
-      return;
-    }
-    const nextTeams = teams.map((team) => team.id === selectedTeam.id
-      ? formatTeam({ ...team, members: team.members.map((item) => item.id === member.id ? data.member : item) })
-      : team);
-    setTeams(nextTeams);
-    setSelectedTeam(nextTeams.find((team) => team.id === selectedTeam.id) || null);
-  };
-
   const handleSaveMember = async ({ name, phone, role, accessLevel, orgTeamId }) => {
     const token = localStorage.getItem("convene_token");
     const res = await fetch(
@@ -1091,7 +1059,6 @@ export function TeamsPage() {
         onAddMember={handleAddMember}
         onRemoveMember={handleRemoveMember}
         onViewKey={setViewingMemberKey}
-        onLinkMember={handleLinkMember}
         isLead={isLead}
       />
       <InviteKeyModal member={isLead ? viewingMemberKey : null} onClose={() => setViewingMemberKey(null)} onRegenerate={handleRegenerateKey} />

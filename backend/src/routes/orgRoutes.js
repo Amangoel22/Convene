@@ -106,27 +106,6 @@ router.patch("/:eventId/organizing-teams/:teamId/members/:memberId/key", authent
 });
 
 // Handles router.patch.
-router.patch("/:eventId/organizing-teams/:teamId/members/:memberId/link-self", authenticate, authorizeEventMembership(["organizer"]), authorizeOrgLead(), async (req, res) => {
-  try {
-    const member = await prisma.orgMember.findFirst({ where: { id: req.params.memberId, orgTeamId: req.params.teamId, eventId: req.params.eventId } });
-    if (!member) return res.status(404).json({ error: "Team member not found." });
-    const existingLink = await prisma.orgMember.findFirst({ where: { eventId: req.params.eventId, userId: req.user.id, NOT: { id: member.id } }, select: { id: true, name: true } });
-    if (existingLink) return res.status(409).json({ error: `Your account is already linked to ${existingLink.name}. Remove that link before linking another member.` });
-    const updated = await prisma.orgMember.update({ where: { id: member.id }, data: { userId: req.user.id }, include: { user: { select: memberInclude.user.select }, orgTeam: { select: { id: true, name: true } } } });
-    await prisma.eventMembership.upsert({
-      where: { unique_event_user: { eventId: req.params.eventId, userId: req.user.id } },
-      update: { role: "organizer" },
-      create: { eventId: req.params.eventId, userId: req.user.id, role: "organizer" }
-    });
-    await prisma.orgAccess.upsert({
-      where: { unique_event_org_access: { eventId: req.params.eventId, userId: req.user.id } },
-      update: { accessLevel: "lead" },
-      create: { eventId: req.params.eventId, userId: req.user.id, accessLevel: "lead" }
-    });
-    return res.json({ message: "Team member linked to your account.", member: updated });
-  } catch (error) { return res.status(500).json({ error: "Failed to link team member.", details: error.message }); }
-});
-
 // Handles router.patch.
 router.patch("/:eventId/organizing-teams/:teamId/members/:memberId", authenticate, authorizeEventMembership(["organizer"]), authorizeOrgLead(), async (req, res) => {
   const { name, phone, userId, role, orgTeamId, accessLevel } = req.body;

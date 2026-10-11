@@ -1,3 +1,4 @@
+// Purpose: taskRoutes implements this source module.
 import express from "express";
 import { prisma } from "../config/prisma.js";
 import { authenticate, authorizeEventMembership, authorizeOrgLead } from "../middlewares/auth.js";
@@ -5,6 +6,7 @@ import { authenticate, authorizeEventMembership, authorizeOrgLead } from "../mid
 const router = express.Router();
 const memberInclude = { user: { select: { id: true, name: true, email: true, phone: true, avatarUrl: true } }, orgTeam: { select: { id: true, name: true } } };
 
+// Handles router.get.
 router.get("/:eventId/tasks", authenticate, authorizeEventMembership(), async (req, res) => {
   const { orgTeamId, status, priority } = req.query;
   try {
@@ -13,6 +15,7 @@ router.get("/:eventId/tasks", authenticate, authorizeEventMembership(), async (r
   } catch (error) { return res.status(500).json({ error: "Failed to fetch tasks.", details: error.message }); }
 });
 
+// Handles router.post.
 router.post("/:eventId/tasks", authenticate, authorizeEventMembership(["organizer"]), authorizeOrgLead(), async (req, res) => {
   const { title, description, orgTeamId, assignedOrgMemberId, priority, dueAt } = req.body;
   if (!title) return res.status(400).json({ error: "Task title is required." });
@@ -33,6 +36,7 @@ router.post("/:eventId/tasks", authenticate, authorizeEventMembership(["organize
   } catch (error) { return res.status(500).json({ error: "Failed to create task.", details: error.message }); }
 });
 
+// Handles router.patch.
 router.patch("/:taskId/status", authenticate, async (req, res) => {
   const { status } = req.body;
   if (!status) return res.status(400).json({ error: "Status is required." });
@@ -47,6 +51,7 @@ router.patch("/:taskId/status", authenticate, async (req, res) => {
   } catch (error) { return res.status(500).json({ error: "Failed to update task status.", details: error.message }); }
 });
 
+// Handles router.patch.
 router.patch("/:taskId", authenticate, async (req, res) => {
   const { assignedOrgMemberId } = req.body;
   try {

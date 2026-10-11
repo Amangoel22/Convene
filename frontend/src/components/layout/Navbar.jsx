@@ -1,4 +1,5 @@
-import { Bell, ChevronDown, Menu, Plus, Search, ShieldCheck, Sparkles } from "lucide-react";
+// Purpose: Navbar implements this source module.
+import { Bell, ChevronDown, Menu, Plus, Search, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -13,7 +14,6 @@ export function Navbar() {
   const dropdownRef = useRef(null);
 
   const role = useAppStore((state) => state.role);
-  const toggleRole = useAppStore((state) => state.toggleRole);
   const events = useAppStore((state) => state.events);
   const activeEvent = useAppStore((state) => state.activeEvent);
   const setActiveEvent = useAppStore((state) => state.setActiveEvent);
@@ -121,15 +121,14 @@ export function Navbar() {
             <Bell size={16} />
           </button>
 
-          {/* Role Switcher */}
-          <button
-            onClick={toggleRole}
-            className="flex items-center gap-1.5 h-9 rounded-full bg-[#EBF0FA] border border-[#3B6FD4]/20 px-3 text-xs font-bold text-[#3B6FD4] hover:bg-[#3B6FD4] hover:text-white transition-colors cursor-pointer"
-            title="Click to toggle between Lead Organizer and Team Member view"
+          {/* Actual event access */}
+          <div
+            className="flex items-center gap-1.5 h-9 rounded-full bg-[#EBF0FA] border border-[#3B6FD4]/20 px-3 text-xs font-bold text-[#3B6FD4]"
+            title="Your access for the selected event"
           >
             <ShieldCheck size={14} />
             <span>{isLead ? "Lead Organizer" : "Team Member"}</span>
-          </button>
+          </div>
 
           {/* Profile Avatar */}
           <UserAvatar initials={isLead ? "AG" : "TM"} className="h-8 w-8 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />

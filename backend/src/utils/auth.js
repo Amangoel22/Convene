@@ -1,3 +1,4 @@
+// Purpose: auth implements this source module.
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
@@ -8,6 +9,7 @@ const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || "10", 10);
 /**
  * Hash a plain-text password using bcrypt
  */
+// Handles hashPassword.
 export async function hashPassword(password) {
   return await bcrypt.hash(password, SALT_ROUNDS);
 }
@@ -15,6 +17,7 @@ export async function hashPassword(password) {
 /**
  * Compare plain-text password with hashed password
  */
+// Handles comparePassword.
 export async function comparePassword(password, hashedPassword) {
   return await bcrypt.compare(password, hashedPassword);
 }
@@ -22,6 +25,7 @@ export async function comparePassword(password, hashedPassword) {
 /**
  * Generate a JWT token containing user payload
  */
+// Handles generateToken.
 export function generateToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
@@ -29,6 +33,7 @@ export function generateToken(payload) {
 /**
  * Verify JWT token string
  */
+// Handles verifyToken.
 export function verifyToken(token) {
   try {
     return jwt.verify(token, JWT_SECRET);

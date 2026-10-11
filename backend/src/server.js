@@ -1,3 +1,4 @@
+// Purpose: server implements this source module.
 import dotenv from "dotenv";
 dotenv.config();
 

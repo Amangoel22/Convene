@@ -1,3 +1,4 @@
+// Purpose: prisma implements this source module.
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis;

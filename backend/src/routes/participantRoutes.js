@@ -1,3 +1,4 @@
+// Purpose: participantRoutes implements this source module.
 import express from "express";
 import crypto from "node:crypto";
 import { prisma } from "../config/prisma.js";

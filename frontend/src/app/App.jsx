@@ -1,3 +1,4 @@
+// Purpose: App implements this source module.
 import { Navigate, Route, Routes } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import { AppShell } from "@/layouts/AppShell";
@@ -72,7 +73,8 @@ function ProtectedRoute({ children }) {
                 useAppStore.setState({
                   events: formattedEvents,
                   eventsHydrated: true,
-                  activeEvent: targetActive
+                  activeEvent: targetActive,
+                  role: targetActive?.accessLevel === "lead" ? "lead" : "member"
                 });
               } else {
                 useAppStore.setState({ eventsHydrated: true });

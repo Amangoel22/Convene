@@ -1,3 +1,4 @@
+// Purpose: QuickActions implements this source module.
 import { quickActions } from "@/data/dashboard";
 import { GlassCard } from "@/components/glass/GlassCard";
 import { QuickActionButton } from "@/components/common/QuickActionButton";

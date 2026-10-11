@@ -1,3 +1,4 @@
+// Purpose: PageTransition implements this source module.
 import { motion } from "framer-motion";
 import { pageTransition } from "@/motion";
 

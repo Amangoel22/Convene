@@ -1,3 +1,4 @@
+// Purpose: GlassDropdown implements this source module.
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 

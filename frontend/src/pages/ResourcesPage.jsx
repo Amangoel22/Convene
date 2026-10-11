@@ -1,3 +1,4 @@
+// Purpose: ResourcesPage implements this source module.
 import { useState } from "react";
 import { FileText, Download, Library, Upload, Plus, X } from "lucide-react";
 import { EmptyState } from "@/components/common/EmptyState";

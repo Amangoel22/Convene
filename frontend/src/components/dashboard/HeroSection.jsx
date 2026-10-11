@@ -1,3 +1,4 @@
+// Purpose: HeroSection implements this source module.
 import { ArrowRight, Radio } from "lucide-react";
 import { eventSummary, timelineStages } from "@/data/dashboard";
 import { Badge } from "@/components/ui/Badge";

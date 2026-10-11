@@ -1,3 +1,4 @@
+// Purpose: MetricCard implements this source module.
 import { GlassCard } from "@/components/glass/GlassCard";
 
 const toneClasses = {

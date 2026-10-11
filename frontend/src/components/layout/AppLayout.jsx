@@ -1,3 +1,4 @@
+// Purpose: AppLayout implements this source module.
 import { AnimatePresence } from "framer-motion";
 import { Outlet } from "react-router";
 import { useEffect } from "react";

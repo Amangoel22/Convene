@@ -1,3 +1,4 @@
+// Purpose: ProgressTimeline implements this source module.
 import { motion } from "framer-motion";
 
 export function ProgressTimeline({ progress, stages }) {

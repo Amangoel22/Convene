@@ -1,3 +1,4 @@
+// Purpose: variants implements this source module.
 import { cva } from "class-variance-authority";
 
 export const badgeVariants = cva("inline-flex whitespace-nowrap min-h-6 items-center rounded-full border px-2.5 text-xs font-semibold", {

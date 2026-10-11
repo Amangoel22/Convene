@@ -1,3 +1,4 @@
+// Purpose: OnboardingPage implements this source module.
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,

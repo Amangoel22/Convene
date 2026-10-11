@@ -1,3 +1,4 @@
+// Purpose: theme implements this source module.
 export const colors = {
   background: {
     primary: "#F5F6F8",

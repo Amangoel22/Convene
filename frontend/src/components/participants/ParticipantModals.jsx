@@ -1,3 +1,4 @@
+// Purpose: ParticipantModals implements this source module.
 import { FileUp, Plus, Upload, X } from "lucide-react";
 import { useState } from "react";
 import { GlassButton } from "@/components/glass/GlassButton";

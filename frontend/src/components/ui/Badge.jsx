@@ -1,3 +1,4 @@
+// Purpose: Badge implements this source module.
 import { badgeVariants } from "@/components/common/variants";
 import { cn } from "@/lib/utils";
 

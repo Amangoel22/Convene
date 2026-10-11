@@ -1,3 +1,4 @@
+// Purpose: Countdown implements this source module.
 import { motion } from "framer-motion";
 
 export function Countdown({ label, value, description }) {

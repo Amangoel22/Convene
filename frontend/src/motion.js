@@ -1,3 +1,4 @@
+// Purpose: motion implements this source module.
 export const pageTransition = {
   initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },

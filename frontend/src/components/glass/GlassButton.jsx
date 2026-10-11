@@ -1,3 +1,4 @@
+// Purpose: GlassButton implements this source module.
 import { motion } from "framer-motion";
 import { buttonAnimation } from "@/motion";
 import { glassButtonVariants } from "@/components/glass/variants";

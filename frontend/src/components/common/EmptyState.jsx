@@ -1,3 +1,4 @@
+// Purpose: EmptyState implements this source module.
 import { GlassButton } from "@/components/glass/GlassButton";
 
 export function EmptyState({ title, description, actionLabel, onAction, icon: Icon }) {

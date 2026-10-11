@@ -1,3 +1,4 @@
+// Purpose: QuickActionButton implements this source module.
 import { GlassButton } from "@/components/glass/GlassButton";
 
 export function QuickActionButton({ action, primary = false }) {

@@ -1,3 +1,4 @@
+// Purpose: RunOfShowPage implements this source module.
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
@@ -22,7 +23,7 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
-import { cn, formatTimeString, parseTimeString, addHoursToTimeString } from "@/lib/utils";
+import { cn, formatTimeString, getStageStatus, isEventComplete, parseTimeString, addHoursToTimeString } from "@/lib/utils";
 
 const statusStyles = {
   LIVE: "bg-[#22A65E]/10 text-[#22A65E]",
@@ -350,11 +351,7 @@ export function RunOfShowPage() {
   const [selectedStage, setSelectedStage] = useState(null);
   const [now, setNow] = useState(new Date());
 
-  const eventIsComplete = Boolean(
-    activeEvent && (
-      (rawStages.length > 0 && rawStages.every((stage) => stage.status === "Completed"))
-    )
-  );
+  const eventIsComplete = isEventComplete(activeEvent, now);
 
   // Tick every second to evaluate live time window
   useEffect(() => {
@@ -368,33 +365,7 @@ export function RunOfShowPage() {
 
   // Evaluate stages dynamically based on current time window, preserving manual overrides
   const stages = useMemo(() => {
-    return rawStages.map((s) => {
-      if (eventIsComplete) return { ...s, status: "Completed" };
-      let status = s.status || "Upcoming";
-
-      if (["Completed", "LIVE"].includes(s.status)) return { ...s, status };
-
-      if (s.timeWindow) {
-        const parts = s.timeWindow.split(/[–—-]/);
-        const startStr = parts[0]?.trim();
-        const endStr = parts[1]?.trim();
-
-        const startDateObj = parseTimeString(startStr, now);
-        const endDateObj = parseTimeString(endStr, now);
-
-        if (startDateObj && endDateObj) {
-          if (now >= endDateObj) {
-            status = "Completed";
-          } else if (now >= startDateObj && now < endDateObj) {
-            status = "LIVE";
-          } else if (now < startDateObj) {
-            status = "Upcoming";
-          }
-        }
-      }
-
-      return { ...s, status };
-    });
+    return rawStages.map((s) => ({ ...s, status: eventIsComplete ? "Completed" : getStageStatus(s, now) }));
   }, [eventIsComplete, rawStages, now]);
 
   const filteredStages = useMemo(() => {

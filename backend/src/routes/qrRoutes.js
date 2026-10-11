@@ -1,3 +1,4 @@
+// Purpose: qrRoutes implements this source module.
 import express from "express";
 import crypto from "node:crypto";
 import { prisma } from "../config/prisma.js";
@@ -6,6 +7,7 @@ import { authenticate } from "../middlewares/auth.js";
 const router = express.Router();
 export const createQrToken = () => crypto.randomBytes(32).toString("hex");
 
+// Handles router.post.
 router.post("/verify", authenticate, async (req, res) => {
   const { qrToken } = req.body;
   if (!qrToken) return res.status(400).json({ error: "QR token is required for verification." });

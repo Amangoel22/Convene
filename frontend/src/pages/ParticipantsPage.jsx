@@ -1,3 +1,4 @@
+// Purpose: ParticipantsPage implements this source module.
 import { FileDown, FileUp, Plus, Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { EmptyState } from "@/components/common/EmptyState";

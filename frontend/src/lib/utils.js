@@ -1,3 +1,4 @@
+// Purpose: utils implements this source module.
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -67,6 +68,57 @@ export function parseTimeString(timeStr, baseDate = new Date()) {
   const result = new Date(baseDate);
   result.setHours(hours, minutes, 0, 0);
   return result;
+}
+
+function validDate(value) {
+  if (!value) return null;
+  const parsed = value instanceof Date ? new Date(value) : new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function eventDateTime(event, dateKey, timeKey) {
+  const dateValue = event?.[dateKey];
+  const timeValue = event?.[timeKey];
+  if (!dateValue || !timeValue) return null;
+  const datePart = String(dateValue).slice(0, 10);
+  const timePart = String(timeValue).trim();
+  const parsed = new Date(`${datePart}T${timePart}`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+/**
+ * Resolve a stage's display status from persisted status and its canonical timestamps.
+ * Manual completion is preserved; stale Upcoming/LIVE labels are corrected from endAt.
+ */
+export function getStageStatus(stage, now = new Date()) {
+  const persisted = String(stage?.status || "Upcoming").toLowerCase();
+  if (persisted === "completed") return "Completed";
+
+  const start = validDate(stage?.startAt);
+  const end = validDate(stage?.endAt);
+  if (end && now >= end) return "Completed";
+  if (start && now >= start && (!end || now < end)) return "LIVE";
+  if (start && now < start) return "Upcoming";
+
+  // Legacy/local stages may only have a timeWindow.
+  if (stage?.timeWindow) {
+    const [startText, endText] = stage.timeWindow.split(/[–—-]/).map((part) => part?.trim());
+    const windowStart = parseTimeString(startText, now);
+    const windowEnd = parseTimeString(endText, now);
+    if (windowEnd && now >= windowEnd) return "Completed";
+    if (windowStart && now >= windowStart && (!windowEnd || now < windowEnd)) return "LIVE";
+    return "Upcoming";
+  }
+
+  return persisted === "live" ? "LIVE" : "Upcoming";
+}
+
+export function isEventComplete(event, now = new Date()) {
+  if (!event) return false;
+  const stages = event.stages || [];
+  if (stages.length > 0) return stages.every((stage) => getStageStatus(stage, now) === "Completed");
+  const eventEnd = eventDateTime(event, "endDate", "endTime");
+  return Boolean(eventEnd && now >= eventEnd);
 }
 
 /**

@@ -1,3 +1,4 @@
+// Purpose: ParticipantDrawer implements this source module.
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, Plus, QrCode, X, Award } from "lucide-react";
 import { useEffect, useState } from "react";

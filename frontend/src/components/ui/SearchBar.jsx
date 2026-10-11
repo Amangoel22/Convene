@@ -1,3 +1,4 @@
+// Purpose: SearchBar implements this source module.
 import { Search } from "lucide-react";
 import { SearchInput } from "@/components/common/SearchInput";
 

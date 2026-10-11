@@ -1,3 +1,4 @@
+// Purpose: SearchInput implements this source module.
 import { GlassInput } from "@/components/glass/GlassInput";
 
 export function SearchInput({ icon, placeholder = "Search tasks, teams, participants...", className }) {

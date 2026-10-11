@@ -1,3 +1,4 @@
+// Purpose: AvatarGroup implements this source module.
 import { UserAvatar } from "@/components/ui/UserAvatar";
 
 export function AvatarGroup({ users = [], max = 4 }) {

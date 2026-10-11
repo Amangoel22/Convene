@@ -1,6 +1,8 @@
+// Purpose: auth implements this source module.
 import { verifyToken } from "../utils/auth.js";
 import { prisma } from "../config/prisma.js";
 
+// Handles authenticate.
 export async function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) return res.status(401).json({ error: "Access denied. Authentication token missing." });
@@ -14,6 +16,7 @@ export async function authenticate(req, res, next) {
   } catch (error) { return res.status(500).json({ error: "Authentication check failed.", details: error.message }); }
 }
 
+// Handles authorizeEventMembership.
 export function authorizeEventMembership(allowedRoles = ["organizer", "participant"]) {
   return async (req, res, next) => {
     const eventId = req.params.eventId || req.body.eventId;
@@ -28,12 +31,13 @@ export function authorizeEventMembership(allowedRoles = ["organizer", "participa
   };
 }
 
+// Handles authorizeOrgLead.
 export function authorizeOrgLead() {
   return async (req, res, next) => {
     const eventId = req.eventId || req.params.eventId || req.body.eventId;
     try {
       const access = await prisma.orgAccess.findUnique({ where: { unique_event_org_access: { eventId, userId: req.user.id } } });
-      if ((!access || access.accessLevel !== "lead") && req.eventMembership?.role !== "organizer") return res.status(403).json({ error: "Access denied. Organizing lead access is required." });
+      if (!access || access.accessLevel !== "lead") return res.status(403).json({ error: "Access denied. Organizing lead access is required." });
       next();
     } catch (error) { return res.status(500).json({ error: "Organizing access check failed.", details: error.message }); }
   };

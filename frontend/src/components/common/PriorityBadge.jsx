@@ -1,3 +1,4 @@
+// Purpose: PriorityBadge implements this source module.
 import { cn } from "@/lib/utils";
 import { COLORS } from "@/constants/colors";
 

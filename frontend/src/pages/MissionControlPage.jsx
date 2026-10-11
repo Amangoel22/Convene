@@ -1,7 +1,8 @@
+// Shows the event dashboard, timeline, and assignments for the active user.
 import { ArrowRight, AlertTriangle, Check, CheckSquare, Clock, MapPin, Square } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { cn, parseTimeString } from "@/lib/utils";
+import { cn, getStageStatus, isEventComplete, parseTimeString } from "@/lib/utils";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
@@ -10,6 +11,29 @@ import { useAppStore } from "@/store/useAppStore";
 const initialOrganizerDuties = [];
 const initialOrganizerTasks = [];
 
+// Converts a persisted duty into the dashboard assignment shape.
+function formatDashboardDuty(duty) {
+  const assignedToCurrentUser = (duty.assignments || []).some((assignment) =>
+    (assignment.orgMember?.userId || assignment.userId) === useAppStore.getState().currentUser?.id
+  );
+  if (!assignedToCurrentUser) return null;
+  const start = new Date(duty.startAt);
+  const end = new Date(duty.endAt);
+  const time = !Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime())
+    ? `${start.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} – ${end.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
+    : "Time not set";
+  return {
+    ...duty,
+    title: duty.title,
+    time,
+    location: duty.venue?.name || "Venue not set",
+    priority: "Medium",
+    status: "Assigned",
+    completed: false
+  };
+}
+
+// Renders the active event command dashboard.
 export function MissionControlPage() {
   const activeEvent = useAppStore((state) => state.activeEvent);
   const currentUser = useAppStore((state) => state.currentUser);
@@ -33,66 +57,36 @@ export function MissionControlPage() {
     }
     setTasksLoading(true);
     const token = localStorage.getItem("convene_token");
-    fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/events/${activeEvent.id}/tasks`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then((res) => res.ok ? res.json() : Promise.reject(new Error("Failed to load tasks.")))
-      .then(({ tasks: eventTasks = [] }) => setTasks(eventTasks
-        .filter((task) => task.assignedOrgMember?.userId === currentUser.id)
-        .map((task) => ({
-          ...task,
-          completed: task.status === "Completed",
-          time: task.dueAt ? new Date(task.dueAt).toLocaleDateString() : "No due date",
-          area: task.orgTeam?.name || "Unassigned",
-          status: task.status === "In_Progress" ? "In Progress" : task.status
-        }))))
-      .catch(() => setTasks([]))
+    const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+    Promise.all([
+      fetch(`${apiBase}/events/${activeEvent.id}/tasks`, { headers: { Authorization: `Bearer ${token}` } }),
+      fetch(`${apiBase}/events/${activeEvent.id}/duties`, { headers: { Authorization: `Bearer ${token}` } })
+    ])
+      .then(async ([tasksResponse, dutiesResponse]) => {
+        if (!tasksResponse.ok) throw new Error("Failed to load tasks.");
+        const [{ tasks: eventTasks = [] }, { duties: eventDuties = [] }] = await Promise.all([tasksResponse.json(), dutiesResponse.ok ? dutiesResponse.json() : Promise.resolve({ duties: [] })]);
+        setTasks(eventTasks
+          .filter((task) => task.assignedOrgMember?.userId === currentUser.id)
+          .map((task) => ({
+            ...task,
+            completed: task.status === "Completed",
+            time: task.dueAt ? new Date(task.dueAt).toLocaleDateString() : "No due date",
+            area: task.orgTeam?.name || "Unassigned",
+            status: task.status === "In_Progress" ? "In Progress" : task.status
+          })));
+        setDuties(eventDuties.map(formatDashboardDuty).filter(Boolean));
+      })
+      .catch(() => { setTasks([]); setDuties([]); })
       .finally(() => setTasksLoading(false));
   }, [activeEvent?.id, currentUser?.id, eventsHydrated]);
 
   // Derive dynamic stage rail from activeEvent or empty array
   const rawStages = activeEvent?.stages || [];
-  const eventIsComplete = Boolean(
-    activeEvent && (
-      (rawStages.length > 0 && rawStages.every((stage) => ["Completed", "completed"].includes(stage.status)))
-    )
-  );
+  const eventIsComplete = isEventComplete(activeEvent, now);
 
   // Evaluate dynamic status based on current real-time clock
   const evaluatedStages = useMemo(() => {
-    return rawStages.map((s) => {
-      if (eventIsComplete) return { ...s, calculatedStatus: "Completed" };
-      let calculatedStatus = s.status || "Upcoming";
-
-      if (["Completed", "LIVE"].includes(s.status)) {
-        return { ...s, calculatedStatus: s.status };
-      }
-
-      if (s.timeWindow) {
-        const parts = s.timeWindow.split(/[–—-]/);
-        const startStr = parts[0]?.trim();
-        const endStr = parts[1]?.trim();
-
-        const startDateObj = parseTimeString(startStr, now);
-        const endDateObj = parseTimeString(endStr, now);
-
-        if (startDateObj && endDateObj) {
-          if (now >= endDateObj) {
-            calculatedStatus = "Completed";
-          } else if (now >= startDateObj && now < endDateObj) {
-            calculatedStatus = "LIVE";
-          } else if (now < startDateObj) {
-            calculatedStatus = "Upcoming";
-          }
-        } else if (startDateObj) {
-          if (now < startDateObj) {
-            calculatedStatus = "Upcoming";
-          }
-        }
-      }
-
-      return { ...s, calculatedStatus };
-    });
+    return rawStages.map((s) => ({ ...s, calculatedStatus: eventIsComplete ? "Completed" : getStageStatus(s, now) }));
   }, [eventIsComplete, rawStages, now]);
 
   const liveStageIndex = evaluatedStages.findIndex((s) => s.calculatedStatus === "LIVE");

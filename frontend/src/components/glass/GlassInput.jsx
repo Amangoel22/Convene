@@ -1,3 +1,4 @@
+// Purpose: GlassInput implements this source module.
 import { cn } from "@/lib/utils";
 
 export function GlassInput({ className, leftIcon, rightSlot, ...props }) {

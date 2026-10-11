@@ -1,3 +1,4 @@
+// Purpose: ThemeToggle implements this source module.
 import { Moon, Sun } from "lucide-react";
 import { GlassButton } from "@/components/ui/GlassButton";
 import { useAppStore } from "@/store/useAppStore";

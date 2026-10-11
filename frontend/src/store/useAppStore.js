@@ -1,3 +1,4 @@
+// Purpose: useAppStore implements this source module.
 import { create } from "zustand";
 
 export const initialEvents = [];
@@ -24,15 +25,18 @@ export const useAppStore = create((set) => ({
     set({ currentUser: null, token: null, events: [], eventsHydrated: false, activeEvent: null });
   },
   setRole: (role) => set({ role }),
-  toggleRole: () => set((state) => ({ role: state.role === "lead" ? "member" : "lead" })),
-  setActiveEvent: (event) => set({ activeEvent: event }),
+  setActiveEvent: (event) => set({ activeEvent: event, role: event?.accessLevel === "lead" ? "lead" : "member" }),
   addEvent: (newEvent) =>
-    set((state) => ({
-      events: [newEvent, ...state.events],
+    set((state) => {
+      const event = { ...newEvent, userRole: newEvent.userRole || "organizer", accessLevel: newEvent.accessLevel || "lead" };
+      return {
+      events: [event, ...state.events],
       eventsHydrated: true,
-      activeEvent: newEvent,
+      activeEvent: event,
+      role: event.accessLevel === "lead" ? "lead" : "member",
       hasOnboarded: true
-    })),
+      };
+    }),
   updateActiveEventStages: (stageId, newStatus) =>
     set((state) => {
       if (!state.activeEvent) return state;

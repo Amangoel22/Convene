@@ -1,3 +1,4 @@
+// Purpose: LoginPage implements this source module.
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/store/useAppStore";
@@ -57,7 +58,7 @@ export function LoginPage() {
         const eventsRes = await fetch(`${API_BASE}/events`, { headers: { Authorization: `Bearer ${data.token}` } });
         const eventsData = await eventsRes.json();
         const joinedEvent = eventsData.events?.find((event) => event.id === data.joinedEventId);
-        if (joinedEvent) useAppStore.setState({ events: eventsData.events, eventsHydrated: true, activeEvent: joinedEvent, role: "member" });
+        if (joinedEvent) useAppStore.setState({ events: eventsData.events, eventsHydrated: true, activeEvent: joinedEvent, role: joinedEvent.accessLevel === "lead" ? "lead" : "member" });
         navigate("/dashboard");
       } else if (isRegister) {
         navigate("/onboarding");

@@ -1,3 +1,4 @@
+// Purpose: InventoryPage implements this source module.
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, Boxes, Edit2, PackageCheck, Plus, X, Wrench } from "lucide-react";
 import { useState } from "react";

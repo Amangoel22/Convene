@@ -1,3 +1,4 @@
+// Purpose: ScheduleCard implements this source module.
 import { schedule } from "@/data/dashboard";
 import { GlassCard } from "@/components/glass/GlassCard";
 import { SectionHeader } from "@/components/common/SectionHeader";

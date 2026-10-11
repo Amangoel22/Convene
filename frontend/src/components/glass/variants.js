@@ -1,3 +1,4 @@
+// Purpose: variants implements this source module.
 import { cva } from "class-variance-authority";
 
 export const glassCardVariants = cva("glass-surface rounded-[20px]", {

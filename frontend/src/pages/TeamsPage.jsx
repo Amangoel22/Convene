@@ -1,3 +1,4 @@
+// Purpose: TeamsPage implements this source module.
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Briefcase,
@@ -66,6 +67,7 @@ function formatTeam(team) {
         ...member,
         name,
         role: member.role || "member",
+        accessLevel: member.accessLevel === "lead" ? "lead" : "member",
         initials: name
           .split(" ")
           .map((part) => part[0])
@@ -123,6 +125,7 @@ function TeamDrawer({
   onAddMember,
   onRemoveMember,
   onViewKey,
+  onLinkMember,
   isLead,
 }) {
   const navigate = useNavigate();
@@ -238,7 +241,7 @@ function TeamDrawer({
                         {member.name}
                       </p>
                       <p className="text-xs font-medium text-[#8E99A8] truncate">
-                        {member.role}
+                        {member.role} · {member.accessLevel === "lead" ? "Lead Organizer" : "Member"}
                       </p>
                     </div>
                   </div>
@@ -278,6 +281,18 @@ function TeamDrawer({
                       >
                         Remove
                       </button>
+                      {!member.userId && (
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onLinkMember(member);
+                          }}
+                          className="ml-2 text-xs font-bold text-[#22A65E]"
+                        >
+                          Link me
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
@@ -553,6 +568,7 @@ function EditMemberModal({ member, teams, onClose, onSave }) {
   const [name, setName] = useState(member?.name || "");
   const [phone, setPhone] = useState(member?.phone || "");
   const [role, setRole] = useState(member?.role || "member");
+  const [accessLevel, setAccessLevel] = useState(member?.accessLevel || "member");
   const [teamId, setTeamId] = useState(member?.orgTeamId || "");
   const [errors, setErrors] = useState({});
   useEffect(() => {
@@ -560,6 +576,7 @@ function EditMemberModal({ member, teams, onClose, onSave }) {
     setName(member.name || "");
     setPhone(member.phone || "");
     setRole((member.role || "member").toLowerCase().replace(" ", "-"));
+    setAccessLevel(member.accessLevel === "lead" ? "lead" : "member");
     setTeamId(member.orgTeamId || "");
     setErrors({});
   }, [member]);
@@ -593,11 +610,12 @@ function EditMemberModal({ member, teams, onClose, onSave }) {
               ? {}
               : { phone: "Phone number is 10 digits." }),
             ...(role ? {} : { role: "Role is required." }),
+            ...(accessLevel ? {} : { accessLevel: "Organizer access is required." }),
             ...(teamId ? {} : { team: "Team is required." }),
           };
           setErrors(nextErrors);
           if (!Object.keys(nextErrors).length)
-            onSave({ name, phone, role, orgTeamId: teamId });
+            onSave({ name, phone, role, accessLevel, orgTeamId: teamId });
         }}
       >
         <div>
@@ -625,8 +643,9 @@ function EditMemberModal({ member, teams, onClose, onSave }) {
             <p className="mt-1 text-[11px] text-[#D6453D]">{errors.phone}</p>
           )}
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div>
+            <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-[#8E99A8]">Team role</label>
             <div className="relative"><select
               value={role}
               onChange={(event) => { setRole(event.target.value); setErrors((current) => ({ ...current, role: "" })); }}
@@ -642,6 +661,22 @@ function EditMemberModal({ member, teams, onClose, onSave }) {
             )}
           </div>
           <div>
+            <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-[#8E99A8]">Event access</label>
+            <div className="relative"><select
+              value={accessLevel}
+              onChange={(event) => { setAccessLevel(event.target.value); setErrors((current) => ({ ...current, accessLevel: "" })); }}
+              className="h-10 w-full appearance-none rounded-full bg-[#F0F2F5] pl-3 pr-8 text-xs outline-none"
+            >
+              <option value="">Select access</option>
+              <option value="lead">Lead Organizer</option>
+              <option value="member">Member</option>
+            </select></div>
+            {errors.accessLevel && (
+              <p className="mt-1 text-[11px] text-[#D6453D]">{errors.accessLevel}</p>
+            )}
+          </div>
+          <div>
+            <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-[#8E99A8]">Team</label>
             <div className="relative"><select
               value={teamId}
               onChange={(event) => { setTeamId(event.target.value); setErrors((current) => ({ ...current, team: "" })); }}
@@ -768,11 +803,12 @@ export function TeamsPage() {
       name: "",
       phone: "",
       role: "member",
+      accessLevel: "member",
       orgTeamId: team.id,
     });
   };
 
-  const handleSaveNewMember = async ({ name, phone, role }) => {
+  const handleSaveNewMember = async ({ name, phone, role, accessLevel }) => {
     const token = localStorage.getItem("convene_token");
     const res = await fetch(
       `${API_BASE}/events/${activeEvent.id}/organizing-teams/${addingMember.orgTeamId}/members`,
@@ -782,7 +818,7 @@ export function TeamsPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name, phone, role }),
+        body: JSON.stringify({ name, phone, role, accessLevel }),
       },
     );
     if (!res.ok) return;
@@ -848,7 +884,26 @@ export function TeamsPage() {
     setViewingMemberKey(nextTeam.members.find((item) => item.id === member.id));
   };
 
-  const handleSaveMember = async ({ name, phone, role, orgTeamId }) => {
+  const handleLinkMember = async (member) => {
+    if (!window.confirm(`Link ${member.name} to your account? This is the account that will receive assigned tasks.`)) return;
+    const token = localStorage.getItem("convene_token");
+    const res = await fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams/${selectedTeam.id}/members/${member.id}/link-self`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error || "Could not link this member to your account.");
+      return;
+    }
+    const nextTeams = teams.map((team) => team.id === selectedTeam.id
+      ? formatTeam({ ...team, members: team.members.map((item) => item.id === member.id ? data.member : item) })
+      : team);
+    setTeams(nextTeams);
+    setSelectedTeam(nextTeams.find((team) => team.id === selectedTeam.id) || null);
+  };
+
+  const handleSaveMember = async ({ name, phone, role, accessLevel, orgTeamId }) => {
     const token = localStorage.getItem("convene_token");
     const res = await fetch(
       `${API_BASE}/events/${activeEvent.id}/organizing-teams/${editingMember.orgTeamId}/members/${editingMember.id}`,
@@ -858,7 +913,7 @@ export function TeamsPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: name.trim(), phone, role, orgTeamId }),
+        body: JSON.stringify({ name: name.trim(), phone, role, accessLevel, orgTeamId }),
       },
     );
     if (res.ok) {
@@ -884,6 +939,7 @@ export function TeamsPage() {
                     name: name.trim(),
                     phone,
                     role,
+                    accessLevel,
                     orgTeamId,
                   },
                 ],
@@ -1035,6 +1091,7 @@ export function TeamsPage() {
         onAddMember={handleAddMember}
         onRemoveMember={handleRemoveMember}
         onViewKey={setViewingMemberKey}
+        onLinkMember={handleLinkMember}
         isLead={isLead}
       />
       <InviteKeyModal member={isLead ? viewingMemberKey : null} onClose={() => setViewingMemberKey(null)} onRegenerate={handleRegenerateKey} />

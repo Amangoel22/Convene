@@ -1,3 +1,4 @@
+// Provides account registration, login, and authenticated profile endpoints.
 import express from "express";
 import { prisma } from "../config/prisma.js";
 import { hashPassword, comparePassword, generateToken } from "../utils/auth.js";
@@ -8,6 +9,7 @@ const router = express.Router();
 // -------------------------------------------------------------
 // POST /api/auth/register - Register a new user
 // -------------------------------------------------------------
+// Registers a user and links an invite to the matching organization member.
 router.post("/register", async (req, res) => {
   const { name, email, password, phone, avatarUrl, inviteKey: rawInviteKey } = req.body;
 
@@ -27,6 +29,9 @@ router.post("/register", async (req, res) => {
       : null;
     if (inviteKey && !invitedMember) return res.status(400).json({ error: "Invalid event invite key." });
     if (invitedMember?.userId) return res.status(409).json({ error: "This event invite key has already been used." });
+    if (invitedMember?.phone && invitedMember.phone.replace(/\D/g, "") !== normalizedPhone) {
+      return res.status(400).json({ error: "Phone number does not match the invited team member." });
+    }
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(409).json({ error: "User with this email already exists." });
@@ -53,10 +58,17 @@ router.post("/register", async (req, res) => {
 
     if (invitedMember) {
       await prisma.orgMember.update({ where: { id: invitedMember.id }, data: { userId: user.id } });
+      await prisma.dutyAssignment.updateMany({ where: { orgMemberId: invitedMember.id }, data: { userId: user.id } });
+      const invitedAccessLevel = invitedMember.accessLevel === "lead" ? "lead" : "member";
       await prisma.eventMembership.upsert({
         where: { unique_event_user: { eventId: invitedMember.eventId, userId: user.id } },
         update: {},
-        create: { eventId: invitedMember.eventId, userId: user.id, role: "participant" }
+        create: { eventId: invitedMember.eventId, userId: user.id, role: invitedAccessLevel === "lead" ? "organizer" : "participant" }
+      });
+      await prisma.orgAccess.upsert({
+        where: { unique_event_org_access: { eventId: invitedMember.eventId, userId: user.id } },
+        update: { accessLevel: invitedAccessLevel },
+        create: { eventId: invitedMember.eventId, userId: user.id, accessLevel: invitedAccessLevel }
       });
     }
 
@@ -76,6 +88,7 @@ router.post("/register", async (req, res) => {
 // -------------------------------------------------------------
 // POST /api/auth/login - User Login
 // -------------------------------------------------------------
+// Authenticates a user and returns a session token.
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -115,6 +128,7 @@ router.post("/login", async (req, res) => {
 // -------------------------------------------------------------
 // GET /api/auth/me - Get Current Authenticated Profile
 // -------------------------------------------------------------
+// Returns the currently authenticated user profile.
 router.get("/me", authenticate, (req, res) => {
   return res.status(200).json({ user: req.user });
 });

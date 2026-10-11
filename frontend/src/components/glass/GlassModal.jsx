@@ -1,3 +1,4 @@
+// Purpose: GlassModal implements this source module.
 import { AnimatePresence, motion } from "framer-motion";
 import { modalAnimation } from "@/motion";
 import { cn } from "@/lib/utils";

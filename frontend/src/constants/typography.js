@@ -1,3 +1,4 @@
+// Purpose: typography implements this source module.
 export const TYPOGRAPHY = {
   fontFamily: {
     sans: ["Inter", "system-ui", "sans-serif"],

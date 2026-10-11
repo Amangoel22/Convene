@@ -1,3 +1,4 @@
+// Purpose: GlassSidebar implements this source module.
 import { cn } from "@/lib/utils";
 
 export function GlassSidebar({ className, expanded, children, ...props }) {

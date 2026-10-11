@@ -1,3 +1,4 @@
+// Purpose: Leaderboard implements this source module.
 import { Trophy } from "lucide-react";
 import { motion } from "framer-motion";
 import { leaderboard } from "@/data/dashboard";

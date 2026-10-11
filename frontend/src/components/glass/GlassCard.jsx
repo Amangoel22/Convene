@@ -1,3 +1,4 @@
+// Purpose: GlassCard implements this source module.
 import { motion } from "framer-motion";
 import { cardAnimation } from "@/motion";
 import { glassCardVariants } from "@/components/glass/variants";

@@ -1,3 +1,4 @@
+// Purpose: PageHeader implements this source module.
 export function PageHeader({ title, description }) {
   return (
     <div className="flex flex-col gap-2">

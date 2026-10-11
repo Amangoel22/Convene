@@ -1,3 +1,4 @@
+// Purpose: SectionHeader implements this source module.
 import { GlassButton } from "@/components/glass/GlassButton";
 import { cn } from "@/lib/utils";
 

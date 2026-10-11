@@ -1,3 +1,4 @@
+// Purpose: colors implements this source module.
 export const COLORS = {
   // Brand / Accent Colors
   primary: "#3B6FD4",

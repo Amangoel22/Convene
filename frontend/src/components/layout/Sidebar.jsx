@@ -1,3 +1,4 @@
+// Purpose: Sidebar implements this source module.
 import {
   Boxes,
   CalendarClock,
@@ -54,7 +55,6 @@ const navSections = [
 export function Sidebar() {
   const navigate = useNavigate();
   const role = useAppStore((state) => state.role);
-  const toggleRole = useAppStore((state) => state.toggleRole);
   const currentUser = useAppStore((state) => state.currentUser);
   const clearSession = useAppStore((state) => state.clearSession);
   const isLead = role === "lead";
@@ -113,7 +113,7 @@ export function Sidebar() {
       {/* Footer Profile & Logout */}
       <div className="pt-4 border-t border-[rgba(0,0,0,0.08)] space-y-2">
         <div className="flex items-center justify-between gap-2 rounded-2xl px-2 py-1.5 hover:bg-[#F0F2F5] transition-colors">
-          <div className="flex items-center gap-2.5 min-w-0 cursor-pointer" onClick={toggleRole} title="Click to switch role view">
+          <div className="flex items-center gap-2.5 min-w-0" title="Your access for the selected event">
             <UserAvatar
               name={currentUser?.name}
               initials={currentUser?.name ? currentUser.name.split(" ").map(n => n[0]).join("") : (isLead ? "AG" : "TM")}

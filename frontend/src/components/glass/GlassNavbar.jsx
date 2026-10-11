@@ -1,3 +1,4 @@
+// Purpose: GlassNavbar implements this source module.
 import { cn } from "@/lib/utils";
 
 export function GlassNavbar({ className, scrolled = false, children, ...props }) {

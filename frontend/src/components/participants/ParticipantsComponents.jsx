@@ -1,3 +1,4 @@
+// Purpose: ParticipantsComponents implements this source module.
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { COLORS } from "@/constants/colors";

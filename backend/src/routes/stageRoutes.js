@@ -1,9 +1,11 @@
+// Purpose: stageRoutes implements this source module.
 import express from "express";
 import { prisma } from "../config/prisma.js";
 import { authenticate, authorizeEventMembership, authorizeOrgLead } from "../middlewares/auth.js";
 
 const router = express.Router();
 
+// Handles parseTimeWindow.
 function parseTimeWindow(eventDate, timeWindow) {
   const [start, end] = String(timeWindow || "09:00 AM – 10:00 AM").split(/[–—-]/).map((v) => v.trim());
   const parse = (value) => {
@@ -19,10 +21,12 @@ function parseTimeWindow(eventDate, timeWindow) {
   return { startAt: parse(start), endAt: parse(end) };
 }
 
+// Handles serializeStage.
 function serializeStage(stage) {
   return { ...stage, timeWindow: `${stage.startAt.toISOString()} – ${stage.endAt.toISOString()}`, location: stage.venue?.name || "" };
 }
 
+// Handles resolveVenue.
 async function resolveVenue(eventId, venueId, location) {
   if (venueId) {
     const venue = await prisma.venue.findFirst({ where: { id: venueId, eventId } });
@@ -38,6 +42,7 @@ async function resolveVenue(eventId, venueId, location) {
   return { connect: { id: venue.id } };
 }
 
+// Handles router.get.
 router.get("/:eventId/stages", authenticate, authorizeEventMembership(), async (req, res) => {
   try {
     const stages = await prisma.stage.findMany({ where: { eventId: req.params.eventId }, include: { venue: { include: { images: { orderBy: { sortOrder: "asc" } } } }, orgTeam: { select: { id: true, name: true } } }, orderBy: { stageOrder: "asc" } });
@@ -45,6 +50,7 @@ router.get("/:eventId/stages", authenticate, authorizeEventMembership(), async (
   } catch (error) { return res.status(500).json({ error: "Failed to fetch stages.", details: error.message }); }
 });
 
+// Handles router.post.
 router.post("/:eventId/stages", authenticate, authorizeEventMembership(["organizer"]), authorizeOrgLead(), async (req, res) => {
   const { title, timeWindow, startAt, endAt, venueId, location, orgTeamId, stageOrder } = req.body;
   if (!title || (!timeWindow && (!startAt || !endAt))) return res.status(400).json({ error: "Title and schedule are required." });
@@ -57,6 +63,7 @@ router.post("/:eventId/stages", authenticate, authorizeEventMembership(["organiz
   } catch (error) { return res.status(500).json({ error: "Failed to create stage.", details: error.message }); }
 });
 
+// Handles router.patch.
 router.patch("/:stageId", authenticate, async (req, res) => {
   try {
     const existing = await prisma.stage.findUnique({ where: { id: req.params.stageId } });

@@ -1,3 +1,4 @@
+// Purpose: IssuesPage implements this source module.
 import { useState } from "react";
 import { AlertCircle, CheckCircle2, Plus, X, MessageSquare, ShieldAlert } from "lucide-react";
 import { GlassButton } from "@/components/glass/GlassButton";

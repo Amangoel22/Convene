@@ -1,3 +1,4 @@
+// Purpose: SettingsPage implements this source module.
 import { GlassButton } from "@/components/glass/GlassButton";
 
 export function SettingsPage() {

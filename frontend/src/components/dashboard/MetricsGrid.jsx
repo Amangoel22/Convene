@@ -1,3 +1,4 @@
+// Purpose: MetricsGrid implements this source module.
 import { MetricCard } from "@/components/common/MetricCard";
 import { metrics } from "@/data/dashboard";
 

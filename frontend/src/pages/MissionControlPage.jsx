@@ -1,8 +1,21 @@
 // Shows the event dashboard, timeline, and assignments for the active user.
-import { ArrowRight, AlertTriangle, Check, CheckSquare, Clock, MapPin, Square } from "lucide-react";
+import {
+  ArrowRight,
+  AlertTriangle,
+  Check,
+  CheckSquare,
+  Clock,
+  MapPin,
+  Square,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { cn, getStageStatus, isEventComplete, parseTimeString } from "@/lib/utils";
+import {
+  cn,
+  getStageStatus,
+  isEventComplete,
+  parseTimeString,
+} from "@/lib/utils";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
@@ -13,20 +26,23 @@ const initialOrganizerTasks = [];
 
 // Converts a persisted duty into the dashboard assignment shape.
 function formatDashboardDuty(duty) {
-  const assignedToCurrentUser = (duty.assignments || []).some((assignment) =>
-    (assignment.orgMember?.userId || assignment.userId) === useAppStore.getState().currentUser?.id
+  const assignedToCurrentUser = (duty.assignments || []).some(
+    (assignment) =>
+      (assignment.orgMember?.userId || assignment.userId) ===
+      useAppStore.getState().currentUser?.id,
   );
   if (!assignedToCurrentUser) return null;
   const start = new Date(duty.startAt);
   const end = new Date(duty.endAt);
-  const time = !Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime())
-    ? `${start.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} – ${end.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
-    : "Time not set";
+  const time =
+    !Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime())
+      ? `${start.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} – ${end.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
+      : "Time not set";
   return {
     ...duty,
     title: duty.title,
     time,
-    location: duty.venue?.name || "Venue not set"
+    location: duty.venue?.name || "Venue not set",
   };
 }
 
@@ -56,24 +72,42 @@ export function MissionControlPage() {
     const token = localStorage.getItem("convene_token");
     const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
     Promise.all([
-      fetch(`${apiBase}/events/${activeEvent.id}/tasks`, { headers: { Authorization: `Bearer ${token}` } }),
-      fetch(`${apiBase}/events/${activeEvent.id}/duties`, { headers: { Authorization: `Bearer ${token}` } })
+      fetch(`${apiBase}/events/${activeEvent.id}/tasks`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+      fetch(`${apiBase}/events/${activeEvent.id}/duties`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
     ])
       .then(async ([tasksResponse, dutiesResponse]) => {
         if (!tasksResponse.ok) throw new Error("Failed to load tasks.");
-        const [{ tasks: eventTasks = [] }, { duties: eventDuties = [] }] = await Promise.all([tasksResponse.json(), dutiesResponse.ok ? dutiesResponse.json() : Promise.resolve({ duties: [] })]);
-        setTasks(eventTasks
-          .filter((task) => task.assignedOrgMember?.userId === currentUser.id)
-          .map((task) => ({
-            ...task,
-            completed: task.status === "Completed",
-            time: task.dueAt ? new Date(task.dueAt).toLocaleDateString() : "No due date",
-            area: task.orgTeam?.name || "Unassigned",
-            status: task.status === "In_Progress" ? "In Progress" : task.status
-          })));
+        const [{ tasks: eventTasks = [] }, { duties: eventDuties = [] }] =
+          await Promise.all([
+            tasksResponse.json(),
+            dutiesResponse.ok
+              ? dutiesResponse.json()
+              : Promise.resolve({ duties: [] }),
+          ]);
+        setTasks(
+          eventTasks
+            .filter((task) => task.assignedOrgMember?.userId === currentUser.id)
+            .map((task) => ({
+              ...task,
+              completed: task.status === "Completed",
+              time: task.dueAt
+                ? new Date(task.dueAt).toLocaleDateString()
+                : "No due date",
+              area: task.orgTeam?.name || "Unassigned",
+              status:
+                task.status === "In_Progress" ? "In Progress" : task.status,
+            })),
+        );
         setDuties(eventDuties.map(formatDashboardDuty).filter(Boolean));
       })
-      .catch(() => { setTasks([]); setDuties([]); })
+      .catch(() => {
+        setTasks([]);
+        setDuties([]);
+      })
       .finally(() => setTasksLoading(false));
   }, [activeEvent?.id, currentUser?.id, eventsHydrated]);
 
@@ -83,13 +117,25 @@ export function MissionControlPage() {
 
   // Evaluate dynamic status based on current real-time clock
   const evaluatedStages = useMemo(() => {
-    return rawStages.map((s) => ({ ...s, calculatedStatus: eventIsComplete ? "Completed" : getStageStatus(s, now) }));
+    return rawStages.map((s) => ({
+      ...s,
+      calculatedStatus: eventIsComplete ? "Completed" : getStageStatus(s, now),
+    }));
   }, [eventIsComplete, rawStages, now]);
 
-  const liveStageIndex = evaluatedStages.findIndex((s) => s.calculatedStatus === "LIVE");
-  const liveStage = liveStageIndex !== -1 ? evaluatedStages[liveStageIndex] : rawStages.find((s) => s.status === "LIVE");
-  const upcomingStage = evaluatedStages.find((s) => s.calculatedStatus === "Upcoming");
-  const completedCount = evaluatedStages.filter((s) => s.calculatedStatus === "Completed").length;
+  const liveStageIndex = evaluatedStages.findIndex(
+    (s) => s.calculatedStatus === "LIVE",
+  );
+  const liveStage =
+    liveStageIndex !== -1
+      ? evaluatedStages[liveStageIndex]
+      : rawStages.find((s) => s.status === "LIVE");
+  const upcomingStage = evaluatedStages.find(
+    (s) => s.calculatedStatus === "Upcoming",
+  );
+  const completedCount = evaluatedStages.filter(
+    (s) => s.calculatedStatus === "Completed",
+  ).length;
 
   // Compute continuous timeline line progress percentage across all stages
   const lineProgressPercent = useMemo(() => {
@@ -104,11 +150,19 @@ export function MissionControlPage() {
       const startDateObj = parseTimeString(startStr, now);
       const endDateObj = parseTimeString(endStr, now);
 
-      if (startDateObj && endDateObj && endDateObj.getTime() > startDateObj.getTime()) {
+      if (
+        startDateObj &&
+        endDateObj &&
+        endDateObj.getTime() > startDateObj.getTime()
+      ) {
         const totalDuration = endDateObj.getTime() - startDateObj.getTime();
-        const elapsed = Math.max(0, Math.min(totalDuration, now.getTime() - startDateObj.getTime()));
+        const elapsed = Math.max(
+          0,
+          Math.min(totalDuration, now.getTime() - startDateObj.getTime()),
+        );
         const withinStageFraction = elapsed / totalDuration; // accurately 0.0 to 1.0 based on current time
-        const overallFraction = (liveStageIndex + withinStageFraction) / totalSegments;
+        const overallFraction =
+          (liveStageIndex + withinStageFraction) / totalSegments;
         return Math.min(100, Math.max(0, Math.round(overallFraction * 100)));
       }
       // If no valid timeWindow duration, progress line at least reaches current node
@@ -125,18 +179,24 @@ export function MissionControlPage() {
 
   useEffect(() => {
     function calculateTargetSeconds() {
-      let parsedTarget = upcomingStage?.startAt ? new Date(upcomingStage.startAt) : null;
+      let parsedTarget = upcomingStage?.startAt
+        ? new Date(upcomingStage.startAt)
+        : null;
 
       if (!parsedTarget || Number.isNaN(parsedTarget.getTime())) {
         if (activeEvent?.startDate && activeEvent?.startTime) {
-          parsedTarget = new Date(`${activeEvent.startDate}T${activeEvent.startTime}`);
+          parsedTarget = new Date(
+            `${activeEvent.startDate}T${activeEvent.startTime}`,
+          );
         } else if (activeEvent?.startTime) {
           parsedTarget = parseTimeString(activeEvent.startTime.trim(), now);
         }
       }
 
       if (parsedTarget && !Number.isNaN(parsedTarget.getTime())) {
-        const diff = Math.floor((parsedTarget.getTime() - now.getTime()) / 1000);
+        const diff = Math.floor(
+          (parsedTarget.getTime() - now.getTime()) / 1000,
+        );
         return diff > 0 ? diff : 0;
       }
 
@@ -149,88 +209,130 @@ export function MissionControlPage() {
   const formatCountdown = (totalSeconds) => {
     if (totalSeconds <= 0) return "00:00:00";
     const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
-    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
+      2,
+      "0",
+    );
     const seconds = String(totalSeconds % 60).padStart(2, "0");
     return `${hours}:${minutes}:${seconds}`;
   };
 
-
   const toggleTask = async (taskId) => {
     const task = tasks.find((item) => item.id === taskId);
     if (!task) return;
-    const nextStatus = task.status === "Completed" ? "In Progress" : "Completed";
+    const nextStatus =
+      task.status === "Completed" ? "In Progress" : "Completed";
     const token = localStorage.getItem("convene_token");
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/tasks/${taskId}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ status: nextStatus })
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/tasks/${taskId}/status`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: nextStatus }),
+        },
+      );
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to update task status.");
+      if (!response.ok)
+        throw new Error(data.error || "Failed to update task status.");
       const updated = data.task;
-      setTasks((prev) => prev.map((item) => item.id === taskId ? {
-        ...item,
-        ...updated,
-        completed: updated.status === "Completed",
-        status: updated.status === "In_Progress" ? "In Progress" : updated.status,
-        area: updated.orgTeam?.name || item.area
-      } : item));
+      setTasks((prev) =>
+        prev.map((item) =>
+          item.id === taskId
+            ? {
+                ...item,
+                ...updated,
+                completed: updated.status === "Completed",
+                status:
+                  updated.status === "In_Progress"
+                    ? "In Progress"
+                    : updated.status,
+                area: updated.orgTeam?.name || item.area,
+              }
+            : item,
+        ),
+      );
     } catch (error) {
       console.error(error);
     }
   };
-
-
 
   return (
     <div className="space-y-9 w-full max-w-[1360px] mx-auto pb-16 pt-2">
       {/* Header */}
       <div>
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-[#1A1D23]">
-          Good morning{currentUser?.name ? `, ${currentUser.name.split(" ")[0]}` : ""}
+          Good morning
+          {currentUser?.name ? `, ${currentUser.name.split(" ")[0]}` : ""}
         </h1>
         <p className="mt-2 text-base text-[#5A6577] font-medium">
-          Here is what requires your operational focus for <span className="font-bold text-[#3B6FD4]">{activeEvent?.name || "your event"}</span> today.
+          Here is what requires your operational focus for{" "}
+          <span className="font-bold text-[#3B6FD4]">
+            {activeEvent?.name || "your event"}
+          </span>{" "}
+          today.
         </p>
       </div>
 
       {/* Hero Surface */}
-      <section aria-label="Current event status" className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-7 md:p-9 space-y-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden">
+      <section
+        aria-label="Current event status"
+        className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-7 md:p-9 space-y-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden"
+      >
         {/* Top Split: Left Event Info & Right Next Stage / Countdown */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           {/* Left Zone: Active Stage Details */}
           <div className="space-y-4 max-w-2xl">
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-xs font-extrabold text-[#3B6FD4] bg-[#EBF0FA] px-3 py-1 rounded-full uppercase tracking-wider">
-                {activeEvent?.name || "No Event Selected"} • {activeEvent?.type || "Event"}
+                {activeEvent?.name || "No Event Selected"} •{" "}
+                {activeEvent?.type || "Event"}
               </span>
-                {eventIsComplete ? (
+              {eventIsComplete ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22A65E]/10 border border-[#22A65E]/25 px-3 py-1 text-xs font-extrabold text-[#22A65E]">
                   <Check size={13} strokeWidth={3} /> COMPLETED
                 </span>
-                ) : liveStage && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22A65E]/10 border border-[#22A65E]/25 px-3 py-1 text-xs font-extrabold text-[#22A65E]">
-                  <span className="h-2 w-2 rounded-full bg-[#22A65E] animate-pulse" />
-                  LIVE STAGE
-                </span>
+              ) : (
+                liveStage && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22A65E]/10 border border-[#22A65E]/25 px-3 py-1 text-xs font-extrabold text-[#22A65E]">
+                    <span className="h-2 w-2 rounded-full bg-[#22A65E] animate-pulse" />
+                    LIVE STAGE
+                  </span>
+                )
               )}
             </div>
 
             <div>
               <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1D23] tracking-tight">
-                {eventIsComplete ? "Event Completed" : liveStage ? liveStage.title : activeEvent ? "Event In Progress" : "No Active Event"}
+                {eventIsComplete
+                  ? "Event Completed"
+                  : liveStage
+                    ? liveStage.title
+                    : activeEvent
+                      ? "Event In Progress"
+                      : "No Active Event"}
               </h2>
               <div className="mt-2 flex flex-wrap items-center gap-3 text-sm font-semibold text-[#5A6577]">
-                {(liveStage?.location || activeEvent?.location || activeEvent?.primaryLocation) && (
+                {(liveStage?.location ||
+                  activeEvent?.location ||
+                  activeEvent?.primaryLocation) && (
                   <span className="inline-flex items-center gap-1.5 bg-[#F0F2F5] px-3 py-1 rounded-full text-xs font-bold text-[#1A1D23]">
                     <MapPin size={14} className="text-[#3B6FD4]" />
-                    <span>{liveStage?.location || activeEvent?.location || activeEvent?.primaryLocation}</span>
+                    <span>
+                      {liveStage?.location ||
+                        activeEvent?.location ||
+                        activeEvent?.primaryLocation}
+                    </span>
                   </span>
                 )}
                 {activeEvent?.duration && !eventIsComplete && (
                   <span className="inline-flex items-center gap-1.5 bg-[#EBF0FA] px-3 py-1 rounded-full text-xs font-bold text-[#3B6FD4] font-mono">
-                    <Clock size={14} /> {activeEvent.duration} ({activeEvent.startTime || "09:00"} – {activeEvent.endTime || "21:00"})
+                    <Clock size={14} /> {activeEvent.duration} (
+                    {activeEvent.startTime || "09:00"} –{" "}
+                    {activeEvent.endTime || "21:00"})
                   </span>
                 )}
               </div>
@@ -244,12 +346,18 @@ export function MissionControlPage() {
                 {eventIsComplete ? "EVENT STATUS" : "UPCOMING STAGE"}
               </span>
               <span className="text-sm font-extrabold text-[#1A1D23] block mt-0.5 truncate">
-                {eventIsComplete ? "Completed" : upcomingStage?.title || "No Upcoming Stages"}
+                {eventIsComplete
+                  ? "Completed"
+                  : upcomingStage?.title || "No Upcoming Stages"}
               </span>
               <div className="mt-2 pt-2 border-t border-[rgba(0,0,0,0.06)] flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-[#8E99A8]">{eventIsComplete ? "Timeline" : "Starts in"}</span>
+                <span className="text-[11px] font-semibold text-[#8E99A8]">
+                  {eventIsComplete ? "Timeline" : "Starts in"}
+                </span>
                 <span className="text-base font-mono font-extrabold text-[#3B6FD4]">
-                  {eventIsComplete ? "100% complete" : formatCountdown(secondsRemaining)}
+                  {eventIsComplete
+                    ? "100% complete"
+                    : formatCountdown(secondsRemaining)}
                 </span>
               </div>
             </div>
@@ -263,7 +371,8 @@ export function MissionControlPage() {
               Run of Show Progress
             </span>
             <span className="text-[#5A6577] text-xs font-medium">
-              {completedCount} of {rawStages.length} completed · {progressPercent}% through event schedule
+              {completedCount} of {rawStages.length} completed ·{" "}
+              {progressPercent}% through event schedule
             </span>
           </div>
 
@@ -273,10 +382,14 @@ export function MissionControlPage() {
               {evaluatedStages.map((stg, i) => {
                 const status = stg.calculatedStatus || stg.status;
                 const isCurrent = status === "LIVE" || status === "current";
-                const isCompleted = status === "Completed" || status === "completed";
+                const isCompleted =
+                  status === "Completed" || status === "completed";
 
                 return (
-                  <div key={stg.id || i} className="flex flex-col items-center gap-2 group cursor-pointer flex-1 min-w-0">
+                  <div
+                    key={stg.id || i}
+                    className="flex flex-col items-center gap-2 group cursor-pointer flex-1 min-w-0"
+                  >
                     {/* Node Circle */}
                     <div
                       className={cn(
@@ -284,11 +397,13 @@ export function MissionControlPage() {
                         isCurrent
                           ? "bg-[#3B6FD4] border-[#3B6FD4] ring-4 ring-[#3B6FD4]/20 shadow-[0_0_12px_rgba(59,111,212,0.3)]"
                           : isCompleted
-                          ? "bg-[#22A65E] border-[#22A65E]"
-                          : "bg-[#F0F2F5] border-[#D0D5DD]"
+                            ? "bg-[#22A65E] border-[#22A65E]"
+                            : "bg-[#F0F2F5] border-[#D0D5DD]",
                       )}
                     >
-                      {isCompleted && <Check size={9} className="text-white stroke-[3]" />}
+                      {isCompleted && (
+                        <Check size={9} className="text-white stroke-[3]" />
+                      )}
                     </div>
 
                     {/* Stage Name */}
@@ -298,8 +413,8 @@ export function MissionControlPage() {
                         isCurrent
                           ? "text-[#3B6FD4] font-bold"
                           : isCompleted
-                          ? "text-[#5A6577]"
-                          : "text-[#8E99A8]"
+                            ? "text-[#5A6577]"
+                            : "text-[#8E99A8]",
                       )}
                     >
                       {stg.title || stg.name}
@@ -312,8 +427,8 @@ export function MissionControlPage() {
                         isCurrent
                           ? "text-[#3B6FD4] font-bold"
                           : isCompleted
-                          ? "text-[#8E99A8]"
-                          : "text-[#B5BCC7]"
+                            ? "text-[#8E99A8]"
+                            : "text-[#B5BCC7]",
                       )}
                     >
                       {stg.timeWindow || stg.timeDisplay || stg.time}
@@ -329,21 +444,21 @@ export function MissionControlPage() {
                 className="absolute top-[17px] h-0.5 bg-[#E8ECF1] -z-0"
                 style={{
                   left: `${100 / (evaluatedStages.length * 2)}%`,
-                  right: `${100 / (evaluatedStages.length * 2)}%`
+                  right: `${100 / (evaluatedStages.length * 2)}%`,
                 }}
               >
                 {/* Active/Live progress line advancing forward towards next stage in blue */}
                 <div
                   className="absolute top-0 bottom-0 left-0 bg-[#3B6FD4] transition-all duration-300"
                   style={{
-                    width: `${lineProgressPercent}%`
+                    width: `${lineProgressPercent}%`,
                   }}
                 />
                 {/* Past completed stages strictly in green */}
                 <div
                   className="absolute top-0 bottom-0 left-0 bg-[#22A65E] transition-all duration-300"
                   style={{
-                    width: `${Math.min(100, Math.round((completedCount / (evaluatedStages.length - 1)) * 100))}%`
+                    width: `${Math.min(100, Math.round((completedCount / (evaluatedStages.length - 1)) * 100))}%`,
                   }}
                 />
               </div>
@@ -355,30 +470,41 @@ export function MissionControlPage() {
       {/* Two-Column Layout: Your Duties (58%) & Your Tasks (42%) */}
       <div className="grid gap-8 lg:grid-cols-12">
         {/* Your Duties (58% width - 7 cols) */}
-        <section className="lg:col-span-7 space-y-4" aria-label="Personal organizer duties">
+        <section
+          className="lg:col-span-7 space-y-4"
+          aria-label="Personal organizer duties"
+        >
           <div className="flex items-center justify-between">
-            <h3 className="text-[20px] font-bold text-[#1A1D23]">Your Duties</h3>
-            <span className="text-xs font-medium text-[#8E99A8]">Assigned shift roles</span>
+            <h3 className="text-[20px] font-bold text-[#1A1D23]">
+              Your Duties
+            </h3>
+            <span className="text-xs font-medium text-[#8E99A8]">
+              Assigned shift roles
+            </span>
           </div>
 
-          <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-3 divide-y divide-[rgba(0,0,0,0.06)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="rounded-3xl bg-white dark:bg-[#151C28] border border-[rgba(0,0,0,0.08)] dark:border-[#293447] p-3 divide-y divide-[rgba(0,0,0,0.06)] dark:divide-[#293447] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             {duties.length === 0 ? (
               <div className="p-8 text-center space-y-2">
-                <p className="text-sm font-bold text-[#1A1D23]">No duties assigned</p>
-                <p className="text-xs text-[#8E99A8]">You currently have no shift duties assigned for this event.</p>
+                <p className="text-sm font-bold text-[#1A1D23]">
+                  No duties assigned
+                </p>
+                <p className="text-xs text-[#8E99A8]">
+                  You currently have no shift duties assigned for this event.
+                </p>
               </div>
             ) : (
               duties.map((duty) => (
                 <div
                   key={duty.id}
-                  className="group flex items-start gap-3.5 py-3.5 px-3 rounded-2xl transition-colors duration-150 hover:bg-[#F7F8FA]"
+                  className="group flex items-start gap-3.5 py-3.5 px-3 rounded-2xl transition-colors duration-150 hover:bg-[#F7F8FA] dark:hover:bg-[#202A3A]"
                 >
                   {/* Duty Details */}
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex items-center justify-between gap-2">
                       <p
                         className={cn(
-                          "text-sm font-bold text-[#1A1D23] leading-snug truncate",
+                          "text-sm font-bold text-[#1A1D23] dark:text-[#F4F7FB] leading-snug truncate",
                         )}
                       >
                         {duty.title}
@@ -392,9 +518,11 @@ export function MissionControlPage() {
                           {duty.time}
                         </span>
                         <span>•</span>
-                        <span className="inline-flex items-center gap-1 text-[#5A6577]">
+                        <span className="inline-flex items-center gap-1 text-secondary">
                           <MapPin size={12} />
-                          <span className="text-[#5A6577] font-medium">{duty.location}</span>
+                          <span className="text-secondary font-medium">
+                            {duty.location}
+                          </span>
                         </span>
                       </div>
                     </div>
@@ -406,7 +534,10 @@ export function MissionControlPage() {
         </section>
 
         {/* Your Tasks (42% width - 5 cols) */}
-        <section className="lg:col-span-5 space-y-4" aria-label="Personal organizer tasks">
+        <section
+          className="lg:col-span-5 space-y-4"
+          aria-label="Personal organizer tasks"
+        >
           <div className="flex items-center justify-between">
             <h3 className="text-[20px] font-bold text-[#1A1D23]">Your Tasks</h3>
             <Link
@@ -417,7 +548,7 @@ export function MissionControlPage() {
             </Link>
           </div>
 
-          <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-3 divide-y divide-[rgba(0,0,0,0.06)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="rounded-3xl bg-white dark:bg-[#151C28] border border-[rgba(0,0,0,0.08)] dark:border-[#293447] p-3 divide-y divide-[rgba(0,0,0,0.06)] dark:divide-[#293447] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             {tasksLoading ? (
               <div className="space-y-3 p-5">
                 <LoadingSkeleton className="h-10" />
@@ -425,51 +556,59 @@ export function MissionControlPage() {
               </div>
             ) : tasks.length === 0 ? (
               <div className="p-8 text-center space-y-2">
-                <p className="text-sm font-bold text-[#1A1D23]">No tasks assigned</p>
-                <p className="text-xs text-[#8E99A8]">You currently have no tasks assigned for this event.</p>
+                <p className="text-sm font-bold text-[#1A1D23]">
+                  No tasks assigned
+                </p>
+                <p className="text-xs text-[#8E99A8]">
+                  You currently have no tasks assigned for this event.
+                </p>
               </div>
             ) : (
-              tasks.map((task) => (
-                <div
-                  key={task.id}
-                  onClick={() => toggleTask(task.id)}
-                  className={cn(
-                    "group flex items-start gap-3 py-3.5 px-3 rounded-xl cursor-pointer transition-colors duration-150",
-                    task.completed
-                      ? "opacity-60"
-                      : "hover:bg-[#F7F8FA]"
-                  )}
-                >
-                  <button
-                    type="button"
-                    aria-label={`Toggle ${task.title}`}
-                    className="mt-0.5 shrink-0 text-[#8E99A8] group-hover:text-[#1A1D23] transition-colors"
-                  >
-                    {task.completed ? (
-                      <CheckSquare size={17} className="text-[#22A65E]" />
-                    ) : (
-                      <Square size={17} />
+              [...tasks]
+                .sort(
+                  (left, right) =>
+                    Number(left.completed) - Number(right.completed),
+                )
+                .map((task) => (
+                  <div
+                    key={task.id}
+                    onClick={() => toggleTask(task.id)}
+                    className={cn(
+                      "group flex items-start gap-3 py-3.5 px-3 rounded-xl cursor-pointer transition-colors duration-150",
+                      task.completed
+                        ? "opacity-75"
+                        : "hover:bg-[#F7F8FA] dark:hover:bg-[#202A3A]",
                     )}
-                  </button>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p
-                        className={cn(
-                          "text-xs font-semibold text-[#1A1D23] leading-snug truncate",
-                          task.completed && "line-through text-[#8E99A8]"
-                        )}
-                      >
-                        {task.title}
-                      </p>
-                    </div>
-                    <div className="mt-1 flex items-center justify-between text-[11px] font-medium text-[#8E99A8]">
-                      <span>{task.time}</span>
-                      <StatusBadge status={task.status} />
-                      <PriorityBadge priority={task.priority} />
+                  >
+                    <button
+                      type="button"
+                      aria-label={`Toggle ${task.title}`}
+                      className="mt-0.5 shrink-0 text-[#8E99A8] group-hover:text-[#1A1D23] transition-colors"
+                    >
+                      {task.completed ? (
+                        <CheckSquare size={17} className="text-[#22A65E]" />
+                      ) : (
+                        <Square size={17} />
+                      )}
+                    </button>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p
+                          className={cn(
+                            "text-xs font-semibold text-[#1A1D23] dark:text-[#F4F7FB] leading-snug truncate",
+                          )}
+                        >
+                          {task.title}
+                        </p>
+                      </div>
+                      <div className="mt-1 flex items-center justify-between text-[11px] font-medium text-[#8E99A8]">
+                        <span>{task.time}</span>
+                        <StatusBadge status={task.status} />
+                        <PriorityBadge priority={task.priority} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
+                ))
             )}
           </div>
         </section>
@@ -484,7 +623,13 @@ export function MissionControlPage() {
                 <AlertTriangle size={15} />
               </div>
               <div>
-                <span className="font-bold text-[#1A1D23]">Needs Attention:</span> <span className="text-[#5A6577]">2 unresolved issues flagged in Technical Team (WiFi latency in Lab C).</span>
+                <span className="font-bold text-[#1A1D23]">
+                  Needs Attention:
+                </span>{" "}
+                <span className="text-[#5A6577]">
+                  2 unresolved issues flagged in Technical Team (WiFi latency in
+                  Lab C).
+                </span>
               </div>
             </div>
             <Link

@@ -261,7 +261,7 @@ export function DutiesPage() {
       return setError("Duty end time must be after its start time.");
     setSaving(true);
     try {
-      const response = await fetch(`${API_BASE}/duties/${viewingDuty.id}`, {
+      const response = await fetch(`${API_BASE}/events/${activeEvent.id}/duties/${viewingDuty.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -315,7 +315,7 @@ export function DutiesPage() {
           </GlassButton>
         )}
       </div>
-      {error && (
+      {error && !editingDuty && (
         <div className="rounded-2xl border border-[#D6453D]/20 bg-[#D6453D]/10 px-4 py-3 text-xs font-semibold text-[#D6453D]">
           {error}
         </div>
@@ -408,12 +408,13 @@ export function DutiesPage() {
 
       <GlassModal
         open={Boolean(viewingDuty)}
-        className="w-[min(720px,calc(100vw-32px))] max-w-none"
+        className="w-[min(560px,calc(100vw-32px))] max-w-none"
       >
         {viewingDuty &&
           (editingDuty ? (
             <form onSubmit={handleUpdateDuty} className="space-y-4 pt-1">
               <h2 className="text-xl font-bold">Edit Duty</h2>
+              {error && <div role="alert" className="rounded-2xl border border-[#D6453D]/30 bg-[#D6453D]/10 px-3 py-2 text-xs font-semibold text-[#D6453D]">{error}</div>}
               <input
                 required
                 value={newTitle}
@@ -545,7 +546,7 @@ export function DutiesPage() {
                   ))}
                 </div>
               </div>
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2">
                 {isLead && (
                   <GlassButton
                     onClick={beginEditDuty}

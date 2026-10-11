@@ -91,7 +91,7 @@ router.post("/:eventId/duties", authenticate, authorizeEventMembership(["organiz
 });
 
 // Updates a duty and replaces its event-scoped member assignments.
-router.patch("/:dutyId", authenticate, async (req, res) => {
+router.patch("/:eventId/duties/:dutyId", authenticate, async (req, res) => {
   const { title, startAt, endAt, venueId, notes, orgMemberIds = [] } = req.body;
   if (!title?.trim() || !startAt || !endAt) return res.status(400).json({ error: "Duty title and times are required." });
   const start = new Date(startAt);
@@ -100,6 +100,7 @@ router.patch("/:dutyId", authenticate, async (req, res) => {
   try {
     const duty = await prisma.duty.findUnique({ where: { id: req.params.dutyId } });
     if (!duty) return res.status(404).json({ error: "Duty not found." });
+    if (duty.eventId !== req.params.eventId) return res.status(400).json({ error: "Duty does not belong to this event." });
     const membership = await prisma.eventMembership.findUnique({ where: { unique_event_user: { eventId: duty.eventId, userId: req.user.id } } });
     if (!membership || membership.role !== "organizer") return res.status(403).json({ error: "Organizer access required." });
     const memberIds = [...new Set(Array.isArray(orgMemberIds) ? orgMemberIds.filter(Boolean) : [])];

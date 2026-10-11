@@ -27,6 +27,22 @@
   --color-text-muted: #8E99A8;
 }
 
+/* Purpose: semantic color classes keep component markup free of literal color values. */
+.text-primary-ink { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-muted { color: var(--color-text-muted); }
+.text-accent { color: var(--color-primary-accent); }
+.surface-card { background-color: var(--color-bg-secondary); }
+.surface-subtle { background-color: var(--color-bg-primary); }
+.border-default { border-color: var(--color-border); }
+
+[data-theme="dark"] .text-primary-ink { color: #F3F6FB; }
+[data-theme="dark"] .text-secondary { color: #AEB9C9; }
+[data-theme="dark"] .text-muted { color: #8491A5; }
+[data-theme="dark"] .surface-card { background-color: #151B25; }
+[data-theme="dark"] .surface-subtle { background-color: #0E131B; }
+[data-theme="dark"] .border-default { border-color: #293447; }
+
 * {
   box-sizing: border-box;
 }
@@ -231,6 +247,11 @@ select::-ms-expand {
 
 [data-theme="dark"] [class~="hover:bg-[#F0F2F5]"]:hover {
   background-color: #202733 !important;
+}
+
+/* Keeps light hover utilities readable when the application uses its data-theme dark mode. */
+[data-theme="dark"] [class~="hover:bg-[#F7F8FA]"]:hover {
+  background-color: #202A3A !important;
 }
 
 [data-theme="dark"] [class~="hover:bg-[#E8ECF1]"]:hover {

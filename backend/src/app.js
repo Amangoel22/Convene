@@ -11,6 +11,7 @@ import orgRoutes from "./routes/orgRoutes.js";
 import dutyRoutes from "./routes/dutyRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import resourceRoutes from "./routes/resourceRoutes.js";
+import issueRoutes from "./routes/issueRoutes.js";
 
 const app = express();
 
@@ -192,6 +193,7 @@ app.use("/api/qr", qrRoutes);
 app.use("/api/events", dutyRoutes);
 app.use("/api/events", inventoryRoutes);
 app.use("/api/events", resourceRoutes);
+app.use("/api/events", issueRoutes);
 app.use("/api/events", orgRoutes);
 
 // Global 404 Handler

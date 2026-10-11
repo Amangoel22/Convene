@@ -25,7 +25,6 @@ model User {
   uploadedResources    EventResource[]
   dutyAssignments      DutyAssignment[]
   reportedIssues       Issue[]                 @relation("IssueReporter")
-  assignedIssues       Issue[]                 @relation("IssueAssignee")
 
   @@map("users")
 }
@@ -377,14 +376,12 @@ model Issue {
   priority                    PriorityLevel @default(Medium)
   status                      IssueStatus   @default(Open)
   reporterUserId              String        @map("reporter_user_id") @db.Uuid
-  assignedUserId              String?       @map("assigned_user_id") @db.Uuid
   mandatoryResolutionFeedback String?       @map("mandatory_resolution_feedback")
   createdAt                   DateTime      @default(now()) @map("created_at") @db.Timestamptz
   resolvedAt                  DateTime?     @map("resolved_at") @db.Timestamptz
   event                       Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
   orgTeam                     OrgTeam?      @relation(fields: [orgTeamId], references: [id], onDelete: SetNull)
   reporterUser                User          @relation("IssueReporter", fields: [reporterUserId], references: [id], onDelete: Cascade)
-  assignedUser                User?         @relation("IssueAssignee", fields: [assignedUserId], references: [id], onDelete: SetNull)
 
   @@index([eventId, status])
   @@index([orgTeamId])

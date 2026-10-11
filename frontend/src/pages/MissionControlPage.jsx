@@ -483,7 +483,7 @@ export function MissionControlPage() {
             </span>
           </div>
 
-          <div className="rounded-3xl surface-card-token  border border-token  p-3 divide-y divide-subtle-token  shadow-token-card">
+          <div className="rounded-3xl surface-card-token border border-token p-3 shadow-token-card">
             {duties.length === 0 ? (
               <div className="p-8 text-center space-y-2">
                 <p className="type-sm weight-bold text-token-primary">
@@ -548,7 +548,7 @@ export function MissionControlPage() {
             </Link>
           </div>
 
-          <div className="rounded-3xl surface-card-token  border border-token  p-3 divide-y divide-subtle-token  shadow-token-card">
+          <div className="rounded-3xl surface-card-token border border-token p-3 shadow-token-card">
             {tasksLoading ? (
               <div className="space-y-3 p-5">
                 <LoadingSkeleton className="h-10" />

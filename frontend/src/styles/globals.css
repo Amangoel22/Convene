@@ -25,6 +25,8 @@
   --color-text-primary: #1A1D23;
   --color-text-secondary: #5A6577;
   --color-text-muted: #8E99A8;
+  --color-loading-base: #E8ECF1;
+  --color-loading-highlight: #F7F8FA;
 }
 
 /* Purpose: semantic color classes keep component markup free of literal color values. */
@@ -35,6 +37,25 @@
 .surface-card { background-color: var(--color-bg-secondary); }
 .surface-subtle { background-color: var(--color-bg-primary); }
 .border-default { border-color: var(--color-border); }
+
+/* Purpose: provide a restrained shimmer buffer without changing loading layout. */
+.loading-skeleton {
+  min-height: 1rem;
+  background: linear-gradient(
+    110deg,
+    var(--color-loading-base) 8%,
+    var(--color-loading-highlight) 18%,
+    var(--color-loading-base) 33%
+  );
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.35s ease-in-out infinite;
+}
+
+/* Purpose: move the loading highlight across reserved content space. */
+@keyframes loading-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
 
 /* Purpose: token utilities are the only presentation names used by migrated components. */
 .text-token-primary { color: var(--color-text-primary); }
@@ -185,6 +206,10 @@
 [data-theme="dark"] .surface-subtle { background-color: #0E131B; }
 [data-theme="dark"] .border-default { border-color: #293447; }
 [data-theme="dark"] .surface-card-token { background-color: #151B25 !important; }
+[data-theme="dark"] {
+  --color-loading-base: #202733;
+  --color-loading-highlight: #2B3545;
+}
 [data-theme="dark"] .surface-token { background-color: #0E131B !important; }
 [data-theme="dark"] .field-token { background-color: #202733 !important; }
 [data-theme="dark"] .hover-token { background-color: #202A3A !important; }

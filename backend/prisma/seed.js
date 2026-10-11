@@ -264,7 +264,6 @@ async function main() {
       title: "North Gate QR Badge Scanner Duty",
       startAt: new Date("2026-10-15T08:00:00Z"),
       endAt: new Date("2026-10-15T11:30:00Z"),
-      category: "Registration",
       notes: "Verify participant QR codes on the Convene App."
     }
   });

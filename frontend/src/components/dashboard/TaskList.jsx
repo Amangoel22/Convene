@@ -3,7 +3,6 @@ import { Check, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { todayTasks } from "@/data/dashboard";
 import { GlassCard } from "@/components/glass/GlassCard";
-import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { SectionHeader } from "@/components/common/SectionHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -24,7 +23,6 @@ export function TaskList() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <p className="truncate text-xs font-semibold text-[#111827]">{task.title}</p>
-                  <PriorityBadge priority={task.priority} />
                 </div>
                 <div className="mt-1 flex items-center gap-2 text-[11px] font-medium text-[#6B7280]">
                   <span className="truncate">{task.department}</span>

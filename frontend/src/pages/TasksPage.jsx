@@ -146,12 +146,7 @@ function TaskDrawer({ task: initialTask, onClose, onUpdateTask, teams, members, 
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
-            <label className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]">
-              <span className="text-[11px] font-semibold text-[#8E99A8]">Severity / Priority</span>
-              <select value={task.priority || "Medium"} onChange={(event) => setDraftTask({ ...task, priority: event.target.value })} className="mt-1 w-full bg-transparent text-xs font-bold text-[#1A1D23] outline-none">
-                {['Critical', 'High', 'Medium', 'Low'].map((value) => <option key={value} value={value}>{value}</option>)}
-              </select>
-            </label>
+            <label className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]"><span className="text-[11px] font-semibold text-[#8E99A8]">Severity / Priority</span><select value={task.priority || "Medium"} onChange={(event) => setDraftTask({ ...task, priority: event.target.value })} className="mt-1 w-full bg-transparent text-xs font-bold text-[#1A1D23] outline-none">{["Critical", "High", "Medium", "Low"].map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
             <label className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]">
               <span className="text-[11px] font-semibold text-[#8E99A8]">Due date</span>
               <input type="date" value={dateInputValue(task.dueAt)} onChange={(event) => setDraftTask({ ...task, dueAt: event.target.value || null })} className="mt-1 w-full bg-transparent text-xs font-bold text-[#1A1D23] outline-none" />
@@ -275,7 +270,7 @@ function NewTaskModal({ open, onClose, onCreateTask, teams, members }) {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div><label className="text-xs font-semibold text-[#8E99A8]">Severity / Priority</label><select value={priority} onChange={(event) => setPriority(event.target.value)} className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] px-3 text-xs font-semibold text-[#1A1D23] outline-none"><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></div>
+          <div><label className="text-xs font-semibold text-[#8E99A8]">Severity / Priority</label><select value={priority} onChange={(event) => setPriority(event.target.value)} className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] px-3 text-xs font-semibold text-[#1A1D23] outline-none"><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select></div>
           <div><label className="text-xs font-semibold text-[#8E99A8]">Due date</label><input type="date" value={dueAt} onChange={(event) => setDueAt(event.target.value)} className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] px-3 text-xs font-semibold text-[#1A1D23] outline-none" /></div>
         </div>
 

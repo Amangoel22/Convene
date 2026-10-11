@@ -20,6 +20,16 @@ export const COLORS = {
   error: "#D6453D",
   info: "#3B6FD4",
   purple: "#9333EA",
+
+  // Named aliases for new and refactored UI work.
+  blue1: "#3B6FD4",
+  blueDark: "#2A54A7",
+  green1: "#22A65E",
+  greenDark: "#187A45",
+  red1: "#D6453D",
+  redDark: "#A92F2A",
+  gray1: "#F0F2F5",
+  gray2: "#F7F8FA",
 };
 
 export const COLOR_CLASSES = {

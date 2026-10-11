@@ -3,8 +3,8 @@ import { ArrowRight, AlertTriangle, Check, CheckSquare, Clock, MapPin, Square } 
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { cn, getStageStatus, isEventComplete, parseTimeString } from "@/lib/utils";
-import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -26,10 +26,7 @@ function formatDashboardDuty(duty) {
     ...duty,
     title: duty.title,
     time,
-    location: duty.venue?.name || "Venue not set",
-    priority: "Medium",
-    status: "Assigned",
-    completed: false
+    location: duty.venue?.name || "Venue not set"
   };
 }
 
@@ -157,11 +154,6 @@ export function MissionControlPage() {
     return `${hours}:${minutes}:${seconds}`;
   };
 
-  const toggleDuty = (dutyId) => {
-    setDuties((prev) =>
-      prev.map((d) => (d.id === dutyId ? { ...d, completed: !d.completed, status: !d.completed ? "Completed" : "In Progress" } : d))
-    );
-  };
 
   const toggleTask = async (taskId) => {
     const task = tasks.find((item) => item.id === taskId);
@@ -379,39 +371,18 @@ export function MissionControlPage() {
               duties.map((duty) => (
                 <div
                   key={duty.id}
-                  onClick={() => toggleDuty(duty.id)}
-                  className={cn(
-                    "group flex items-start gap-3.5 py-3.5 px-3 rounded-2xl cursor-pointer transition-colors duration-150",
-                    duty.completed
-                      ? "opacity-60 bg-[#F7F8FA]"
-                      : "hover:bg-[#F7F8FA]"
-                  )}
+                  className="group flex items-start gap-3.5 py-3.5 px-3 rounded-2xl transition-colors duration-150 hover:bg-[#F7F8FA]"
                 >
-                  {/* Completion Checkbox */}
-                  <button
-                    type="button"
-                    aria-label={`Toggle ${duty.title}`}
-                    className="mt-0.5 shrink-0 text-[#8E99A8] group-hover:text-[#1A1D23] transition-colors"
-                  >
-                    {duty.completed ? (
-                      <CheckSquare size={18} className="text-[#22A65E]" />
-                    ) : (
-                      <Square size={18} />
-                    )}
-                  </button>
-
                   {/* Duty Details */}
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex items-center justify-between gap-2">
                       <p
                         className={cn(
                           "text-sm font-bold text-[#1A1D23] leading-snug truncate",
-                          duty.completed && "line-through text-[#8E99A8]"
                         )}
                       >
                         {duty.title}
                       </p>
-                      <PriorityBadge priority={duty.priority} />
                     </div>
 
                     <div className="flex items-center justify-between text-xs font-medium text-[#5A6577] pt-0.5">
@@ -426,7 +397,6 @@ export function MissionControlPage() {
                           <span className="text-[#5A6577] font-medium">{duty.location}</span>
                         </span>
                       </div>
-                      <StatusBadge status={duty.status} />
                     </div>
                   </div>
                 </div>
@@ -491,11 +461,11 @@ export function MissionControlPage() {
                       >
                         {task.title}
                       </p>
-                      <PriorityBadge priority={task.priority} />
                     </div>
                     <div className="mt-1 flex items-center justify-between text-[11px] font-medium text-[#8E99A8]">
                       <span>{task.time}</span>
                       <StatusBadge status={task.status} />
+                      <PriorityBadge priority={task.priority} />
                     </div>
                   </div>
                 </div>

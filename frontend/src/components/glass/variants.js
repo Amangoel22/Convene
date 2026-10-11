@@ -27,15 +27,15 @@ export const glassCardVariants = cva("glass-surface rounded-[20px]", {
 });
 
 export const glassButtonVariants = cva(
-  "inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 text-xs font-semibold transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B6FD4] disabled:opacity-50",
+  "inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 type-xs weight-semibold transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B6FD4] disabled:opacity-50",
   {
     variants: {
       variant: {
-        primary: "bg-[#3B6FD4] text-white hover:bg-[#2F5BB8] border border-[#3B6FD4] shadow-sm",
-        secondary: "bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23] border border-[rgba(0,0,0,0.08)]",
-        info: "bg-[#3B6FD4] text-white hover:bg-[#2F5BB8]",
-        success: "bg-[#22A65E] text-white hover:bg-[#1B8F50] font-bold",
-        ghost: "bg-transparent text-[#5A6577] hover:bg-[#F0F2F5] hover:text-[#1A1D23]"
+        primary: "bg-token-accent text-token-inverse hover:bg-token-accent-dark border border-token-accent shadow-sm",
+        secondary: "field-token text-token-secondary hover:hover-token hover:text-token-primary border border-token",
+        info: "bg-token-accent text-token-inverse hover:bg-token-accent-dark",
+        success: "bg-token-success text-token-inverse hover:bg-token-success-dark weight-bold",
+        ghost: "bg-transparent text-token-secondary hover:field-token hover:text-token-primary"
       }
     },
     defaultVariants: {

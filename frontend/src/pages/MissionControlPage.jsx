@@ -264,13 +264,13 @@ export function MissionControlPage() {
     <div className="space-y-9 w-full max-w-[1360px] mx-auto pb-16 pt-2">
       {/* Header */}
       <div>
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-[#1A1D23]">
+        <h1 className="type-4xl md:type-5xl weight-extrabold tracking-tight text-token-primary">
           Good morning
           {currentUser?.name ? `, ${currentUser.name.split(" ")[0]}` : ""}
         </h1>
-        <p className="mt-2 text-base text-[#5A6577] font-medium">
+        <p className="mt-2 type-base text-token-secondary weight-medium">
           Here is what requires your operational focus for{" "}
-          <span className="font-bold text-[#3B6FD4]">
+          <span className="weight-bold text-token-accent">
             {activeEvent?.name || "your event"}
           </span>{" "}
           today.
@@ -280,25 +280,25 @@ export function MissionControlPage() {
       {/* Hero Surface */}
       <section
         aria-label="Current event status"
-        className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-7 md:p-9 space-y-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden"
+        className="rounded-3xl surface-card-token border border-token p-7 md:p-9 space-y-8 shadow-token-soft relative overflow-hidden"
       >
         {/* Top Split: Left Event Info & Right Next Stage / Countdown */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           {/* Left Zone: Active Stage Details */}
           <div className="space-y-4 max-w-2xl">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-xs font-extrabold text-[#3B6FD4] bg-[#EBF0FA] px-3 py-1 rounded-full uppercase tracking-wider">
+              <span className="type-xs weight-extrabold text-token-accent accent-surface-token px-3 py-1 rounded-full uppercase tracking-wider">
                 {activeEvent?.name || "No Event Selected"} •{" "}
                 {activeEvent?.type || "Event"}
               </span>
               {eventIsComplete ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22A65E]/10 border border-[#22A65E]/25 px-3 py-1 text-xs font-extrabold text-[#22A65E]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-token-success/10 border border-token-success/25 px-3 py-1 type-xs weight-extrabold text-token-success">
                   <Check size={13} strokeWidth={3} /> COMPLETED
                 </span>
               ) : (
                 liveStage && (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22A65E]/10 border border-[#22A65E]/25 px-3 py-1 text-xs font-extrabold text-[#22A65E]">
-                    <span className="h-2 w-2 rounded-full bg-[#22A65E] animate-pulse" />
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-token-success/10 border border-token-success/25 px-3 py-1 type-xs weight-extrabold text-token-success">
+                    <span className="h-2 w-2 rounded-full bg-token-success animate-pulse" />
                     LIVE STAGE
                   </span>
                 )
@@ -306,7 +306,7 @@ export function MissionControlPage() {
             </div>
 
             <div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1D23] tracking-tight">
+              <h2 className="type-3xl md:type-4xl weight-extrabold text-token-primary tracking-tight">
                 {eventIsComplete
                   ? "Event Completed"
                   : liveStage
@@ -315,12 +315,12 @@ export function MissionControlPage() {
                       ? "Event In Progress"
                       : "No Active Event"}
               </h2>
-              <div className="mt-2 flex flex-wrap items-center gap-3 text-sm font-semibold text-[#5A6577]">
+              <div className="mt-2 flex flex-wrap items-center gap-3 type-sm weight-semibold text-token-secondary">
                 {(liveStage?.location ||
                   activeEvent?.location ||
                   activeEvent?.primaryLocation) && (
-                  <span className="inline-flex items-center gap-1.5 bg-[#F0F2F5] px-3 py-1 rounded-full text-xs font-bold text-[#1A1D23]">
-                    <MapPin size={14} className="text-[#3B6FD4]" />
+                  <span className="inline-flex items-center gap-1.5 field-token px-3 py-1 rounded-full type-xs weight-bold text-token-primary">
+                    <MapPin size={14} className="text-token-accent" />
                     <span>
                       {liveStage?.location ||
                         activeEvent?.location ||
@@ -329,7 +329,7 @@ export function MissionControlPage() {
                   </span>
                 )}
                 {activeEvent?.duration && !eventIsComplete && (
-                  <span className="inline-flex items-center gap-1.5 bg-[#EBF0FA] px-3 py-1 rounded-full text-xs font-bold text-[#3B6FD4] font-mono">
+                  <span className="inline-flex items-center gap-1.5 accent-surface-token px-3 py-1 rounded-full type-xs weight-bold text-token-accent font-mono">
                     <Clock size={14} /> {activeEvent.duration} (
                     {activeEvent.startTime || "09:00"} –{" "}
                     {activeEvent.endTime || "21:00"})
@@ -340,21 +340,21 @@ export function MissionControlPage() {
           </div>
 
           {/* Right Zone: Next Stage & Live Countdown Timer */}
-          <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-between gap-4 shrink-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-[rgba(0,0,0,0.06)]">
-            <div className="text-left lg:text-right rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5 w-full sm:w-auto lg:w-56">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8] block">
+          <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-between gap-4 shrink-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-subtle-token">
+            <div className="text-left lg:text-right rounded-2xl surface-token border border-subtle-token p-3.5 w-full sm:w-auto lg:w-56">
+              <span className="type-10 weight-bold uppercase tracking-wider text-token-muted block">
                 {eventIsComplete ? "EVENT STATUS" : "UPCOMING STAGE"}
               </span>
-              <span className="text-sm font-extrabold text-[#1A1D23] block mt-0.5 truncate">
+              <span className="type-sm weight-extrabold text-token-primary block mt-0.5 truncate">
                 {eventIsComplete
                   ? "Completed"
                   : upcomingStage?.title || "No Upcoming Stages"}
               </span>
-              <div className="mt-2 pt-2 border-t border-[rgba(0,0,0,0.06)] flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-[#8E99A8]">
+              <div className="mt-2 pt-2 border-t border-subtle-token flex items-center justify-between">
+                <span className="type-11 weight-semibold text-token-muted">
                   {eventIsComplete ? "Timeline" : "Starts in"}
                 </span>
-                <span className="text-base font-mono font-extrabold text-[#3B6FD4]">
+                <span className="type-base font-mono weight-extrabold text-token-accent">
                   {eventIsComplete
                     ? "100% complete"
                     : formatCountdown(secondsRemaining)}
@@ -365,12 +365,12 @@ export function MissionControlPage() {
         </div>
 
         {/* Bottom Zone: Run of Show Progress Rail */}
-        <div className="pt-5 border-t border-[rgba(0,0,0,0.06)] space-y-4">
-          <div className="flex items-center justify-between text-xs font-semibold">
-            <span className="text-[#1A1D23] font-bold uppercase tracking-wider text-xs">
+        <div className="pt-5 border-t border-subtle-token space-y-4">
+          <div className="flex items-center justify-between type-xs weight-semibold">
+            <span className="text-token-primary weight-bold uppercase tracking-wider type-xs">
               Run of Show Progress
             </span>
-            <span className="text-[#5A6577] text-xs font-medium">
+            <span className="text-token-secondary type-xs weight-medium">
               {completedCount} of {rawStages.length} completed ·{" "}
               {progressPercent}% through event schedule
             </span>
@@ -395,26 +395,26 @@ export function MissionControlPage() {
                       className={cn(
                         "h-4 w-4 rounded-full transition-all flex items-center justify-center border-2 shrink-0",
                         isCurrent
-                          ? "bg-[#3B6FD4] border-[#3B6FD4] ring-4 ring-[#3B6FD4]/20 shadow-[0_0_12px_rgba(59,111,212,0.3)]"
+                          ? "bg-token-accent border-token-accent ring-4 ring-token-accent/20 shadow-token-accent"
                           : isCompleted
-                            ? "bg-[#22A65E] border-[#22A65E]"
-                            : "bg-[#F0F2F5] border-[#D0D5DD]",
+                            ? "bg-token-success border-token-success"
+                            : "field-token border-token-medium",
                       )}
                     >
                       {isCompleted && (
-                        <Check size={9} className="text-white stroke-[3]" />
+                        <Check size={9} className="text-token-inverse stroke-[3]" />
                       )}
                     </div>
 
                     {/* Stage Name */}
                     <span
                       className={cn(
-                        "text-xs font-semibold truncate w-full text-center",
+                        "type-xs weight-semibold truncate w-full text-center",
                         isCurrent
-                          ? "text-[#3B6FD4] font-bold"
+                          ? "text-token-accent weight-bold"
                           : isCompleted
-                            ? "text-[#5A6577]"
-                            : "text-[#8E99A8]",
+                            ? "text-token-secondary"
+                            : "text-token-muted",
                       )}
                     >
                       {stg.title || stg.name}
@@ -423,12 +423,12 @@ export function MissionControlPage() {
                     {/* Event Timing Below Name */}
                     <span
                       className={cn(
-                        "text-[11px] font-mono font-medium truncate w-full text-center",
+                        "type-11 font-mono weight-medium truncate w-full text-center",
                         isCurrent
-                          ? "text-[#3B6FD4] font-bold"
+                          ? "text-token-accent weight-bold"
                           : isCompleted
-                            ? "text-[#8E99A8]"
-                            : "text-[#B5BCC7]",
+                            ? "text-token-muted"
+                            : "text-token-inverse-muted",
                       )}
                     >
                       {stg.timeWindow || stg.timeDisplay || stg.time}
@@ -441,7 +441,7 @@ export function MissionControlPage() {
             {/* Connecting Line */}
             {evaluatedStages.length > 1 && (
               <div
-                className="absolute top-[17px] h-0.5 bg-[#E8ECF1] -z-0"
+                className="absolute top-[17px] h-0.5 hover-token -z-0"
                 style={{
                   left: `${100 / (evaluatedStages.length * 2)}%`,
                   right: `${100 / (evaluatedStages.length * 2)}%`,
@@ -449,14 +449,14 @@ export function MissionControlPage() {
               >
                 {/* Active/Live progress line advancing forward towards next stage in blue */}
                 <div
-                  className="absolute top-0 bottom-0 left-0 bg-[#3B6FD4] transition-all duration-300"
+                  className="absolute top-0 bottom-0 left-0 bg-token-accent transition-all duration-300"
                   style={{
                     width: `${lineProgressPercent}%`,
                   }}
                 />
                 {/* Past completed stages strictly in green */}
                 <div
-                  className="absolute top-0 bottom-0 left-0 bg-[#22A65E] transition-all duration-300"
+                  className="absolute top-0 bottom-0 left-0 bg-token-success transition-all duration-300"
                   style={{
                     width: `${Math.min(100, Math.round((completedCount / (evaluatedStages.length - 1)) * 100))}%`,
                   }}
@@ -475,21 +475,21 @@ export function MissionControlPage() {
           aria-label="Personal organizer duties"
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-[20px] font-bold text-[#1A1D23]">
+            <h3 className="type-20 weight-bold text-token-primary">
               Your Duties
             </h3>
-            <span className="text-xs font-medium text-[#8E99A8]">
+            <span className="type-xs weight-medium text-token-muted">
               Assigned shift roles
             </span>
           </div>
 
-          <div className="rounded-3xl bg-white dark:bg-[#151C28] border border-[rgba(0,0,0,0.08)] dark:border-[#293447] p-3 divide-y divide-[rgba(0,0,0,0.06)] dark:divide-[#293447] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="rounded-3xl surface-card-token  border border-token  p-3 divide-y divide-subtle-token  shadow-token-card">
             {duties.length === 0 ? (
               <div className="p-8 text-center space-y-2">
-                <p className="text-sm font-bold text-[#1A1D23]">
+                <p className="type-sm weight-bold text-token-primary">
                   No duties assigned
                 </p>
-                <p className="text-xs text-[#8E99A8]">
+                <p className="type-xs text-token-muted">
                   You currently have no shift duties assigned for this event.
                 </p>
               </div>
@@ -497,30 +497,30 @@ export function MissionControlPage() {
               duties.map((duty) => (
                 <div
                   key={duty.id}
-                  className="group flex items-start gap-3.5 py-3.5 px-3 rounded-2xl transition-colors duration-150 hover:bg-[#F7F8FA] dark:hover:bg-[#202A3A]"
+                  className="group flex items-start gap-3.5 py-3.5 px-3 rounded-2xl transition-colors duration-150 hover-surface-token "
                 >
                   {/* Duty Details */}
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex items-center justify-between gap-2">
                       <p
                         className={cn(
-                          "text-sm font-bold text-[#1A1D23] dark:text-[#F4F7FB] leading-snug truncate",
+                          "type-sm weight-bold text-token-primary dark:text-token-inverse leading-snug truncate",
                         )}
                       >
                         {duty.title}
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs font-medium text-[#5A6577] pt-0.5">
+                    <div className="flex items-center justify-between type-xs weight-medium text-token-secondary pt-0.5">
                       <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-[#3B6FD4]">
-                          <Clock size={12} className="text-[#3B6FD4]" />
+                        <span className="inline-flex items-center gap-1 font-mono type-11 weight-bold text-token-accent">
+                          <Clock size={12} className="text-token-accent" />
                           {duty.time}
                         </span>
                         <span>•</span>
                         <span className="inline-flex items-center gap-1 text-secondary">
                           <MapPin size={12} />
-                          <span className="text-secondary font-medium">
+                          <span className="text-secondary weight-medium">
                             {duty.location}
                           </span>
                         </span>
@@ -539,16 +539,16 @@ export function MissionControlPage() {
           aria-label="Personal organizer tasks"
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-[20px] font-bold text-[#1A1D23]">Your Tasks</h3>
+            <h3 className="type-20 weight-bold text-token-primary">Your Tasks</h3>
             <Link
               to="/tasks"
-              className="text-xs font-semibold text-[#3B6FD4] hover:text-[#2F5BB8] transition-colors inline-flex items-center gap-1"
+              className="type-xs weight-semibold text-token-accent hover:text-token-accent-dark transition-colors inline-flex items-center gap-1"
             >
               View all <ArrowRight size={13} />
             </Link>
           </div>
 
-          <div className="rounded-3xl bg-white dark:bg-[#151C28] border border-[rgba(0,0,0,0.08)] dark:border-[#293447] p-3 divide-y divide-[rgba(0,0,0,0.06)] dark:divide-[#293447] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="rounded-3xl surface-card-token  border border-token  p-3 divide-y divide-subtle-token  shadow-token-card">
             {tasksLoading ? (
               <div className="space-y-3 p-5">
                 <LoadingSkeleton className="h-10" />
@@ -556,10 +556,10 @@ export function MissionControlPage() {
               </div>
             ) : tasks.length === 0 ? (
               <div className="p-8 text-center space-y-2">
-                <p className="text-sm font-bold text-[#1A1D23]">
+                <p className="type-sm weight-bold text-token-primary">
                   No tasks assigned
                 </p>
-                <p className="text-xs text-[#8E99A8]">
+                <p className="type-xs text-token-muted">
                   You currently have no tasks assigned for this event.
                 </p>
               </div>
@@ -577,16 +577,16 @@ export function MissionControlPage() {
                       "group flex items-start gap-3 py-3.5 px-3 rounded-xl cursor-pointer transition-colors duration-150",
                       task.completed
                         ? "opacity-75"
-                        : "hover:bg-[#F7F8FA] dark:hover:bg-[#202A3A]",
+                        : "hover-surface-token ",
                     )}
                   >
                     <button
                       type="button"
                       aria-label={`Toggle ${task.title}`}
-                      className="mt-0.5 shrink-0 text-[#8E99A8] group-hover:text-[#1A1D23] transition-colors"
+                      className="mt-0.5 shrink-0 text-token-muted group-hover:text-token-primary transition-colors"
                     >
                       {task.completed ? (
-                        <CheckSquare size={17} className="text-[#22A65E]" />
+                        <CheckSquare size={17} className="text-token-success" />
                       ) : (
                         <Square size={17} />
                       )}
@@ -595,13 +595,13 @@ export function MissionControlPage() {
                       <div className="flex items-center justify-between gap-2">
                         <p
                           className={cn(
-                            "text-xs font-semibold text-[#1A1D23] dark:text-[#F4F7FB] leading-snug truncate",
+                            "type-xs weight-semibold text-token-primary dark:text-token-inverse leading-snug truncate",
                           )}
                         >
                           {task.title}
                         </p>
                       </div>
-                      <div className="mt-1 flex items-center justify-between text-[11px] font-medium text-[#8E99A8]">
+                      <div className="mt-1 flex items-center justify-between type-11 weight-medium text-token-muted">
                         <span>{task.time}</span>
                         <StatusBadge status={task.status} />
                         <PriorityBadge priority={task.priority} />
@@ -617,16 +617,16 @@ export function MissionControlPage() {
       {/* Operational Attention Alert Banner */}
       {hasUrgentIssue && (
         <section aria-label="Operational alerts" className="pt-2">
-          <div className="flex items-center justify-between rounded-2xl bg-white border border-[rgba(212,147,14,0.25)] px-5 py-3.5 text-xs font-medium text-[#1A1D23] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center justify-between rounded-2xl surface-card-token border border-token-warning-soft px-5 py-3.5 type-xs weight-medium text-token-primary shadow-token-card">
             <div className="flex items-center gap-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D4930E]/15 text-[#D4930E]">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-token-warning/15 text-token-warning">
                 <AlertTriangle size={15} />
               </div>
               <div>
-                <span className="font-bold text-[#1A1D23]">
+                <span className="weight-bold text-token-primary">
                   Needs Attention:
                 </span>{" "}
-                <span className="text-[#5A6577]">
+                <span className="text-token-secondary">
                   2 unresolved issues flagged in Technical Team (WiFi latency in
                   Lab C).
                 </span>
@@ -634,7 +634,7 @@ export function MissionControlPage() {
             </div>
             <Link
               to="/issues"
-              className="font-bold text-[#3B6FD4] hover:text-[#2F5BB8] shrink-0 text-xs inline-flex items-center gap-1"
+              className="weight-bold text-token-accent hover:text-token-accent-dark shrink-0 type-xs inline-flex items-center gap-1"
             >
               Resolve <ArrowRight size={13} />
             </Link>

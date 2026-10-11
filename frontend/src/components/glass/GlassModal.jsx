@@ -7,7 +7,7 @@ export function GlassModal({ open, className, children }) {
   return (
     <AnimatePresence>
       {open ? (
-        <motion.div className="fixed inset-0 z-50 grid place-items-center bg-white/20 p-6 backdrop-blur-sm" {...modalAnimation}>
+        <motion.div className="fixed inset-0 z-50 grid place-items-center surface-card-token/20 p-6 backdrop-blur-sm" {...modalAnimation}>
           <div className={cn("glass-surface max-w-lg rounded-[32px] p-6", className)}>{children}</div>
         </motion.div>
       ) : null}

@@ -34,13 +34,13 @@ export const COLORS = {
 
 export const COLOR_CLASSES = {
   // Common text color utilities
-  textDark: "text-[#1A1D23]",
-  textMuted: "text-[#8E99A8]",
-  textSubtle: "text-[#5A6577]",
-  textPrimary: "text-[#3B6FD4]",
+  textDark: "text-token-primary",
+  textMuted: "text-token-muted",
+  textSubtle: "text-token-secondary",
+  textPrimary: "text-token-accent",
 
   // Common background utilities
-  bgLight: "bg-[#F0F2F5]",
-  bgCard: "bg-[#F7F8FA]",
-  bgPrimaryLight: "bg-[#EBF0FA]",
+  bgLight: "field-token",
+  bgCard: "surface-token",
+  bgPrimaryLight: "accent-surface-token",
 };

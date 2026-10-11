@@ -23,7 +23,7 @@ export function StatusBadge({ status, children, className }) {
   return (
     <span
       className={cn(
-        "text-xs font-semibold whitespace-nowrap inline-block",
+        "type-xs weight-semibold whitespace-nowrap inline-block",
         statusTextStyles[status] ?? `text-[${COLORS.grayText}]`,
         className
       )}

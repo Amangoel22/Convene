@@ -6,8 +6,8 @@ export function SectionHeader({ title, description, actionLabel, className }) {
   return (
     <div className={cn("mb-5 flex items-center justify-between gap-4", className)}>
       <div>
-        <h3 className="text-xl font-semibold text-[#111827]">{title}</h3>
-        {description ? <p className="mt-1 text-sm font-medium text-[#6B7280]">{description}</p> : null}
+        <h3 className="type-xl weight-semibold text-token-primary">{title}</h3>
+        {description ? <p className="mt-1 type-sm weight-medium text-token-secondary">{description}</p> : null}
       </div>
       {actionLabel ? <GlassButton variant="ghost">{actionLabel}</GlassButton> : null}
     </div>

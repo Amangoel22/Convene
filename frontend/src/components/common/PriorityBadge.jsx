@@ -2,9 +2,9 @@
 import { cn } from "@/lib/utils";
 import { COLORS } from "@/constants/colors";
 
-const priorityStyles = { Critical: `text-[${COLORS.error}] font-bold`, High: `text-[${COLORS.warning}] font-bold`, Medium: `text-[${COLORS.primary}] font-bold`, Low: `text-[${COLORS.grayMuted}] font-bold` };
+const priorityStyles = { Critical: `text-[${COLORS.error}] weight-bold`, High: `text-[${COLORS.warning}] weight-bold`, Medium: `text-[${COLORS.primary}] weight-bold`, Low: `text-[${COLORS.grayMuted}] weight-bold` };
 
 // Renders a priority label using centralized color tokens.
 export function PriorityBadge({ priority = "Medium", className }) {
-  return <span className={cn("text-xs font-bold whitespace-nowrap inline-block tracking-wide", priorityStyles[priority] ?? priorityStyles.Medium, className)}>{priority}</span>;
+  return <span className={cn("type-xs weight-bold whitespace-nowrap inline-block tracking-wide", priorityStyles[priority] ?? priorityStyles.Medium, className)}>{priority}</span>;
 }

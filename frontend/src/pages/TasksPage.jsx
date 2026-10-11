@@ -55,15 +55,15 @@ function dateInputValue(value) {
 
 function SelectFilter({ value, onChange, options, label }) {
   return (
-    <label className="filter-chip flex h-9 shrink-0 items-center rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] pl-3 text-xs font-semibold text-[#5A6577]">
+    <label className="filter-chip flex h-9 shrink-0 items-center rounded-full field-token border border-token pl-3 type-xs weight-semibold text-token-secondary">
       <span className="sr-only">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="cursor-pointer bg-transparent text-xs font-semibold text-[#1A1D23] outline-none"
+        className="cursor-pointer bg-transparent type-xs weight-semibold text-token-primary outline-none"
       >
         {options.map((option) => (
-          <option key={option} value={option} className="bg-white text-[#1A1D23]">
+          <option key={option} value={option} className="surface-card-token text-token-primary">
             {option}
           </option>
         ))}
@@ -93,26 +93,26 @@ function TaskDrawer({ task: initialTask, onClose, onUpdateTask, teams, members, 
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
+        className="fixed inset-0 z-40 bg-token-black/20 backdrop-blur-[2px]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       />
       <motion.aside
-        className="fixed bottom-2 right-4 top-2 z-50 flex max-h-[calc(100vh-1rem)] w-[min(560px,calc(100vw-32px))] min-h-0 flex-col overflow-hidden rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 shadow-xl text-[#1A1D23]"
+        className="fixed bottom-2 right-4 top-2 z-50 flex max-h-[calc(100vh-1rem)] w-[min(560px,calc(100vw-32px))] min-h-0 flex-col overflow-hidden rounded-3xl surface-card-token border border-token p-6 shadow-xl text-token-primary"
         initial={{ x: 580, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 580, opacity: 0 }}
         transition={{ type: "spring", stiffness: 320, damping: 30 }}
       >
         {/* Drawer Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-[rgba(0,0,0,0.06)] pb-4">
+        <div className="flex items-start justify-between gap-4 border-b border-subtle-token pb-4">
           <div>
-            <h2 className="text-xl font-bold text-[#1A1D23]">{task.title}</h2>
+            <h2 className="type-xl weight-bold text-token-primary">{task.title}</h2>
           </div>
           <button
-            className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
+            className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary"
             onClick={onClose}
             aria-label="Close task drawer"
           >
@@ -124,70 +124,70 @@ function TaskDrawer({ task: initialTask, onClose, onUpdateTask, teams, members, 
         <div className="flex-1 overflow-y-auto py-5 space-y-6 pr-1">
           {/* Status & Team Matrix */}
           <div className="grid grid-cols-2 gap-2.5">
-            <div className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]">
-              <p className="text-[11px] font-semibold text-[#8E99A8]">Status</p>
+            <div className="rounded-2xl surface-token p-3 border border-subtle-token">
+              <p className="type-11 weight-semibold text-token-muted">Status</p>
               <select
                 value={task.status}
                 onChange={(e) => handleStatusChange(e.target.value)}
                 disabled={task.status === "Completed"}
-                className="mt-1 w-full bg-transparent text-xs font-bold text-[#1A1D23] outline-none cursor-pointer"
+                className="mt-1 w-full bg-transparent type-xs weight-bold text-token-primary outline-none cursor-pointer"
               >
                 {statuses.slice(1).map((s) => (
-                  <option key={s} value={s} className="bg-white text-[#1A1D23]">
+                  <option key={s} value={s} className="surface-card-token text-token-primary">
                     {s}
                   </option>
                 ))}
               </select>
             </div>
-            <div className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]">
-              <p className="text-[11px] font-semibold text-[#8E99A8]">Department / Team</p>
-              <p className="mt-1 text-xs font-bold text-[#1A1D23] truncate">{task.department}</p>
+            <div className="rounded-2xl surface-token p-3 border border-subtle-token">
+              <p className="type-11 weight-semibold text-token-muted">Department / Team</p>
+              <p className="mt-1 type-xs weight-bold text-token-primary truncate">{task.department}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
-            <label className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]"><span className="text-[11px] font-semibold text-[#8E99A8]">Severity / Priority</span><select value={task.priority || "Medium"} onChange={(event) => setDraftTask({ ...task, priority: event.target.value })} className="mt-1 w-full bg-transparent text-xs font-bold text-[#1A1D23] outline-none">{["Critical", "High", "Medium", "Low"].map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-            <label className="rounded-2xl bg-[#F7F8FA] p-3 border border-[rgba(0,0,0,0.06)]">
-              <span className="text-[11px] font-semibold text-[#8E99A8]">Due date</span>
-              <input type="date" value={dateInputValue(task.dueAt)} onChange={(event) => setDraftTask({ ...task, dueAt: event.target.value || null })} className="mt-1 w-full bg-transparent text-xs font-bold text-[#1A1D23] outline-none" />
+            <label className="rounded-2xl surface-token p-3 border border-subtle-token"><span className="type-11 weight-semibold text-token-muted">Severity / Priority</span><select value={task.priority || "Medium"} onChange={(event) => setDraftTask({ ...task, priority: event.target.value })} className="mt-1 w-full bg-transparent type-xs weight-bold text-token-primary outline-none">{["Critical", "High", "Medium", "Low"].map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+            <label className="rounded-2xl surface-token p-3 border border-subtle-token">
+              <span className="type-11 weight-semibold text-token-muted">Due date</span>
+              <input type="date" value={dateInputValue(task.dueAt)} onChange={(event) => setDraftTask({ ...task, dueAt: event.target.value || null })} className="mt-1 w-full bg-transparent type-xs weight-bold text-token-primary outline-none" />
             </label>
           </div>
 
           {/* Assignee Box */}
-          <div className="flex items-center gap-3 rounded-2xl bg-[#F7F8FA] p-3.5 border border-[rgba(0,0,0,0.06)]">
-            <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-9 w-9 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />
+          <div className="flex items-center gap-3 rounded-2xl surface-token p-3.5 border border-subtle-token">
+            <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-9 w-9 type-xs accent-surface-token text-token-accent" />
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-semibold text-[#8E99A8]">Assigned Member</p>
-              <p className="text-sm font-bold text-[#1A1D23] truncate">{task.assignee.name}</p>
+              <p className="type-11 weight-semibold text-token-muted">Assigned Member</p>
+              <p className="type-sm weight-bold text-token-primary truncate">{task.assignee.name}</p>
             </div>
-            <span className="text-xs font-bold text-[#3B6FD4] font-mono">{task.assignee.phone || "+91 98765 40012"}</span>
+            <span className="type-xs weight-bold text-token-accent font-mono">{task.assignee.phone || "+91 98765 40012"}</span>
           </div>
 
-          {isLead && <label className="block rounded-2xl bg-[#F7F8FA] p-3 text-[11px] font-semibold text-[#8E99A8]">Assigned To
-            <select value={task.assignedOrgMemberId || ""} onChange={(event) => { const member = members.find((item) => item.id === event.target.value); setDraftTask({ ...task, assignedOrgMemberId: event.target.value || null, orgTeamId: member?.orgTeamId || null, department: member?.teamName || "Unassigned", assignee: member ? { ...task.assignee, name: member.name, initials: member.initials, phone: member.phone } : { name: "Unassigned", initials: "U", phone: "" } }); }} className="mt-1 h-9 w-full rounded-full bg-white px-3 pr-9 text-xs text-[#1A1D23] outline-none">
+          {isLead && <label className="block rounded-2xl surface-token p-3 type-11 weight-semibold text-token-muted">Assigned To
+            <select value={task.assignedOrgMemberId || ""} onChange={(event) => { const member = members.find((item) => item.id === event.target.value); setDraftTask({ ...task, assignedOrgMemberId: event.target.value || null, orgTeamId: member?.orgTeamId || null, department: member?.teamName || "Unassigned", assignee: member ? { ...task.assignee, name: member.name, initials: member.initials, phone: member.phone } : { name: "Unassigned", initials: "U", phone: "" } }); }} className="mt-1 h-9 w-full rounded-full surface-card-token px-3 pr-9 type-xs text-token-primary outline-none">
               <option value="">Unassigned</option>{members.map((member) => <option key={member.id} value={member.id}>{member.name} — {member.teamName}</option>)}
             </select>
-            {task.assignedOrgMemberId && <span className="mt-2 block text-[11px] font-semibold text-[#5A6577]">Team: {task.department}</span>}
+            {task.assignedOrgMemberId && <span className="mt-2 block type-11 weight-semibold text-token-secondary">Team: {task.department}</span>}
           </label>}
 
           {/* Task Description */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Description</h3>
-            <p className="mt-2 text-sm leading-relaxed text-[#5A6577] bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] rounded-2xl p-3.5 font-medium">
+            <h3 className="type-xs weight-bold uppercase tracking-wider text-token-muted">Description</h3>
+            <p className="mt-2 type-sm leading-relaxed text-token-secondary surface-token border border-subtle-token rounded-2xl p-3.5 weight-medium">
               {task.description}
             </p>
           </div>
 
-          <div className="border-t border-[rgba(0,0,0,0.06)] pt-4 text-xs text-[#8E99A8]">
-            Last updated by <span className="font-bold text-[#5A6577]">{task.lastUpdatedBy}</span> at {task.lastUpdatedAt ? new Date(task.lastUpdatedAt).toLocaleString() : "—"}
+          <div className="border-t border-subtle-token pt-4 type-xs text-token-muted">
+            Last updated by <span className="weight-bold text-token-secondary">{task.lastUpdatedBy}</span> at {task.lastUpdatedAt ? new Date(task.lastUpdatedAt).toLocaleString() : "—"}
           </div>
         </div>
 
         {/* Save changes footer */}
-        <div className="shrink-0 border-t border-[rgba(0,0,0,0.06)] pt-4 flex items-center gap-3">
+        <div className="shrink-0 border-t border-subtle-token pt-4 flex items-center gap-3">
           <GlassButton
             variant="primary"
-            className="flex-1 h-9 text-xs justify-center rounded-full"
+            className="flex-1 h-9 type-xs justify-center rounded-full"
             icon={task.status === "Completed" ? <RotateCcw size={15} /> : <Save size={15} />}
             onClick={async () => {
               if (task.status === "Completed") {
@@ -229,15 +229,15 @@ function NewTaskModal({ open, onClose, onCreateTask, teams, members }) {
   };
 
   return (
-    <GlassModal open={open} className="w-[min(540px,calc(100vw-32px))] max-w-none bg-white border border-[rgba(0,0,0,0.08)] rounded-3xl p-6 text-[#1A1D23]">
+    <GlassModal open={open} className="w-[min(540px,calc(100vw-32px))] max-w-none surface-card-token border border-token rounded-3xl p-6 text-token-primary">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-[#1A1D23]">Create Operational Task</h2>
-          <p className="mt-1 text-xs font-medium text-[#5A6577]">Assign a new duty allocation for team execution.</p>
+          <h2 className="type-xl weight-bold text-token-primary">Create Operational Task</h2>
+          <p className="mt-1 type-xs weight-medium text-token-secondary">Assign a new duty allocation for team execution.</p>
         </div>
 
         <button
-          className="flex h-8 w-8 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
+          className="flex h-8 w-8 min-h-0 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary"
           onClick={onClose}
           aria-label="Close new task modal"
         >
@@ -247,46 +247,46 @@ function NewTaskModal({ open, onClose, onCreateTask, teams, members }) {
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         <div>
-          <label className="text-xs font-semibold text-[#8E99A8]">Task Title</label>
+          <label className="type-xs weight-semibold text-token-muted">Task Title</label>
           <input
             type="text"
             required
             placeholder="e.g. Setup VIP Lounge & Stage Monitors"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
+            className="mt-1 h-10 w-full rounded-full field-token border border-token px-4 type-xs weight-semibold text-token-primary outline-none placeholder:text-token-muted"
           />
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-[#8E99A8]">Description</label>
+          <label className="type-xs weight-semibold text-token-muted">Description</label>
           <textarea
             rows={3}
             placeholder="Task scope details, location and deliverables..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] p-3.5 text-xs font-medium text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
+            className="mt-1 w-full rounded-2xl field-token border border-token p-3.5 type-xs weight-medium text-token-primary outline-none placeholder:text-token-muted"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div><label className="text-xs font-semibold text-[#8E99A8]">Severity / Priority</label><select value={priority} onChange={(event) => setPriority(event.target.value)} className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] px-3 text-xs font-semibold text-[#1A1D23] outline-none"><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select></div>
-          <div><label className="text-xs font-semibold text-[#8E99A8]">Due date</label><input type="date" value={dueAt} onChange={(event) => setDueAt(event.target.value)} className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] px-3 text-xs font-semibold text-[#1A1D23] outline-none" /></div>
+          <div><label className="type-xs weight-semibold text-token-muted">Severity / Priority</label><select value={priority} onChange={(event) => setPriority(event.target.value)} className="mt-1 h-9 w-full rounded-full field-token px-3 type-xs weight-semibold text-token-primary outline-none"><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select></div>
+          <div><label className="type-xs weight-semibold text-token-muted">Due date</label><input type="date" value={dueAt} onChange={(event) => setDueAt(event.target.value)} className="mt-1 h-9 w-full rounded-full field-token px-3 type-xs weight-semibold text-token-primary outline-none" /></div>
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-[#8E99A8]">Assign To</label>
-          <select value={assignedOrgMemberId} onChange={(e) => setAssignedOrgMemberId(e.target.value)} className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none cursor-pointer">
+          <label className="type-xs weight-semibold text-token-muted">Assign To</label>
+          <select value={assignedOrgMemberId} onChange={(e) => setAssignedOrgMemberId(e.target.value)} className="mt-1 h-9 w-full rounded-full field-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none cursor-pointer">
             <option value="">Unassigned</option>
             {members.map((member) => <option key={member.id} value={member.id}>{member.name} — {member.teamName}</option>)}
           </select>
         </div>
 
         <div className="mt-6 flex justify-end gap-3 pt-2">
-          <GlassButton type="button" onClick={onClose} className="h-9 text-xs rounded-full">
+          <GlassButton type="button" onClick={onClose} className="h-9 type-xs rounded-full">
             Cancel
           </GlassButton>
-          <GlassButton type="submit" variant="primary" icon={<Plus size={15} />} className="h-9 text-xs rounded-full">
+          <GlassButton type="submit" variant="primary" icon={<Plus size={15} />} className="h-9 type-xs rounded-full">
             Create Task
           </GlassButton>
         </div>
@@ -419,8 +419,8 @@ export function TasksPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#1A1D23] md:text-3xl">Tasks</h1>
-          <p className="mt-1 text-sm text-[#5A6577] font-medium">Assign, monitor and complete operational work.</p>
+          <h1 className="type-2xl weight-bold tracking-tight text-token-primary md:type-3xl">Tasks</h1>
+          <p className="mt-1 type-sm text-token-secondary weight-medium">Assign, monitor and complete operational work.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
           {isLead && (
@@ -434,56 +434,56 @@ export function TasksPage() {
 
       {/* Onboarding-style Task Metric Overview Banner */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">Total Assigned</p>
-          <p className="mt-1 text-2xl font-extrabold text-[#1A1D23] font-mono">{filteredTasks.length}</p>
-          <span className="text-[11px] font-medium text-[#5A6577]">Active operational items</span>
+        <div className="rounded-3xl surface-card-token border border-token p-4 shadow-token-card">
+          <p className="type-10 weight-bold uppercase tracking-wider text-token-muted">Total Assigned</p>
+          <p className="mt-1 type-2xl weight-extrabold text-token-primary font-mono">{filteredTasks.length}</p>
+          <span className="type-11 weight-medium text-token-secondary">Active operational items</span>
         </div>
 
-        <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#3B6FD4]">In Progress</p>
-          <p className="mt-1 text-2xl font-extrabold text-[#3B6FD4] font-mono">
+        <div className="rounded-3xl surface-card-token border border-token p-4 shadow-token-card">
+          <p className="type-10 weight-bold uppercase tracking-wider text-token-accent">In Progress</p>
+          <p className="mt-1 type-2xl weight-extrabold text-token-accent font-mono">
             {filteredTasks.filter((t) => t.status === "In Progress").length}
           </p>
-          <span className="text-[11px] font-medium text-[#5A6577]">Currently being executed</span>
+          <span className="type-11 weight-medium text-token-secondary">Currently being executed</span>
         </div>
 
-        <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">Todo</p>
-          <p className="mt-1 text-2xl font-extrabold text-[#5A6577] font-mono">
+        <div className="rounded-3xl surface-card-token border border-token p-4 shadow-token-card">
+          <p className="type-10 weight-bold uppercase tracking-wider text-token-muted">Todo</p>
+          <p className="mt-1 type-2xl weight-extrabold text-token-secondary font-mono">
             {filteredTasks.filter((t) => t.status === "Todo").length}
           </p>
-          <span className="text-[11px] font-medium text-[#5A6577]">Awaiting execution</span>
+          <span className="type-11 weight-medium text-token-secondary">Awaiting execution</span>
         </div>
 
-        <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#D6453D]">Blocked / Impended</p>
-          <p className="mt-1 text-2xl font-extrabold text-[#D6453D] font-mono">
+        <div className="rounded-3xl surface-card-token border border-token p-4 shadow-token-card">
+          <p className="type-10 weight-bold uppercase tracking-wider text-token-error">Blocked / Impended</p>
+          <p className="mt-1 type-2xl weight-extrabold text-token-error font-mono">
             {filteredTasks.filter((t) => t.status === "Blocked").length}
           </p>
-          <span className="text-[11px] font-medium text-[#5A6577]">Requires resolution</span>
+          <span className="type-11 weight-medium text-token-secondary">Requires resolution</span>
         </div>
 
-        <div className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#22A65E]">Resolved / Done</p>
-          <p className="mt-1 text-2xl font-extrabold text-[#22A65E] font-mono">
+        <div className="rounded-3xl surface-card-token border border-token p-4 shadow-token-card">
+          <p className="type-10 weight-bold uppercase tracking-wider text-token-success">Resolved / Done</p>
+          <p className="mt-1 type-2xl weight-extrabold text-token-success font-mono">
             {filteredTasks.filter((t) => t.status === "Completed").length}
           </p>
-          <span className="text-[11px] font-medium text-[#5A6577]">Successfully completed</span>
+          <span className="type-11 weight-medium text-token-secondary">Successfully completed</span>
         </div>
       </div>
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-0">
-          <div className="flex h-9 min-w-[220px] max-w-sm flex-1 items-center gap-2 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-medium text-[#1A1D23] focus-within:ring-1 focus-within:ring-[#3B6FD4]">
-            <Search size={15} strokeWidth={2} className="text-[#8E99A8] shrink-0" />
+          <div className="flex h-9 min-w-[220px] max-w-sm flex-1 items-center gap-2 rounded-full field-token border border-token px-3.5 type-xs weight-medium text-token-primary focus-within:ring-1 focus-within:ring-token-accent">
+            <Search size={15} strokeWidth={2} className="text-token-muted shrink-0" />
             <input
               type="text"
               placeholder="Search tasks by title, team, assignee..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-transparent outline-none text-xs font-medium text-[#1A1D23] placeholder:text-[#8E99A8]"
+              className="w-full bg-transparent outline-none type-xs weight-medium text-token-primary placeholder:text-token-muted"
               aria-label="Search tasks"
             />
           </div>
@@ -493,14 +493,14 @@ export function TasksPage() {
         </div>
 
         {/* View Toggle */}
-        <div className="flex items-center rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] p-1 shrink-0">
+        <div className="flex items-center rounded-full field-token border border-token p-1 shrink-0">
           <button
             onClick={() => setView("list")}
             className={cn(
-              "flex h-7 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold transition-all min-h-0 cursor-pointer",
+              "flex h-7 items-center gap-1.5 rounded-full px-3.5 type-xs weight-semibold transition-all min-h-0 cursor-pointer",
               view === "list"
-                ? "bg-[#3B6FD4] text-white font-bold"
-                : "text-[#5A6577] hover:text-[#1A1D23]"
+                ? "bg-token-accent text-token-inverse weight-bold"
+                : "text-token-secondary hover:text-token-primary"
             )}
           >
             <LayoutList size={14} /> List
@@ -508,10 +508,10 @@ export function TasksPage() {
           <button
             onClick={() => setView("board")}
             className={cn(
-              "flex h-7 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold transition-all min-h-0 cursor-pointer",
+              "flex h-7 items-center gap-1.5 rounded-full px-3.5 type-xs weight-semibold transition-all min-h-0 cursor-pointer",
               view === "board"
-                ? "bg-[#3B6FD4] text-white font-bold"
-                : "text-[#5A6577] hover:text-[#1A1D23]"
+                ? "bg-token-accent text-token-inverse weight-bold"
+                : "text-token-secondary hover:text-token-primary"
             )}
           >
             <Kanban size={14} /> Board
@@ -520,7 +520,7 @@ export function TasksPage() {
       </div>
 
       {/* Task Workspace (List / Board) */}
-      <div className="overflow-hidden rounded-2xl border border-[rgba(0,0,0,0.08)] bg-white min-h-[500px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <div className="overflow-hidden rounded-2xl border border-token surface-card-token min-h-[500px] shadow-token-card">
         {loading ? (
           <div className="space-y-3 p-4">
             {Array.from({ length: 7 }).map((_, i) => (
@@ -540,42 +540,42 @@ export function TasksPage() {
           /* List View */
           <div className="overflow-x-auto">
             <table className="w-full min-w-[800px] table-fixed border-separate border-spacing-0 text-left">
-              <thead className="sticky top-0 z-10 bg-[#F7F8FA] text-[#5A6577] font-bold text-xs uppercase border-b border-[rgba(0,0,0,0.06)]">
+              <thead className="sticky top-0 z-10 surface-token text-token-secondary weight-bold type-xs uppercase border-b border-subtle-token">
                 <tr>
-                  <th className="w-[8%] px-4 py-3 text-[11px] tracking-wider text-center">S.No.</th>
-                  <th className="w-[30%] px-4 py-3 text-[11px] tracking-wider">Task Title</th>
-                  <th className="w-[24%] px-4 py-3 text-[11px] tracking-wider">Assigned To</th>
-                  <th className="w-[18%] px-4 py-3 text-[11px] tracking-wider">Team</th>
-                  <th className="w-[14%] px-4 py-3 text-[11px] tracking-wider">Status</th>
-                  <th className="w-[6%] px-4 py-3 text-right text-[11px] tracking-wider">Done</th>
+                  <th className="w-[8%] px-4 py-3 type-11 tracking-wider text-center">S.No.</th>
+                  <th className="w-[30%] px-4 py-3 type-11 tracking-wider">Task Title</th>
+                  <th className="w-[24%] px-4 py-3 type-11 tracking-wider">Assigned To</th>
+                  <th className="w-[18%] px-4 py-3 type-11 tracking-wider">Team</th>
+                  <th className="w-[14%] px-4 py-3 type-11 tracking-wider">Status</th>
+                  <th className="w-[6%] px-4 py-3 text-right type-11 tracking-wider">Done</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[rgba(0,0,0,0.05)]">
+              <tbody className="divide-y divide-token-subtle">
                 {filteredTasks.map((task, idx) => (
                   <tr
                     key={task.id}
-                    className="group cursor-pointer transition-colors hover:bg-[#F7F8FA]"
+                    className="group cursor-pointer transition-colors hover-surface-token"
                     onClick={() => setSelectedTask(task)}
                   >
-                    <td className="px-4 py-3 text-center text-xs font-mono font-bold text-[#8E99A8]">
+                    <td className="px-4 py-3 text-center type-xs font-mono weight-bold text-token-muted">
                       {idx + 1}
                     </td>
 
                     <td className="px-4 py-3">
-                      <p className="text-xs font-bold text-[#1A1D23] transition-colors">
+                      <p className="type-xs weight-bold text-token-primary transition-colors">
                         {task.title}
                       </p>
                     </td>
 
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-6 w-6 text-[10px] bg-[#EBF0FA] text-[#3B6FD4]" />
-                        <span className="text-xs font-semibold text-[#1A1D23]">{task.assignee.name}</span>
+                        <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-6 w-6 type-10 accent-surface-token text-token-accent" />
+                        <span className="type-xs weight-semibold text-token-primary">{task.assignee.name}</span>
                       </div>
                     </td>
 
                     <td className="px-4 py-3">
-                      <span className="text-xs font-semibold text-[#5A6577]">
+                      <span className="type-xs weight-semibold text-token-secondary">
                         {task.department}
                       </span>
                     </td>
@@ -589,8 +589,8 @@ export function TasksPage() {
                         className={cn(
                           "inline-flex h-6 w-6 min-h-0 items-center justify-center rounded-full transition-colors",
                           task.status === "Completed"
-                            ? "bg-[#22A65E] text-white"
-                            : "bg-[#F0F2F5] text-[#22A65E] hover:bg-[#E8ECF1]"
+                            ? "bg-token-success text-token-inverse"
+                            : "field-token text-token-success hover:hover-token"
                         )}
                         onClick={(e) => handleToggleComplete(e, task.id)}
                         aria-label={`Toggle complete ${task.title}`}
@@ -609,11 +609,11 @@ export function TasksPage() {
             {["Todo", "In Progress", "Blocked", "Completed"].map((columnStatus) => {
               const columnTasks = filteredTasks.filter((t) => t.status === columnStatus);
               return (
-                <div key={columnStatus} className="rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5 flex flex-col min-h-[480px]">
+                <div key={columnStatus} className="rounded-2xl surface-token border border-subtle-token p-3.5 flex flex-col min-h-[480px]">
                   {/* Column Header */}
-                  <div className="mb-3 flex items-center justify-between border-b border-[rgba(0,0,0,0.06)] pb-2.5 px-1">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#1A1D23]">{columnStatus}</span>
-                    <span className="inline-flex h-5 px-2 items-center justify-center rounded-full bg-[#E8ECF1] text-[11px] font-bold text-[#1A1D23]">
+                  <div className="mb-3 flex items-center justify-between border-b border-subtle-token pb-2.5 px-1">
+                    <span className="type-xs weight-bold uppercase tracking-wider text-token-primary">{columnStatus}</span>
+                    <span className="inline-flex h-5 px-2 items-center justify-center rounded-full hover-token type-11 weight-bold text-token-primary">
                       {columnTasks.length}
                     </span>
                   </div>
@@ -623,22 +623,22 @@ export function TasksPage() {
                     {columnTasks.map((task) => (
                       <div
                         key={task.id}
-                        className="group cursor-pointer rounded-2xl bg-white border border-[rgba(0,0,0,0.08)] p-3.5 transition-all hover:border-[rgba(0,0,0,0.15)] shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                        className="group cursor-pointer rounded-2xl surface-card-token border border-token p-3.5 transition-all hover:border-token-strong shadow-token-small"
                         onClick={() => setSelectedTask(task)}
                       >
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#3B6FD4] bg-[#EBF0FA] px-2 py-0.5 rounded-full">
+                        <span className="type-10 weight-extrabold uppercase tracking-wider text-token-accent accent-surface-token px-2 py-0.5 rounded-full">
                           {task.department}
                         </span>
-                        <p className="mt-2 text-xs font-bold text-[#1A1D23] line-clamp-2">{task.title}</p>
-                        <div className="mt-3 flex items-center justify-between border-t border-[rgba(0,0,0,0.06)] pt-2 text-[11px]">
+                        <p className="mt-2 type-xs weight-bold text-token-primary line-clamp-2">{task.title}</p>
+                        <div className="mt-3 flex items-center justify-between border-t border-subtle-token pt-2 type-11">
                           <div className="flex items-center gap-1.5">
-                            <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-5 w-5 text-[9px] bg-[#EBF0FA] text-[#3B6FD4]" />
-                            <span className="font-semibold text-[#5A6577] truncate max-w-[90px]">{task.assignee.name}</span>
+                            <UserAvatar initials={task.assignee.initials} image={task.assignee.avatar} className="h-5 w-5 type-9 accent-surface-token text-token-accent" />
+                            <span className="weight-semibold text-token-secondary truncate max-w-[90px]">{task.assignee.name}</span>
                           </div>
                           <button
                             className={cn(
                               "flex h-5 w-5 min-h-0 items-center justify-center rounded-full transition-colors",
-                              task.status === "Completed" ? "bg-[#22A65E] text-white" : "bg-[#F0F2F5] text-[#22A65E] hover:bg-[#E8ECF1]"
+                              task.status === "Completed" ? "bg-token-success text-token-inverse" : "field-token text-token-success hover:hover-token"
                             )}
                             onClick={(e) => handleToggleComplete(e, task.id)}
                           >
@@ -666,7 +666,7 @@ export function TasksPage() {
       />
 
       {/* New Task Modal */}
-      {error && <p className="text-sm font-semibold text-[#D6453D]">{error}</p>}
+      {error && <p className="type-sm weight-semibold text-token-error">{error}</p>}
       <NewTaskModal open={newTaskOpen} onClose={() => setNewTaskOpen(false)} onCreateTask={handleCreateTask} teams={teamsList} members={membersList} />
     </div>
   );

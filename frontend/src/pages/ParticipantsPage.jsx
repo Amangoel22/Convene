@@ -432,10 +432,10 @@ export function ParticipantsPage() {
     <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#1A1D23] md:text-3xl">
+          <h1 className="type-2xl weight-bold tracking-tight text-token-primary md:type-3xl">
             Participants
           </h1>
-          <p className="mt-1 text-sm text-[#5A6577] font-medium">
+          <p className="mt-1 type-sm text-token-secondary weight-medium">
             Manage teams, check-ins, and event operations.
           </p>
         </div>
@@ -476,16 +476,16 @@ export function ParticipantsPage() {
           type="button"
           onClick={() => setStatus("All Statuses")}
           className={cn(
-            "text-left rounded-3xl bg-white border p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all cursor-pointer hover:border-[#3B6FD4]/40",
+            "text-left rounded-3xl surface-card-token border p-4 shadow-token-card transition-all cursor-pointer hover:border-token-accent/40",
             status === "All Statuses"
-              ? "border-[#3B6FD4] ring-2 ring-[#3B6FD4]/20 bg-[#F8FAFC]"
-              : "border-[rgba(0,0,0,0.08)]",
+              ? "border-token-accent ring-2 ring-token-accent/20 bg-token-surface-light"
+              : "border-token",
           )}
         >
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">
+          <p className="type-10 weight-bold uppercase tracking-wider text-token-muted">
             Total Teams
           </p>
-          <p className="mt-1 text-2xl font-bold text-[#1A1D23]">
+          <p className="mt-1 type-2xl weight-bold text-token-primary">
             {counts.total}
           </p>
         </button>
@@ -493,16 +493,16 @@ export function ParticipantsPage() {
           type="button"
           onClick={() => setStatus("Checked In")}
           className={cn(
-            "text-left rounded-3xl bg-white border p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all cursor-pointer hover:border-[#22A65E]/40",
+            "text-left rounded-3xl surface-card-token border p-4 shadow-token-card transition-all cursor-pointer hover:border-token-success/40",
             status === "Checked In"
-              ? "border-[#22A65E] ring-2 ring-[#22A65E]/20 bg-[#F4FBF7]"
-              : "border-[rgba(0,0,0,0.08)]",
+              ? "border-token-success ring-2 ring-token-success/20 bg-token-success-light"
+              : "border-token",
           )}
         >
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">
+          <p className="type-10 weight-bold uppercase tracking-wider text-token-muted">
             Checked In
           </p>
-          <p className="mt-1 text-2xl font-bold text-[#22A65E]">
+          <p className="mt-1 type-2xl weight-bold text-token-success">
             {counts.checkedIn}
           </p>
         </button>
@@ -510,16 +510,16 @@ export function ParticipantsPage() {
           type="button"
           onClick={() => setStatus("Confirmed")}
           className={cn(
-            "text-left rounded-3xl bg-white border p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all cursor-pointer hover:border-[#3B6FD4]/40",
+            "text-left rounded-3xl surface-card-token border p-4 shadow-token-card transition-all cursor-pointer hover:border-token-accent/40",
             status === "Confirmed"
-              ? "border-[#3B6FD4] ring-2 ring-[#3B6FD4]/20 bg-[#F5F8FF]"
-              : "border-[rgba(0,0,0,0.08)]",
+              ? "border-token-accent ring-2 ring-token-accent/20 bg-token-accent-light"
+              : "border-token",
           )}
         >
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">
+          <p className="type-10 weight-bold uppercase tracking-wider text-token-muted">
             Confirmed
           </p>
-          <p className="mt-1 text-2xl font-bold text-[#3B6FD4]">
+          <p className="mt-1 type-2xl weight-bold text-token-accent">
             {counts.confirmed}
           </p>
         </button>
@@ -527,16 +527,16 @@ export function ParticipantsPage() {
           type="button"
           onClick={() => setStatus("Unconfirmed")}
           className={cn(
-            "text-left rounded-3xl bg-white border p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all cursor-pointer hover:border-[#D4930E]/40",
+            "text-left rounded-3xl surface-card-token border p-4 shadow-token-card transition-all cursor-pointer hover:border-token-warning/40",
             status === "Unconfirmed"
-              ? "border-[#D4930E] ring-2 ring-[#D4930E]/20 bg-[#FEFBF3]"
-              : "border-[rgba(0,0,0,0.08)]",
+              ? "border-token-warning ring-2 ring-token-warning/20 bg-token-warning-light"
+              : "border-token",
           )}
         >
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">
+          <p className="type-10 weight-bold uppercase tracking-wider text-token-muted">
             Unconfirmed
           </p>
-          <p className="mt-1 text-2xl font-bold text-[#D4930E]">
+          <p className="mt-1 type-2xl weight-bold text-token-warning">
             {counts.unconfirmed}
           </p>
         </button>
@@ -544,31 +544,31 @@ export function ParticipantsPage() {
           type="button"
           onClick={() => setStatus("Rejected")}
           className={cn(
-            "text-left rounded-3xl bg-white border p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all cursor-pointer hover:border-[#E53E3E]/40",
+            "text-left rounded-3xl surface-card-token border p-4 shadow-token-card transition-all cursor-pointer hover:border-token-error/40",
             status === "Rejected"
-              ? "border-[#E53E3E] ring-2 ring-[#E53E3E]/20 bg-[#FFF5F5]"
-              : "border-[rgba(0,0,0,0.08)]",
+              ? "border-token-error ring-2 ring-token-error/20 bg-token-error-light"
+              : "border-token",
           )}
         >
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">
+          <p className="type-10 weight-bold uppercase tracking-wider text-token-muted">
             Rejected
           </p>
-          <p className="mt-1 text-2xl font-bold text-[#E53E3E]">
+          <p className="mt-1 type-2xl weight-bold text-token-error">
             {counts.rejected}
           </p>
         </button>
       </div>
 
       {/* Search & Filters */}
-      <div className="flex flex-col gap-3 rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-3 sm:flex-row sm:items-center sm:justify-between shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <div className="flex flex-1 items-center gap-2 rounded-full bg-[#F0F2F5] px-3.5 py-2">
-          <Search size={16} strokeWidth={2} className="text-[#8E99A8]" />
+      <div className="flex flex-col gap-3 rounded-3xl surface-card-token border border-token p-3 sm:flex-row sm:items-center sm:justify-between shadow-token-card">
+        <div className="flex flex-1 items-center gap-2 rounded-full field-token px-3.5 py-2">
+          <Search size={16} strokeWidth={2} className="text-token-muted" />
           <input
             type="text"
             placeholder="Search teams, leaders, colleges..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            className="w-full bg-transparent outline-none text-xs font-medium text-[#1A1D23] placeholder:text-[#8E99A8]"
+            className="w-full bg-transparent outline-none type-xs weight-medium text-token-primary placeholder:text-token-muted"
             aria-label="Search participants"
           />
         </div>
@@ -611,7 +611,7 @@ export function ParticipantsPage() {
           ))}
         </div>
       ) : filteredTeams.length === 0 ? (
-        <div className="p-10 text-center rounded-3xl border border-[rgba(0,0,0,0.08)] bg-white">
+        <div className="p-10 text-center rounded-3xl border border-token surface-card-token">
           <EmptyState
             title="No matching participants found."
             description="Create a participant or import a CSV to start building your event directory."
@@ -624,20 +624,20 @@ export function ParticipantsPage() {
           {filteredTeams.map((team) => (
             <div
               key={team.id}
-              className="rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] overflow-hidden transition-colors hover:border-[rgba(0,0,0,0.14)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+              className="rounded-3xl surface-card-token border border-token overflow-hidden transition-colors hover:border-token-strong shadow-token-card"
             >
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-[#F7F8FA] px-6 py-4 border-b border-[rgba(0,0,0,0.06)]">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between surface-token px-6 py-4">
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="font-mono text-xs font-bold text-[#3B6FD4] bg-[#EBF0FA] px-3 py-1 rounded-full shrink-0">
+                  <span className="font-mono type-xs weight-bold text-token-accent accent-surface-token px-3 py-1 rounded-full shrink-0">
                     {team.team}
                   </span>
                   <div className="flex flex-wrap items-baseline gap-2">
-                    <h3 className="text-base font-bold text-[#1A1D23]">
+                    <h3 className="type-base weight-bold text-token-primary">
                       {team.teamName}
                     </h3>
-                    <span className="text-xs font-semibold text-[#5A6577]">
+                    <span className="type-xs weight-semibold text-token-secondary">
                       • Leader:{" "}
-                      <strong className="text-[#1A1D23] font-bold">
+                      <strong className="text-token-primary weight-bold">
                         {team.leader.name}
                       </strong>{" "}
                       • {team.members.length} Members
@@ -654,14 +654,14 @@ export function ParticipantsPage() {
                       setSelectedTeam(team);
                       setSelectedMember(null);
                     }}
-                    className="h-8 px-3.5 text-xs font-bold rounded-full min-h-0 text-[#3B6FD4] bg-[#EBF0FA] border-[#3B6FD4]/20 hover:bg-[#3B6FD4] hover:text-white cursor-pointer"
+                    className="h-8 px-3.5 type-xs weight-bold rounded-full min-h-0 text-token-accent accent-surface-token border-token-accent/20 hover:bg-token-accent hover:text-token-inverse cursor-pointer"
                   >
                     View Details
                   </GlassButton>
                 </div>
               </div>
 
-              <div className="hidden sm:grid grid-cols-[200px_1fr_130px_150px_130px_80px] items-center gap-3 bg-[#FAFAFC] px-6 py-2 border-b border-[rgba(0,0,0,0.04)] text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">
+              <div className="hidden sm:grid grid-cols-[200px_1fr_130px_150px_130px_80px] items-center gap-3 bg-token-header px-6 py-2 type-10 weight-bold uppercase tracking-wider text-token-muted">
                 <span>Participant</span>
                 <span>Email</span>
                 <span>Phone</span>
@@ -670,7 +670,7 @@ export function ParticipantsPage() {
                 <span className="text-right">Role</span>
               </div>
 
-              <div className="divide-y divide-[rgba(0,0,0,0.05)]">
+              <div>
                 {team.members.map((member) => {
                   const isLeader = member.role === "Leader";
 
@@ -681,33 +681,33 @@ export function ParticipantsPage() {
                         setSelectedTeam(team);
                         setSelectedMember(member);
                       }}
-                      className="group grid grid-cols-1 sm:grid-cols-[200px_1fr_130px_150px_130px_80px] items-center gap-3 px-6 py-3 text-xs transition-colors hover:bg-[#F7F8FA] cursor-pointer"
+                      className="group grid grid-cols-1 sm:grid-cols-[200px_1fr_130px_150px_130px_80px] items-center gap-3 px-6 py-3 type-xs transition-colors hover-surface-token cursor-pointer"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <UserAvatar
                           initials={member.initials}
                           image={member.avatar}
-                          className="h-7 w-7 text-[10px] bg-[#EBF0FA] text-[#3B6FD4] shrink-0"
+                          className="h-7 w-7 type-10 accent-surface-token text-token-accent shrink-0"
                         />
-                        <p className="font-bold text-[#1A1D23] truncate">
+                        <p className="weight-bold text-token-primary truncate">
                           {member.name}
                         </p>
                       </div>
 
                       <div className="min-w-0 truncate">
-                        <span className="font-medium text-[#5A6577] truncate">
+                        <span className="weight-medium text-token-secondary truncate">
                           {member.email}
                         </span>
                       </div>
 
                       <div className="min-w-0 shrink-0">
-                        <span className="font-medium text-[#5A6577]">
+                        <span className="weight-medium text-token-secondary">
                           {member.phone}
                         </span>
                       </div>
 
                       <div className="min-w-0 truncate">
-                        <span className="font-semibold text-[#1A1D23] truncate">
+                        <span className="weight-semibold text-token-primary truncate">
                           {member.college || team.college || "Convene Campus"}
                         </span>
                       </div>

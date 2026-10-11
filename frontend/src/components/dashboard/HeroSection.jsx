@@ -19,11 +19,11 @@ export function HeroSection() {
                   <Radio className="mr-1 h-3.5 w-3.5" strokeWidth={1.75} />
                   Live Now
                 </Badge>
-                <span className="text-xs font-medium text-[#6B7280]">{eventSummary.date}</span>
+                <span className="type-xs weight-medium text-token-secondary">{eventSummary.date}</span>
               </div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9CA3AF]">Current Event</p>
-              <h2 className="mt-1 text-2xl font-bold leading-tight text-[#111827] md:text-3xl">{eventSummary.name}</h2>
-              <p className="mt-2 max-w-2xl text-xs leading-5 text-[#6B7280]">
+              <p className="type-xs weight-semibold uppercase tracking-[0.18em] text-token-muted">Current Event</p>
+              <h2 className="mt-1 type-2xl weight-bold leading-tight text-token-primary md:type-3xl">{eventSummary.name}</h2>
+              <p className="mt-2 max-w-2xl type-xs leading-5 text-token-secondary">
                 Mentoring is active across four labs. Keep owners visible, close urgent tasks, and prepare the judging transition.
               </p>
             </div>
@@ -33,7 +33,7 @@ export function HeroSection() {
           <ProgressTimeline progress={eventSummary.progress} stages={timelineStages} />
 
           <div>
-            <GlassButton variant="primary" icon={<ArrowRight size={16} strokeWidth={1.75} />} className="h-9 px-4 text-xs">
+            <GlassButton variant="primary" icon={<ArrowRight size={16} strokeWidth={1.75} />} className="h-9 px-4 type-xs">
               Open run of show
             </GlassButton>
           </div>

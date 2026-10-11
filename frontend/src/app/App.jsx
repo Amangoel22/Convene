@@ -108,9 +108,9 @@ function ProtectedRoute({ children }) {
 
   if (isValidating) {
     return (
-      <div className="min-h-screen bg-[#F6F7FB] flex items-center justify-center">
-        <div className="flex items-center gap-3 text-xs font-bold text-[#5A6577]">
-          <span className="h-4 w-4 rounded-full border-2 border-[#3B6FD4] border-t-transparent animate-spin" />
+      <div className="min-h-screen bg-token-page flex items-center justify-center">
+        <div className="flex items-center gap-3 type-xs weight-bold text-token-secondary">
+          <span className="h-4 w-4 rounded-full border-2 border-token-accent border-t-transparent animate-spin" />
           Authenticating session...
         </div>
       </div>

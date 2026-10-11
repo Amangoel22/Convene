@@ -5,7 +5,7 @@ export function UserAvatar({ initials, image, className }) {
   return (
     <span
       className={cn(
-        "inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-white/60 text-sm font-bold text-[#111827] shadow-sm",
+        "inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-token-inverse/60 surface-card-token/60 type-sm weight-bold text-token-primary shadow-sm",
         className
       )}
     >

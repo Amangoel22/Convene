@@ -10,9 +10,9 @@ import { COLORS } from "@/constants/colors";
 
 function Info({ label, value }) {
   return (
-    <div className={`rounded-2xl bg-[${COLORS.cardBg}] border border-[rgba(0,0,0,0.06)] p-3`}>
-      <p className={`text-[11px] font-semibold text-[${COLORS.grayMuted}]`}>{label}</p>
-      <p className={`mt-0.5 truncate text-sm font-bold text-[${COLORS.dark}]`}>
+    <div className={`rounded-2xl bg-[${COLORS.cardBg}] border border-subtle-token p-3`}>
+      <p className={`type-11 weight-semibold text-[${COLORS.grayMuted}]`}>{label}</p>
+      <p className={`mt-0.5 truncate type-sm weight-bold text-[${COLORS.dark}]`}>
         {value || "N/A"}
       </p>
     </div>
@@ -65,14 +65,14 @@ export function ParticipantDrawer({
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
+        className="fixed inset-0 z-40 bg-token-black/20 backdrop-blur-[2px]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       />
       <motion.aside
-        className="fixed bottom-4 right-4 top-4 z-50 w-[min(520px,calc(100vw-32px))] overflow-y-auto rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 shadow-xl text-[#1A1D23]"
+        className="fixed bottom-4 right-4 top-4 z-50 w-[min(520px,calc(100vw-32px))] overflow-y-auto rounded-3xl surface-card-token border border-token p-6 shadow-xl text-token-primary"
         initial={{ x: 540, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 540, opacity: 0 }}
@@ -82,22 +82,22 @@ export function ParticipantDrawer({
           <div>
             <div className="flex items-center gap-2">
               <StatusPill status={currentStatus} />
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#8E99A8]">
+              <span className="type-11 weight-bold uppercase tracking-wider text-token-muted">
                 {isIndividual ? "Teammate Profile" : "Team Overview"}
               </span>
             </div>
-            <h2 className="mt-1 text-2xl font-bold text-[#1A1D23]">
+            <h2 className="mt-1 type-2xl weight-bold text-token-primary">
               {isIndividual ? member.name : `${team.team}: ${team.teamName}`}
             </h2>
             {isIndividual && (
-              <p className="mt-0.5 text-xs font-semibold text-[#5A6577]">
+              <p className="mt-0.5 type-xs weight-semibold text-token-secondary">
                 {team.team}: {team.teamName} •{" "}
                 {member.role === "Leader" ? "Team Leader" : "Team Member"}
               </p>
             )}
           </div>
           <button
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
+            className="flex h-9 w-9 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary"
             onClick={onClose}
             aria-label="Close drawer"
           >
@@ -106,15 +106,15 @@ export function ParticipantDrawer({
         </div>
 
         {isLead && (
-          <div className="mt-5 flex items-center justify-between rounded-2xl bg-[#EBF0FA] border border-[#3B6FD4]/20 p-3.5">
-            <span className="text-xs font-bold text-[#3B6FD4]">
+          <div className="mt-5 flex items-center justify-between rounded-2xl accent-surface-token border border-token-accent/20 p-3.5">
+            <span className="type-xs weight-bold text-token-accent">
               {isIndividual ? "Update Participant Status" : "Update Team Status"}
             </span>
             <div className="relative inline-flex items-center">
               <select
                 value={currentStatus}
                 onChange={(e) => handleStatusChange(e.target.value)}
-                className="cursor-pointer appearance-none rounded-full bg-white border border-[#3B6FD4]/30 pl-3 pr-7 py-1 text-xs font-bold text-[#1A1D23] outline-none shadow-sm"
+                className="cursor-pointer appearance-none rounded-full surface-card-token border border-token-accent/30 pl-3 pr-7 py-1 type-xs weight-bold text-token-primary outline-none shadow-sm"
               >
                 {isIndividual ? (
                   <>
@@ -167,7 +167,7 @@ export function ParticipantDrawer({
         </div>
 
         <div className="mt-6">
-          <h3 className="text-sm font-bold text-[#1A1D23]">
+          <h3 className="type-sm weight-bold text-token-primary">
             Team Members ({team.members.length})
           </h3>
           <div className="mt-3 space-y-2">
@@ -178,26 +178,26 @@ export function ParticipantDrawer({
                   "rounded-2xl border p-3 transition-colors",
                   isIndividual &&
                     (m.id === member.id || m.email === member.email)
-                    ? "bg-[#EBF0FA] border-[#3B6FD4]/30"
-                    : "bg-[#F7F8FA] border-[rgba(0,0,0,0.06)]",
+                    ? "accent-surface-token border-token-accent/30"
+                    : "surface-token border-subtle-token",
                 )}
               >
                 <div className="flex items-center gap-3">
                   <UserAvatar
                     initials={m.initials}
                     image={m.avatar}
-                    className="bg-[#EBF0FA] text-[#3B6FD4]"
+                    className="accent-surface-token text-token-accent"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-[#1A1D23]">
+                    <p className="truncate type-sm weight-bold text-token-primary">
                       {m.name}
                     </p>
-                    <p className="truncate text-xs font-medium text-[#8E99A8]">
+                    <p className="truncate type-xs weight-medium text-token-muted">
                       {m.email}
                     </p>
                   </div>
                 </div>
-                <p className="mt-2 text-xs font-medium text-[#5A6577]">
+                <p className="mt-2 type-xs weight-medium text-token-secondary">
                   {m.phone}
                 </p>
               </div>
@@ -211,7 +211,7 @@ export function ParticipantDrawer({
               variant="primary"
               icon={<Check size={16} strokeWidth={2} />}
               onClick={() => handleStatusChange("Checked In")}
-              className="justify-start rounded-full text-xs"
+              className="justify-start rounded-full type-xs"
             >
               Mark Check-In
             </GlassButton>
@@ -219,7 +219,7 @@ export function ParticipantDrawer({
               <GlassButton
                 variant="secondary"
                 icon={<QrCode size={16} strokeWidth={2} />}
-                className="justify-start rounded-full text-xs"
+                className="justify-start rounded-full type-xs"
               >
                 Generate QR
               </GlassButton>
@@ -227,7 +227,7 @@ export function ParticipantDrawer({
               <GlassButton
                 variant="secondary"
                 icon={<Award size={16} strokeWidth={2} />}
-                className="justify-start rounded-full text-xs"
+                className="justify-start rounded-full type-xs"
               >
                 Issue Certificate
               </GlassButton>
@@ -236,16 +236,16 @@ export function ParticipantDrawer({
               variant="secondary"
               icon={<Plus size={16} strokeWidth={2} />}
               onClick={() => setIsEditingNote(true)}
-              className="justify-start rounded-full text-xs"
+              className="justify-start rounded-full type-xs"
             >
               {isEditingNote ? "Editing Note..." : "Add Note"}
             </GlassButton>
           </div>
         )}
 
-        <div className="mt-6 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-4">
+        <div className="mt-6 rounded-2xl surface-token border border-subtle-token p-4">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#1A1D23]">
+            <p className="type-xs weight-bold uppercase tracking-wider text-token-primary">
               {isIndividual
                 ? "Participant Internal Notes"
                 : "Team Internal Notes"}
@@ -253,7 +253,7 @@ export function ParticipantDrawer({
             {!isEditingNote && isLead && (
               <button
                 onClick={() => setIsEditingNote(true)}
-                className="text-xs font-bold text-[#3B6FD4] hover:underline"
+                className="type-xs weight-bold text-token-accent hover:underline"
               >
                 Edit
               </button>
@@ -271,25 +271,25 @@ export function ParticipantDrawer({
                     : "Enter notes specific to this team..."
                 }
                 rows={3}
-                className="w-full rounded-xl border border-[rgba(0,0,0,0.12)] p-2.5 text-xs font-semibold text-[#1A1D23] outline-none"
+                className="w-full rounded-xl border border-token-medium p-2.5 type-xs weight-semibold text-token-primary outline-none"
               />
               <div className="flex items-center justify-end gap-2">
                 <button
                   onClick={() => setIsEditingNote(false)}
-                  className="px-3 py-1 rounded-full text-xs font-bold text-[#5A6577] bg-[#E8ECF1]"
+                  className="px-3 py-1 rounded-full type-xs weight-bold text-token-secondary hover-token"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveNoteSubmit}
-                  className="px-3 py-1 rounded-full text-xs font-bold text-white bg-[#3B6FD4]"
+                  className="px-3 py-1 rounded-full type-xs weight-bold text-token-inverse bg-token-accent"
                 >
                   Save Note
                 </button>
               </div>
             </div>
           ) : (
-            <p className="mt-1.5 text-sm leading-relaxed text-[#5A6577] font-medium">
+            <p className="mt-1.5 type-sm leading-relaxed text-token-secondary weight-medium">
               {currentNotes ||
                 (isIndividual
                   ? "No participant notes added yet."

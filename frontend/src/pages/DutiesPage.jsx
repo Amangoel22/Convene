@@ -292,13 +292,13 @@ export function DutiesPage() {
   };
 
   return (
-    <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1 text-[#1A1D23]">
+    <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1 text-token-primary">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+          <h1 className="type-2xl weight-bold tracking-tight md:type-3xl">
             Shift Duties
           </h1>
-          <p className="mt-1 text-sm text-[#5A6577] font-medium">
+          <p className="mt-1 type-sm text-token-secondary weight-medium">
             {isLead
               ? "Assign ground shift duties to organizing team members."
               : "View your assigned shift responsibilities and locations."}
@@ -316,26 +316,26 @@ export function DutiesPage() {
         )}
       </div>
       {error && !editingDuty && (
-        <div className="rounded-2xl border border-[#D6453D]/20 bg-[#D6453D]/10 px-4 py-3 text-xs font-semibold text-[#D6453D]">
+        <div className="rounded-2xl border border-token-error/20 bg-token-error/10 px-4 py-3 type-xs weight-semibold text-token-error">
           {error}
         </div>
       )}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex h-9 min-w-[240px] flex-1 items-center gap-2 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-medium">
-          <Search size={15} className="text-[#8E99A8]" />
+        <div className="flex h-9 min-w-[240px] flex-1 items-center gap-2 rounded-full field-token border border-token px-3.5 type-xs weight-medium">
+          <Search size={15} className="text-token-muted" />
           <input
             placeholder="Search duty title, assigned member, venue..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            className="w-full bg-transparent outline-none text-xs"
+            className="w-full bg-transparent outline-none type-xs"
           />
         </div>
-        <label className="flex h-9 items-center gap-2 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#5A6577]">
+        <label className="flex h-9 items-center gap-2 rounded-full field-token border border-token px-3 type-xs weight-semibold text-token-secondary">
           Team:
           <select
             value={teamFilter}
             onChange={(event) => setTeamFilter(event.target.value)}
-            className="bg-transparent outline-none text-xs font-semibold"
+            className="bg-transparent outline-none type-xs weight-semibold"
           >
             {teamOptions.map((team) => (
               <option key={team} value={team}>
@@ -366,35 +366,35 @@ export function DutiesPage() {
               type="button"
               key={duty.id}
               onClick={() => setViewingDuty(duty)}
-              className="text-left rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-6 shadow-sm hover:border-[#3B6FD4]/40 transition-all"
+              className="text-left rounded-3xl surface-card-token border border-token p-6 shadow-sm hover:border-token-accent/40 transition-all"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] font-bold font-mono text-[#5A6577] flex items-center gap-1">
-                  <Clock size={12} className="text-[#3B6FD4]" />
+                <span className="type-11 weight-bold font-mono text-token-secondary flex items-center gap-1">
+                  <Clock size={12} className="text-token-accent" />
                   {duty.time}
                 </span>
               </div>
-              <h3 className="mt-3.5 text-base font-bold leading-snug">
+              <h3 className="mt-3.5 type-base weight-bold leading-snug">
                 {duty.title}
               </h3>
-              <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-[#5A6577]">
-                <MapPin size={14} className="text-[#3B6FD4]" />
+              <p className="mt-2 flex items-center gap-1.5 type-xs weight-semibold text-token-secondary">
+                <MapPin size={14} className="text-token-accent" />
                 {duty.location}
               </p>
-              <p className="mt-1 text-[11px] font-semibold text-[#8E99A8]">
+              <p className="mt-1 type-11 weight-semibold text-token-muted">
                 {duty.date}
               </p>
               {duty.notes && (
-                <div className="mt-3.5 rounded-2xl bg-[#F7F8FA] p-3 text-xs font-medium text-[#5A6577] line-clamp-2">
+                <div className="mt-3.5 rounded-2xl surface-token p-3 type-xs weight-medium text-token-secondary line-clamp-2">
                   {duty.notes}
                 </div>
               )}
-              <div className="mt-5 pt-3.5 border-t border-[rgba(0,0,0,0.06)] flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#8E99A8]">
+              <div className="mt-5 pt-3.5 border-t border-subtle-token flex items-center justify-between">
+                <span className="type-11 weight-bold uppercase tracking-wider text-token-muted">
                   {duty.assignees.length} team member
                   {duty.assignees.length === 1 ? "" : "s"}
                 </span>
-                <span className="text-xs font-bold">
+                <span className="type-xs weight-bold">
                   {duty.assignees[0]?.name || "Unassigned"}
                   {duty.assignees.length > 1
                     ? ` +${duty.assignees.length - 1}`
@@ -413,13 +413,13 @@ export function DutiesPage() {
         {viewingDuty &&
           (editingDuty ? (
             <form onSubmit={handleUpdateDuty} className="space-y-4 pt-1">
-              <h2 className="text-xl font-bold">Edit Duty</h2>
-              {error && <div role="alert" className="rounded-2xl border border-[#D6453D]/30 bg-[#D6453D]/10 px-3 py-2 text-xs font-semibold text-[#D6453D]">{error}</div>}
+              <h2 className="type-xl weight-bold">Edit Duty</h2>
+              {error && <div role="alert" className="rounded-2xl border border-token-error/30 bg-token-error/10 px-3 py-2 type-xs weight-semibold text-token-error">{error}</div>}
               <input
                 required
                 value={newTitle}
                 onChange={(event) => setNewTitle(event.target.value)}
-                className="h-10 w-full rounded-2xl bg-[#F0F2F5] px-3.5 text-xs font-semibold outline-none"
+                className="h-10 w-full rounded-2xl field-token px-3.5 type-xs weight-semibold outline-none"
               />
               <div className="grid grid-cols-2 gap-3">
                 <input
@@ -427,20 +427,20 @@ export function DutiesPage() {
                   required
                   value={newStartTime}
                   onChange={(event) => setNewStartTime(event.target.value)}
-                  className="h-10 rounded-2xl bg-[#F0F2F5] px-3.5 text-xs font-semibold outline-none"
+                  className="h-10 rounded-2xl field-token px-3.5 type-xs weight-semibold outline-none"
                 />
                 <input
                   type="time"
                   required
                   value={newEndTime}
                   onChange={(event) => setNewEndTime(event.target.value)}
-                  className="h-10 rounded-2xl bg-[#F0F2F5] px-3.5 text-xs font-semibold outline-none"
+                  className="h-10 rounded-2xl field-token px-3.5 type-xs weight-semibold outline-none"
                 />
               </div>
               <select
                 value={newVenueId}
                 onChange={(event) => setNewVenueId(event.target.value)}
-                className="h-10 w-full rounded-2xl bg-[#F0F2F5] px-3.5 text-xs font-semibold outline-none"
+                className="h-10 w-full rounded-2xl field-token px-3.5 type-xs weight-semibold outline-none"
               >
                 <option value="">No venue selected</option>
                 {(activeEvent?.venues || []).map((venue) => (
@@ -449,7 +449,7 @@ export function DutiesPage() {
                   </option>
                 ))}
               </select>
-              <div className="max-h-44 overflow-y-auto rounded-2xl border bg-white p-1.5 space-y-1">
+              <div className="max-h-44 overflow-y-auto rounded-2xl border surface-card-token p-1.5 space-y-1">
                 {members.map((member) => {
                   const selected = selectedAssignees.includes(member.id);
                   return (
@@ -458,15 +458,15 @@ export function DutiesPage() {
                       key={member.id}
                       onClick={() => toggleAssignee(member.id)}
                       className={cn(
-                        "flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-semibold",
+                        "flex w-full items-center justify-between rounded-xl px-3 py-2 text-left type-xs weight-semibold",
                         selected
-                          ? "bg-[#EBF0FA] text-[#3B6FD4]"
-                          : "hover:bg-[#F0F2F5]",
+                          ? "accent-surface-token text-token-accent"
+                          : "hover:field-token",
                       )}
                     >
                       <span>
                         {member.displayName}{" "}
-                        <span className="text-[10px] text-[#8E99A8]">
+                        <span className="type-10 text-token-muted">
                           · {member.team}
                         </span>
                       </span>
@@ -480,13 +480,13 @@ export function DutiesPage() {
                 value={newNotes}
                 onChange={(event) => setNewNotes(event.target.value)}
                 placeholder="Optional instructions"
-                className="w-full resize-none rounded-2xl bg-[#F0F2F5] p-3 text-xs font-medium outline-none"
+                className="w-full resize-none rounded-2xl field-token p-3 type-xs weight-medium outline-none"
               />
               <div className="flex justify-end gap-3">
                 <GlassButton
                   type="button"
                   onClick={() => setEditingDuty(false)}
-                  className="h-9 text-xs rounded-full"
+                  className="h-9 type-xs rounded-full"
                 >
                   Cancel
                 </GlassButton>
@@ -494,7 +494,7 @@ export function DutiesPage() {
                   type="submit"
                   variant="primary"
                   disabled={saving}
-                  className="h-9 text-xs rounded-full"
+                  className="h-9 type-xs rounded-full"
                 >
                   {saving ? "Saving..." : "Save changes"}
                 </GlassButton>
@@ -503,42 +503,42 @@ export function DutiesPage() {
           ) : (
             <div className="space-y-4 pt-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold font-mono text-[#3B6FD4]">
+                <span className="type-xs weight-bold font-mono text-token-accent">
                   {viewingDuty.time}
                 </span>
               </div>
               <div>
-                <h2 className="text-xl font-bold">{viewingDuty.title}</h2>
-                <p className="mt-1 flex items-center gap-1.5 text-xs font-bold text-[#5A6577]">
-                  <MapPin size={14} className="text-[#3B6FD4]" />
+                <h2 className="type-xl weight-bold">{viewingDuty.title}</h2>
+                <p className="mt-1 flex items-center gap-1.5 type-xs weight-bold text-token-secondary">
+                  <MapPin size={14} className="text-token-accent" />
                   {viewingDuty.location}
                 </p>
               </div>
-              <div className="rounded-2xl bg-[#F7F8FA] p-3.5">
-                <p className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">
+              <div className="rounded-2xl surface-token p-3.5">
+                <p className="type-xs weight-bold uppercase tracking-wider text-token-muted">
                   Instructions / Notes
                 </p>
-                <p className="mt-1.5 text-xs leading-relaxed font-medium">
+                <p className="mt-1.5 type-xs leading-relaxed weight-medium">
                   {viewingDuty.notes || "No special instructions provided."}
                 </p>
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[#8E99A8] mb-2">
+                <p className="type-xs weight-bold uppercase tracking-wider text-token-muted mb-2">
                   Assigned Personnel
                 </p>
                 <div className="space-y-2">
                   {viewingDuty.assignees.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center gap-3 rounded-2xl bg-[#F7F8FA] p-3"
+                      className="flex items-center gap-3 rounded-2xl surface-token p-3"
                     >
                       <UserAvatar
                         initials={member.initials}
-                        className="h-8 w-8 text-xs bg-[#EBF0FA] text-[#3B6FD4]"
+                        className="h-8 w-8 type-xs accent-surface-token text-token-accent"
                       />
                       <div>
-                        <p className="text-xs font-bold">{member.name}</p>
-                        <p className="text-[10px] font-medium text-[#8E99A8]">
+                        <p className="type-xs weight-bold">{member.name}</p>
+                        <p className="type-10 weight-medium text-token-muted">
                           {member.role}
                         </p>
                       </div>
@@ -551,7 +551,7 @@ export function DutiesPage() {
                   <GlassButton
                     onClick={beginEditDuty}
                     icon={<Pencil size={14} />}
-                    className="h-9 text-xs rounded-full"
+                    className="h-9 type-xs rounded-full"
                   >
                     Edit
                   </GlassButton>
@@ -561,7 +561,7 @@ export function DutiesPage() {
                     setViewingDuty(null);
                     setEditingDuty(false);
                   }}
-                  className="h-9 text-xs rounded-full"
+                  className="h-9 type-xs rounded-full"
                 >
                   Close
                 </GlassButton>
@@ -577,43 +577,43 @@ export function DutiesPage() {
       >
         <form onSubmit={handleCreateDuty} className="space-y-4 pt-2">
           <div>
-            <label className="text-xs font-bold">Duty Title / Task</label>
+            <label className="type-xs weight-bold">Duty Title / Task</label>
             <input
               required
               value={newTitle}
               onChange={(event) => setNewTitle(event.target.value)}
               placeholder="e.g. Guest Welcome & VIP Escort"
-              className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] px-3.5 text-xs font-semibold outline-none"
+              className="mt-1 h-10 w-full rounded-2xl field-token px-3.5 type-xs weight-semibold outline-none"
             />
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="text-xs font-bold">Start time</label>
+              <label className="type-xs weight-bold">Start time</label>
               <input
                 type="time"
                 required
                 value={newStartTime}
                 onChange={(event) => setNewStartTime(event.target.value)}
-                className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] px-3.5 text-xs font-semibold outline-none"
+                className="mt-1 h-10 w-full rounded-2xl field-token px-3.5 type-xs weight-semibold outline-none"
               />
             </div>
             <div>
-              <label className="text-xs font-bold">End time</label>
+              <label className="type-xs weight-bold">End time</label>
               <input
                 type="time"
                 required
                 value={newEndTime}
                 onChange={(event) => setNewEndTime(event.target.value)}
-                className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] px-3.5 text-xs font-semibold outline-none"
+                className="mt-1 h-10 w-full rounded-2xl field-token px-3.5 type-xs weight-semibold outline-none"
               />
             </div>
           </div>
           <div>
-            <label className="text-xs font-bold">Venue</label>
+            <label className="type-xs weight-bold">Venue</label>
             <select
               value={newVenueId}
               onChange={(event) => setNewVenueId(event.target.value)}
-              className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] px-3.5 text-xs font-semibold outline-none"
+              className="mt-1 h-10 w-full rounded-2xl field-token px-3.5 type-xs weight-semibold outline-none"
             >
               <option value="">No venue selected</option>
               {(activeEvent?.venues || []).map((venue) => (
@@ -625,25 +625,25 @@ export function DutiesPage() {
           </div>
           <div>
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold">
+              <label className="type-xs weight-bold">
                 Assign to team members
               </label>
-              <span className="text-[11px] font-bold text-[#3B6FD4]">
+              <span className="type-11 weight-bold text-token-accent">
                 {selectedAssignees.length} selected
               </span>
             </div>
-            <div className="mt-1 flex items-center gap-2 h-10 rounded-2xl bg-[#F0F2F5] px-3.5">
-              <Search size={14} className="text-[#8E99A8]" />
+            <div className="mt-1 flex items-center gap-2 h-10 rounded-2xl field-token px-3.5">
+              <Search size={14} className="text-token-muted" />
               <input
                 value={memberSearch}
                 onChange={(event) => setMemberSearch(event.target.value)}
                 placeholder="Filter members or teams"
-                className="w-full bg-transparent text-xs outline-none"
+                className="w-full bg-transparent type-xs outline-none"
               />
             </div>
-            <div className="mt-1 max-h-44 overflow-y-auto rounded-2xl border bg-white p-1.5 space-y-1">
+            <div className="mt-1 max-h-44 overflow-y-auto rounded-2xl border surface-card-token p-1.5 space-y-1">
               {matchingMembers.length === 0 ? (
-                <p className="p-3 text-center text-xs text-[#8E99A8]">
+                <p className="p-3 text-center type-xs text-token-muted">
                   No team members found.
                 </p>
               ) : (
@@ -655,22 +655,22 @@ export function DutiesPage() {
                       key={member.id}
                       onClick={() => toggleAssignee(member.id)}
                       className={cn(
-                        "flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-semibold",
+                        "flex w-full items-center justify-between rounded-xl px-3 py-2 text-left type-xs weight-semibold",
                         selected
-                          ? "bg-[#EBF0FA] text-[#3B6FD4]"
-                          : "hover:bg-[#F0F2F5]",
+                          ? "accent-surface-token text-token-accent"
+                          : "hover:field-token",
                       )}
                     >
                       <span className="flex items-center gap-2.5">
                         <UserAvatar
                           initials={member.initials}
-                          className="h-6 w-6 text-[10px] bg-[#F0F2F5] text-[#3B6FD4]"
+                          className="h-6 w-6 type-10 field-token text-token-accent"
                         />
                         <span>
-                          <span className="block font-bold">
+                          <span className="block weight-bold">
                             {member.displayName}
                           </span>
-                          <span className="block text-[10px] text-[#8E99A8]">
+                          <span className="block type-10 text-token-muted">
                             {member.role} · {member.team}
                           </span>
                         </span>
@@ -683,7 +683,7 @@ export function DutiesPage() {
             </div>
           </div>
           <div>
-            <label className="text-xs font-bold">
+            <label className="type-xs weight-bold">
               Duty Notes / Instructions
             </label>
             <textarea
@@ -691,14 +691,14 @@ export function DutiesPage() {
               value={newNotes}
               onChange={(event) => setNewNotes(event.target.value)}
               placeholder="Optional instructions"
-              className="mt-1 w-full resize-none rounded-2xl bg-[#F0F2F5] p-3 text-xs font-medium outline-none"
+              className="mt-1 w-full resize-none rounded-2xl field-token p-3 type-xs weight-medium outline-none"
             />
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <GlassButton
               type="button"
               onClick={() => setCreateModalOpen(false)}
-              className="h-9 text-xs rounded-full"
+              className="h-9 type-xs rounded-full"
             >
               Cancel
             </GlassButton>
@@ -707,7 +707,7 @@ export function DutiesPage() {
               variant="primary"
               icon={<Plus size={15} />}
               disabled={saving}
-              className="h-9 text-xs rounded-full"
+              className="h-9 type-xs rounded-full"
             >
               {saving ? "Saving..." : "Assign Duty"}
             </GlassButton>

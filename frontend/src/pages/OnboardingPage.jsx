@@ -243,17 +243,17 @@ export function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F8FA] flex flex-col items-center justify-center p-4 sm:p-6 text-[#1A1D23]">
+    <div className="min-h-screen surface-token flex flex-col items-center justify-center p-4 sm:p-6 text-token-primary">
       {/* Brand Header */}
       <div className="mb-6 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#3B6FD4] text-white shadow-md">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-token-accent text-token-inverse shadow-md">
           <Flag size={20} strokeWidth={2.5} />
         </div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-[#1A1D23]">Convene</h1>
+        <h1 className="type-2xl weight-extrabold tracking-tight text-token-primary">Convene</h1>
       </div>
 
       {/* Main Container */}
-      <div className="w-full max-w-2xl rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-7 sm:p-10 shadow-[0_4px_24px_rgba(0,0,0,0.06)] relative overflow-hidden">
+      <div className="w-full max-w-2xl rounded-3xl surface-card-token border border-token p-7 sm:p-10 shadow-token-elevated relative overflow-hidden">
         {/* Progress Bar */}
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -262,12 +262,12 @@ export function OnboardingPage() {
                 key={s}
                 className={cn(
                   "h-2 rounded-full transition-all duration-300",
-                  step === s ? "w-8 bg-[#3B6FD4]" : s < step ? "w-2 bg-[#22A65E]" : "w-2 bg-[#E8ECF1]"
+                  step === s ? "w-8 bg-token-accent" : s < step ? "w-2 bg-token-success" : "w-2 hover-token"
                 )}
               />
             ))}
           </div>
-          <span className="text-xs font-bold text-[#8E99A8]">Step {step} of 4</span>
+          <span className="type-xs weight-bold text-token-muted">Step {step} of 4</span>
         </div>
 
         <AnimatePresence mode="wait">
@@ -275,30 +275,30 @@ export function OnboardingPage() {
           {step === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold tracking-tight text-[#1A1D23]">Welcome! How are you joining Convene?</h2>
-                <p className="mt-1.5 text-sm font-medium text-[#5A6577]">Select your role to customize your workspace experience.</p>
+                <h2 className="type-2xl weight-bold tracking-tight text-token-primary">Welcome! How are you joining Convene?</h2>
+                <p className="mt-1.5 type-sm weight-medium text-token-secondary">Select your role to customize your workspace experience.</p>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 pt-2">
-                <div onClick={() => handleSelectUserType("organizer")} className="group cursor-pointer rounded-2xl border border-[rgba(0,0,0,0.08)] bg-[#F7F8FA] p-6 transition-all hover:border-[#3B6FD4] hover:bg-white hover:shadow-md">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EBF0FA] text-[#3B6FD4] group-hover:bg-[#3B6FD4] group-hover:text-white">
+                <div onClick={() => handleSelectUserType("organizer")} className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl accent-surface-token text-token-accent group-hover:bg-token-accent group-hover:text-token-inverse">
                     <Users size={24} strokeWidth={2} />
                   </div>
-                  <h3 className="mt-4 text-base font-bold text-[#1A1D23]">Organizing Team</h3>
-                  <p className="mt-1 text-xs font-medium text-[#5A6577] leading-relaxed">Manage event tasks, team shifts, run of show, and hardware assets.</p>
-                  <div className="mt-4 flex items-center gap-1 text-xs font-bold text-[#3B6FD4]">
+                  <h3 className="mt-4 type-base weight-bold text-token-primary">Organizing Team</h3>
+                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">Manage event tasks, team shifts, run of show, and hardware assets.</p>
+                  <div className="mt-4 flex items-center gap-1 type-xs weight-bold text-token-accent">
                     <span>Continue as Organizer</span>
                     <ArrowRight size={14} />
                   </div>
                 </div>
 
-                <div onClick={() => handleSelectUserType("participant")} className="group cursor-pointer rounded-2xl border border-[rgba(0,0,0,0.08)] bg-[#F7F8FA] p-6 transition-all hover:border-[#3B6FD4] hover:bg-white hover:shadow-md opacity-80">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F0F2F5] text-[#5A6577] group-hover:bg-[#3B6FD4] group-hover:text-white">
+                <div onClick={() => handleSelectUserType("participant")} className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md opacity-80">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl field-token text-token-secondary group-hover:bg-token-accent group-hover:text-token-inverse">
                     <UserCheck size={24} strokeWidth={2} />
                   </div>
-                  <h3 className="mt-4 text-base font-bold text-[#1A1D23]">Participant</h3>
-                  <p className="mt-1 text-xs font-medium text-[#5A6577] leading-relaxed">View team schedules, submission deadlines, and event announcements.</p>
-                  <div className="mt-4 flex items-center gap-1 text-xs font-bold text-[#8E99A8]">
+                  <h3 className="mt-4 type-base weight-bold text-token-primary">Participant</h3>
+                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">View team schedules, submission deadlines, and event announcements.</p>
+                  <div className="mt-4 flex items-center gap-1 type-xs weight-bold text-token-muted">
                     <span>Participant Portal</span>
                     <ArrowRight size={14} />
                   </div>
@@ -311,35 +311,35 @@ export function OnboardingPage() {
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <div className="flex items-center gap-2">
-                <button onClick={() => setStep(1)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]">
+                <button onClick={() => setStep(1)} className="flex h-8 w-8 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary">
                   <ArrowLeft size={16} />
                 </button>
                 <div>
-                  <h2 className="text-2xl font-bold tracking-tight text-[#1A1D23]">Organizing Team Setup</h2>
-                  <p className="text-xs font-medium text-[#5A6577]">Are you setting up a new event or joining an existing team?</p>
+                  <h2 className="type-2xl weight-bold tracking-tight text-token-primary">Organizing Team Setup</h2>
+                  <p className="type-xs weight-medium text-token-secondary">Are you setting up a new event or joining an existing team?</p>
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 pt-2">
-                <div onClick={() => handleSelectEventChoice("existing")} className="group cursor-pointer rounded-2xl border border-[rgba(0,0,0,0.08)] bg-[#F7F8FA] p-6 transition-all hover:border-[#3B6FD4] hover:bg-white hover:shadow-md">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EBF0FA] text-[#3B6FD4] group-hover:bg-[#3B6FD4] group-hover:text-white">
+                <div onClick={() => handleSelectEventChoice("existing")} className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl accent-surface-token text-token-accent group-hover:bg-token-accent group-hover:text-token-inverse">
                     <Globe size={24} strokeWidth={2} />
                   </div>
-                  <h3 className="mt-4 text-base font-bold text-[#1A1D23]">Join Existing Event</h3>
-                  <p className="mt-1 text-xs font-medium text-[#5A6577] leading-relaxed">View events you have been added to by your lead organizer.</p>
-                  <div className="mt-4 flex items-center gap-1 text-xs font-bold text-[#3B6FD4]">
+                  <h3 className="mt-4 type-base weight-bold text-token-primary">Join Existing Event</h3>
+                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">View events you have been added to by your lead organizer.</p>
+                  <div className="mt-4 flex items-center gap-1 type-xs weight-bold text-token-accent">
                     <span>Select Event</span>
                     <ArrowRight size={14} />
                   </div>
                 </div>
 
-                <div onClick={() => handleSelectEventChoice("new")} className="group cursor-pointer rounded-2xl border border-[rgba(0,0,0,0.08)] bg-[#F7F8FA] p-6 transition-all hover:border-[#3B6FD4] hover:bg-white hover:shadow-md">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EBF0FA] text-[#3B6FD4] group-hover:bg-[#3B6FD4] group-hover:text-white">
+                <div onClick={() => handleSelectEventChoice("new")} className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl accent-surface-token text-token-accent group-hover:bg-token-accent group-hover:text-token-inverse">
                     <Plus size={24} strokeWidth={2} />
                   </div>
-                  <h3 className="mt-4 text-base font-bold text-[#1A1D23]">Create New Event</h3>
-                  <p className="mt-1 text-xs font-medium text-[#5A6577] leading-relaxed">Set up a brand new event, configure timeline, timings, and location.</p>
-                  <div className="mt-4 flex items-center gap-1 text-xs font-bold text-[#3B6FD4]">
+                  <h3 className="mt-4 type-base weight-bold text-token-primary">Create New Event</h3>
+                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">Set up a brand new event, configure timeline, timings, and location.</p>
+                  <div className="mt-4 flex items-center gap-1 type-xs weight-bold text-token-accent">
                     <span>Start Event Setup</span>
                     <ArrowRight size={14} />
                   </div>
@@ -352,14 +352,14 @@ export function OnboardingPage() {
           {step === 3 && (
             <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <div className="flex items-center gap-2">
-                <button onClick={() => setStep(2)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]">
+                <button onClick={() => setStep(2)} className="flex h-8 w-8 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary">
                   <ArrowLeft size={16} />
                 </button>
                 <div>
-                  <h2 className="text-2xl font-bold tracking-tight text-[#1A1D23]">
+                  <h2 className="type-2xl weight-bold tracking-tight text-token-primary">
                     {eventTypeChoice === "existing" ? "Select Your Assigned Event" : "Basic Event Details"}
                   </h2>
-                  <p className="text-xs font-medium text-[#5A6577]">
+                  <p className="type-xs weight-medium text-token-secondary">
                     {eventTypeChoice === "existing"
                       ? "Choose an event below to open your team workspace dashboard."
                       : "Enter primary event identification details."}
@@ -373,47 +373,47 @@ export function OnboardingPage() {
                     <div
                       key={evt.id}
                       onClick={() => handleSelectExistingEvent(evt)}
-                      className="group flex items-center justify-between rounded-2xl border border-[rgba(0,0,0,0.08)] bg-[#F7F8FA] p-4 transition-all hover:border-[#3B6FD4] hover:bg-white hover:shadow-sm cursor-pointer"
+                      className="group flex items-center justify-between rounded-2xl border border-token surface-token p-4 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-sm cursor-pointer"
                     >
                       <div className="flex items-center gap-3.5">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EBF0FA] text-[#3B6FD4]">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl accent-surface-token text-token-accent">
                           <Sparkles size={18} />
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-[#1A1D23]">{evt.name}</h4>
-                          <p className="text-xs font-medium text-[#5A6577]">
-                            {evt.type} • {evt.date} • <span className="text-[#3B6FD4] font-semibold">{evt.role}</span>
+                          <h4 className="type-sm weight-bold text-token-primary">{evt.name}</h4>
+                          <p className="type-xs weight-medium text-token-secondary">
+                            {evt.type} • {evt.date} • <span className="text-token-accent weight-semibold">{evt.role}</span>
                           </p>
                         </div>
                       </div>
-                      <ChevronRight size={18} className="text-[#8E99A8] group-hover:text-[#3B6FD4] transition-colors" />
+                      <ChevronRight size={18} className="text-token-muted group-hover:text-token-accent transition-colors" />
                     </div>
                   ))}
                 </div>
               ) : (
                 <form onSubmit={handleProceedToAdvancedSetup} className="space-y-4 pt-2">
                   <div>
-                    <label className="text-xs font-bold text-[#1A1D23]">Event Name</label>
+                    <label className="type-xs weight-bold text-token-primary">Event Name</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Annual Tech Hackathon 2026"
                       value={eventName}
                       onChange={(e) => setEventName(e.target.value)}
-                      className="mt-1.5 h-11 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none focus:border-[#3B6FD4] placeholder:text-[#8E99A8]"
+                      className="mt-1.5 h-11 w-full rounded-2xl field-token border border-token px-4 type-xs weight-semibold text-token-primary outline-none focus:border-token-accent placeholder:text-token-muted"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-bold text-[#1A1D23]">Event Type</label>
+                      <label className="type-xs weight-bold text-token-primary">Event Type</label>
                       <select
                         value={eventType}
                         onChange={(e) => setEventType(e.target.value)}
-                        className="mt-1.5 h-11 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none cursor-pointer"
+                        className="mt-1.5 h-11 w-full rounded-2xl field-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none cursor-pointer"
                       >
                         {eventTypes.map((type) => (
-                          <option key={type} value={type} className="bg-white text-[#1A1D23]">
+                          <option key={type} value={type} className="surface-card-token text-token-primary">
                             {type}
                           </option>
                         ))}
@@ -421,13 +421,13 @@ export function OnboardingPage() {
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-[#1A1D23]">Date of Event</label>
+                      <label className="type-xs weight-bold text-token-primary">Date of Event</label>
                       <input
                         type="date"
                         required
                         value={eventDate}
                         onChange={(e) => setEventDate(e.target.value)}
-                        className="mt-1.5 h-11 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none"
+                        className="mt-1.5 h-11 w-full rounded-2xl field-token border border-token px-4 type-xs weight-semibold text-token-primary outline-none"
                       />
                     </div>
                   </div>
@@ -435,7 +435,7 @@ export function OnboardingPage() {
                   <div className="pt-4">
                     <button
                       type="submit"
-                      className="w-full flex h-11 items-center justify-center gap-2 rounded-full bg-[#3B6FD4] text-xs font-bold text-white hover:bg-[#2F5BB8] shadow-md transition-colors"
+                      className="w-full flex h-11 items-center justify-center gap-2 rounded-full bg-token-accent type-xs weight-bold text-token-inverse hover:bg-token-accent-dark shadow-md transition-colors"
                     >
                       <span>Continue to Timeline & Location Setup</span>
                       <ArrowRight size={16} />
@@ -450,12 +450,12 @@ export function OnboardingPage() {
           {step === 4 && (
             <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <div className="flex items-center gap-2">
-                <button onClick={() => setStep(3)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]">
+                <button onClick={() => setStep(3)} className="flex h-8 w-8 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary">
                   <ArrowLeft size={16} />
                 </button>
                 <div>
-                  <h2 className="text-2xl font-bold tracking-tight text-[#1A1D23]">Dashboard & Timeline Setup</h2>
-                  <p className="text-xs font-medium text-[#5A6577]">Configure start/end timings, location, and run of show stages for {eventName}.</p>
+                  <h2 className="type-2xl weight-bold tracking-tight text-token-primary">Dashboard & Timeline Setup</h2>
+                  <p className="type-xs weight-medium text-token-secondary">Configure start/end timings, location, and run of show stages for {eventName}.</p>
                 </div>
               </div>
 
@@ -463,54 +463,54 @@ export function OnboardingPage() {
                 {/* Date & Time Picker Matrix */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Start Date & Time */}
-                  <div className="space-y-2 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#3B6FD4]">Start Date & Time</span>
+                  <div className="space-y-2 rounded-2xl surface-token border border-subtle-token p-3.5">
+                    <span className="type-11 weight-bold uppercase tracking-wider text-token-accent">Start Date & Time</span>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="text-[10px] font-bold text-[#8E99A8]">Start Date</label>
+                        <label className="type-10 weight-bold text-token-muted">Start Date</label>
                         <input
                           type="date"
                           required
                           value={startDate}
                           onChange={(e) => setStartDate(e.target.value)}
-                          className="mt-0.5 h-9 w-full rounded-xl bg-white border border-[rgba(0,0,0,0.08)] px-2.5 text-xs font-semibold text-[#1A1D23] outline-none"
+                          className="mt-0.5 h-9 w-full rounded-xl surface-card-token border border-token px-2.5 type-xs weight-semibold text-token-primary outline-none"
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] font-bold text-[#8E99A8]">Start Time</label>
+                        <label className="type-10 weight-bold text-token-muted">Start Time</label>
                         <input
                           type="time"
                           required
                           value={startTime}
                           onChange={(e) => setStartTime(e.target.value)}
-                          className="mt-0.5 h-9 w-full rounded-xl bg-white border border-[rgba(0,0,0,0.08)] px-2 text-xs font-semibold text-[#1A1D23] outline-none"
+                          className="mt-0.5 h-9 w-full rounded-xl surface-card-token border border-token px-2 type-xs weight-semibold text-token-primary outline-none"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* End Date & Time */}
-                  <div className="space-y-2 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#D4930E]">End Date & Time</span>
+                  <div className="space-y-2 rounded-2xl surface-token border border-subtle-token p-3.5">
+                    <span className="type-11 weight-bold uppercase tracking-wider text-token-warning">End Date & Time</span>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="text-[10px] font-bold text-[#8E99A8]">End Date</label>
+                        <label className="type-10 weight-bold text-token-muted">End Date</label>
                         <input
                           type="date"
                           required
                           value={endDate}
                           onChange={(e) => setEndDate(e.target.value)}
-                          className="mt-0.5 h-9 w-full rounded-xl bg-white border border-[rgba(0,0,0,0.08)] px-2.5 text-xs font-semibold text-[#1A1D23] outline-none"
+                          className="mt-0.5 h-9 w-full rounded-xl surface-card-token border border-token px-2.5 type-xs weight-semibold text-token-primary outline-none"
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] font-bold text-[#8E99A8]">End Time</label>
+                        <label className="type-10 weight-bold text-token-muted">End Time</label>
                         <input
                           type="time"
                           required
                           value={endTime}
                           onChange={(e) => setEndTime(e.target.value)}
-                          className="mt-0.5 h-9 w-full rounded-xl bg-white border border-[rgba(0,0,0,0.08)] px-2 text-xs font-semibold text-[#1A1D23] outline-none"
+                          className="mt-0.5 h-9 w-full rounded-xl surface-card-token border border-token px-2 type-xs weight-semibold text-token-primary outline-none"
                         />
                       </div>
                     </div>
@@ -518,12 +518,12 @@ export function OnboardingPage() {
                 </div>
 
                 {/* Auto-Calculated Duration Banner */}
-                <div className="flex items-center justify-between rounded-2xl bg-[#EBF0FA] border border-[#3B6FD4]/20 px-4 py-2.5">
+                <div className="flex items-center justify-between rounded-2xl accent-surface-token border border-token-accent/20 px-4 py-2.5">
                   <div className="flex items-center gap-2">
-                    <Clock size={16} className="text-[#3B6FD4]" />
-                    <span className="text-xs font-bold text-[#1A1D23]">Total Calculated Event Duration:</span>
+                    <Clock size={16} className="text-token-accent" />
+                    <span className="type-xs weight-bold text-token-primary">Total Calculated Event Duration:</span>
                   </div>
-                  <span className="text-xs font-extrabold text-[#3B6FD4] font-mono bg-white px-3 py-1 rounded-full shadow-sm">
+                  <span className="type-xs weight-extrabold text-token-accent font-mono surface-card-token px-3 py-1 rounded-full shadow-sm">
                     {duration}
                   </span>
                 </div>
@@ -531,29 +531,29 @@ export function OnboardingPage() {
                 {/* Event Timeline Stages Builder */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-bold text-[#1A1D23]">Run of Show Stages & Locations ({stagesList.length})</label>
-                    <span className="text-[11px] font-medium text-[#8E99A8]">Appears on Dashboard & Run of Show</span>
+                    <label className="type-xs weight-bold text-token-primary">Run of Show Stages & Locations ({stagesList.length})</label>
+                    <span className="type-11 weight-medium text-token-muted">Appears on Dashboard & Run of Show</span>
                   </div>
 
                   {/* Configured Stages List */}
                   <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                     {stagesList.map((stg) => (
-                      <div key={stg.id} className="flex items-center justify-between rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] px-3.5 py-2.5 text-xs">
+                      <div key={stg.id} className="flex items-center justify-between rounded-2xl surface-token border border-subtle-token px-3.5 py-2.5 type-xs">
                         <div className="flex items-center gap-3 min-w-0">
-                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EBF0FA] font-mono text-[11px] font-bold text-[#3B6FD4]">
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full accent-surface-token font-mono type-11 weight-bold text-token-accent">
                             {stg.order}
                           </span>
                           <div className="min-w-0">
-                            <p className="font-bold text-[#1A1D23] truncate">{stg.title}</p>
-                            <p className="text-[11px] font-medium text-[#5A6577] truncate">
-                              {stg.timeWindow} • <span className="text-[#3B6FD4] font-semibold">{stg.location}</span>
+                            <p className="weight-bold text-token-primary truncate">{stg.title}</p>
+                            <p className="type-11 weight-medium text-token-secondary truncate">
+                              {stg.timeWindow} • <span className="text-token-accent weight-semibold">{stg.location}</span>
                             </p>
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleRemoveStage(stg.id)}
-                          className="text-[#8E99A8] hover:text-[#D6453D] transition-colors p-1 shrink-0"
+                          className="text-token-muted hover:text-token-error transition-colors p-1 shrink-0"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -568,33 +568,33 @@ export function OnboardingPage() {
                       placeholder="Stage Title (e.g. Keynote)"
                       value={stageTitle}
                       onChange={(e) => setStageTitle(e.target.value)}
-                      className="h-9 sm:col-span-4 rounded-xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-medium text-[#1A1D23] outline-none"
+                      className="h-9 sm:col-span-4 rounded-xl field-token border border-token px-3 type-xs weight-medium text-token-primary outline-none"
                     />
                     <input
                       type="text"
                       placeholder="Venue (e.g. Lab A)"
                       value={stageVenue}
                       onChange={(e) => setStageVenue(e.target.value)}
-                      className="h-9 sm:col-span-3 rounded-xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-medium text-[#1A1D23] outline-none"
+                      className="h-9 sm:col-span-3 rounded-xl field-token border border-token px-3 type-xs weight-medium text-token-primary outline-none"
                     />
                     <input
                       type="text"
                       placeholder="Start (09:00 AM)"
                       value={stageStart}
                       onChange={(e) => setStageStart(e.target.value)}
-                      className="h-9 sm:col-span-2 rounded-xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-2.5 text-xs font-medium text-[#1A1D23] outline-none"
+                      className="h-9 sm:col-span-2 rounded-xl field-token border border-token px-2.5 type-xs weight-medium text-token-primary outline-none"
                     />
                     <input
                       type="text"
                       placeholder="End (10:00 AM)"
                       value={stageEnd}
                       onChange={(e) => setStageEnd(e.target.value)}
-                      className="h-9 sm:col-span-2 rounded-xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-2.5 text-xs font-medium text-[#1A1D23] outline-none"
+                      className="h-9 sm:col-span-2 rounded-xl field-token border border-token px-2.5 type-xs weight-medium text-token-primary outline-none"
                     />
                     <button
                       type="button"
                       onClick={handleAddStage}
-                      className="h-9 sm:col-span-1 flex items-center justify-center rounded-xl bg-[#EBF0FA] text-[#3B6FD4] text-xs font-bold hover:bg-[#3B6FD4] hover:text-white transition-colors"
+                      className="h-9 sm:col-span-1 flex items-center justify-center rounded-xl accent-surface-token text-token-accent type-xs weight-bold hover:bg-token-accent hover:text-token-inverse transition-colors"
                       title="Add Stage"
                     >
                       <Plus size={16} />
@@ -604,15 +604,15 @@ export function OnboardingPage() {
 
                 <div className="pt-3 space-y-3">
                   {launchError && (
-                    <div className="flex items-start gap-3 rounded-2xl bg-[#FEF2F2] border border-[#FECACA] px-4 py-3">
-                      <Zap size={16} className="text-[#D6453D] mt-0.5 shrink-0" />
-                      <p className="text-xs font-semibold text-[#D6453D] leading-relaxed">{launchError}</p>
+                    <div className="flex items-start gap-3 rounded-2xl error-surface-token border border-token-error-light px-4 py-3">
+                      <Zap size={16} className="text-token-error mt-0.5 shrink-0" />
+                      <p className="type-xs weight-semibold text-token-error leading-relaxed">{launchError}</p>
                     </div>
                   )}
                   <button
                     type="submit"
                     disabled={isLaunching}
-                    className="w-full flex h-11 items-center justify-center gap-2 rounded-full bg-[#3B6FD4] text-xs font-bold text-white hover:bg-[#2F5BB8] shadow-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="w-full flex h-11 items-center justify-center gap-2 rounded-full bg-token-accent type-xs weight-bold text-token-inverse hover:bg-token-accent-dark shadow-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isLaunching ? (
                       <>

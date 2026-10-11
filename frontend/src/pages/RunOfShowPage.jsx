@@ -26,24 +26,24 @@ import { GlassModal } from "@/components/glass/GlassModal";
 import { cn, formatTimeString, getStageStatus, isEventComplete, parseTimeString, addHoursToTimeString } from "@/lib/utils";
 
 const statusStyles = {
-  LIVE: "bg-[#22A65E]/10 text-[#22A65E]",
-  Completed: "bg-[#22A65E]/10 text-[#22A65E]",
-  Upcoming: "bg-[#EBF0FA] text-[#3B6FD4]"
+  LIVE: "bg-token-success/10 text-token-success",
+  Completed: "bg-token-success/10 text-token-success",
+  Upcoming: "accent-surface-token text-token-accent"
 };
 
 function StatusBadge({ status = "Upcoming" }) {
   return (
     <span
       className={cn(
-        "inline-flex whitespace-nowrap items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold tracking-wide",
+        "inline-flex whitespace-nowrap items-center gap-1.5 rounded-full px-2.5 py-0.5 type-xs weight-bold tracking-wide",
         statusStyles[status] ?? statusStyles.Upcoming
       )}
     >
       {status === "LIVE" ? (
         <>
           <span className="relative flex h-1.5 w-1.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22A65E] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#22A65E]"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-token-success opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-token-success"></span>
           </span>
           LIVE
         </>
@@ -71,15 +71,15 @@ function formatStageSchedule(stage) {
 
 function SelectFilter({ value, onChange, options, label }) {
   return (
-    <label className="filter-chip flex h-9 shrink-0 items-center rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] pl-3 text-xs font-semibold text-[#5A6577]">
+    <label className="filter-chip flex h-9 shrink-0 items-center rounded-full field-token border border-token pl-3 type-xs weight-semibold text-token-secondary">
       <span className="sr-only">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="cursor-pointer bg-transparent text-xs font-semibold text-[#1A1D23] outline-none pr-1"
+        className="cursor-pointer bg-transparent type-xs weight-semibold text-token-primary outline-none pr-1"
       >
         {options.map((option) => (
-          <option key={option} value={option} className="bg-white text-[#1A1D23]">
+          <option key={option} value={option} className="surface-card-token text-token-primary">
             {option}
           </option>
         ))}
@@ -102,30 +102,30 @@ function StageDrawer({ stage, onClose, onUpdateStatus }) {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
+        className="fixed inset-0 z-40 bg-token-black/20 backdrop-blur-[2px]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       />
       <motion.aside
-        className="fixed bottom-4 right-4 top-4 z-50 flex w-[min(540px,calc(100vw-32px))] flex-col overflow-hidden rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-7 shadow-xl text-[#1A1D23]"
+        className="fixed bottom-4 right-4 top-4 z-50 flex w-[min(540px,calc(100vw-32px))] flex-col overflow-hidden rounded-3xl surface-card-token border border-token p-7 shadow-xl text-token-primary"
         initial={{ x: 600, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 600, opacity: 0 }}
         transition={{ type: "spring", stiffness: 320, damping: 30 }}
       >
         {/* Drawer Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-[rgba(0,0,0,0.06)] pb-5">
+        <div className="flex items-start justify-between gap-4 border-b border-subtle-token pb-5">
           <div>
             <div className="flex items-center gap-2.5">
               <StatusBadge status={stage.status} />
-              <span className="text-xs font-bold text-[#8E99A8]">Stage {stage.order} of 6</span>
+              <span className="type-xs weight-bold text-token-muted">Stage {stage.order} of 6</span>
             </div>
-            <h2 className="mt-2 text-2xl font-bold text-[#1A1D23]">{stage.title}</h2>
+            <h2 className="mt-2 type-2xl weight-bold text-token-primary">{stage.title}</h2>
           </div>
           <button
-            className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
+            className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary"
             onClick={onClose}
             aria-label="Close stage drawer"
           >
@@ -137,33 +137,33 @@ function StageDrawer({ stage, onClose, onUpdateStatus }) {
         <div className="flex-1 overflow-y-auto py-6 space-y-6 pr-1">
           {/* Metadata Grid */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5">
-              <span className="text-[11px] font-semibold text-[#8E99A8] block">Time Window</span>
-              <span className="text-xs font-bold text-[#1A1D23] block mt-1">{stage.timeWindow}</span>
+            <div className="rounded-2xl surface-token border border-subtle-token p-3.5">
+              <span className="type-11 weight-semibold text-token-muted block">Time Window</span>
+              <span className="type-xs weight-bold text-token-primary block mt-1">{stage.timeWindow}</span>
             </div>
-            <div className="rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5">
-              <span className="text-[11px] font-semibold text-[#8E99A8] block">Location</span>
-              <span className="text-xs font-bold text-[#1A1D23] block mt-1">{stage.location}</span>
+            <div className="rounded-2xl surface-token border border-subtle-token p-3.5">
+              <span className="type-11 weight-semibold text-token-muted block">Location</span>
+              <span className="type-xs weight-bold text-token-primary block mt-1">{stage.location}</span>
             </div>
-            <div className="rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5">
-              <span className="text-[11px] font-semibold text-[#8E99A8] block">Lead Owner</span>
-              <span className="text-xs font-bold text-[#1A1D23] block mt-1">{stage.owner}</span>
+            <div className="rounded-2xl surface-token border border-subtle-token p-3.5">
+              <span className="type-11 weight-semibold text-token-muted block">Lead Owner</span>
+              <span className="type-xs weight-bold text-token-primary block mt-1">{stage.owner}</span>
             </div>
-            <div className="rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3.5">
-              <span className="text-[11px] font-semibold text-[#8E99A8] block">Department</span>
-              <span className="text-xs font-bold text-[#1A1D23] block mt-1">{stage.department}</span>
+            <div className="rounded-2xl surface-token border border-subtle-token p-3.5">
+              <span className="type-11 weight-semibold text-token-muted block">Department</span>
+              <span className="type-xs weight-bold text-token-primary block mt-1">{stage.department}</span>
             </div>
           </div>
 
           {/* Key Checklist Milestones */}
           {stage.milestones && stage.milestones.length > 0 && (
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#8E99A8]">Stage Milestones</h3>
+              <h3 className="type-xs weight-bold uppercase tracking-wider text-token-muted">Stage Milestones</h3>
               <div className="mt-3 space-y-2">
                 {stage.milestones.map((m, idx) => (
-                  <div key={idx} className="flex items-center gap-3 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] p-3 text-xs font-medium text-[#1A1D23]">
-                    <CheckCircle2 size={16} className={cn(m.completed ? "text-[#22A65E]" : "text-[#8E99A8]")} />
-                    <span className={cn(m.completed && "line-through text-[#8E99A8]")}>{m.label}</span>
+                  <div key={idx} className="flex items-center gap-3 rounded-2xl surface-token border border-subtle-token p-3 type-xs weight-medium text-token-primary">
+                    <CheckCircle2 size={16} className={cn(m.completed ? "text-token-success" : "text-token-muted")} />
+                    <span className={cn(m.completed && "line-through text-token-muted")}>{m.label}</span>
                   </div>
                 ))}
               </div>
@@ -173,13 +173,13 @@ function StageDrawer({ stage, onClose, onUpdateStatus }) {
 
         {/* Quick Action Footer */}
         {isLead && (
-          <div className="border-t border-[rgba(0,0,0,0.06)] pt-5 flex items-center gap-3">
+          <div className="border-t border-subtle-token pt-5 flex items-center gap-3">
             {isLive && (
               <GlassButton
                 variant="secondary"
                 icon={<Check size={16} />}
                 onClick={() => onUpdateStatus(stage.id, "Completed")}
-                className="flex-1 h-10 text-xs font-bold rounded-full"
+                className="flex-1 h-10 type-xs weight-bold rounded-full"
               >
                 Mark Completed
               </GlassButton>
@@ -273,60 +273,60 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
     <GlassModal open={open} onClose={onClose} title={stage ? "Edit Timeline Stage" : "Add Timeline Stage"}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="text-xs font-semibold text-[#8E99A8]">Stage Title</label>
+          <label className="type-xs weight-semibold text-token-muted">Stage Title</label>
           <input
             type="text"
             required
             placeholder="e.g. Inauguration & Keynote Address"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 h-10 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-4 text-xs font-semibold text-[#1A1D23] outline-none placeholder:text-[#8E99A8]"
+            className="mt-1 h-10 w-full rounded-full field-token border border-token px-4 type-xs weight-semibold text-token-primary outline-none placeholder:text-token-muted"
           />
         </div>
 
         {/* Time Selector Inputs */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-semibold text-[#8E99A8]">Start Time</label>
+            <label className="type-xs weight-semibold text-token-muted">Start Time</label>
             <input
               type="time"
               required
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="mt-1 h-9 w-full cursor-pointer rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-bold text-[#1A1D23] outline-none"
+              className="mt-1 h-9 w-full cursor-pointer rounded-full field-token border border-token px-3.5 type-xs weight-bold text-token-primary outline-none"
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#8E99A8]">End Time</label>
+            <label className="type-xs weight-semibold text-token-muted">End Time</label>
             <input
               type="time"
               required
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="mt-1 h-9 w-full cursor-pointer rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-bold text-[#1A1D23] outline-none"
+              className="mt-1 h-9 w-full cursor-pointer rounded-full field-token border border-token px-3.5 type-xs weight-bold text-token-primary outline-none"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-semibold text-[#8E99A8]">Venue</label>
+            <label className="type-xs weight-semibold text-token-muted">Venue</label>
             <input
               type="text"
               placeholder="e.g. Main Auditorium"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="mt-1 h-9 w-full rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
+              className="mt-1 h-9 w-full rounded-full field-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none"
             />
           </div>
         </div>
 
         <div className="mt-6 flex justify-end gap-3 pt-2">
-          <GlassButton type="button" onClick={onClose} className="h-9 text-xs rounded-full">
+          <GlassButton type="button" onClick={onClose} className="h-9 type-xs rounded-full">
             Cancel
           </GlassButton>
-          <GlassButton type="submit" variant="primary" icon={<Check size={15} />} className="h-9 text-xs rounded-full">
+          <GlassButton type="submit" variant="primary" icon={<Check size={15} />} className="h-9 type-xs rounded-full">
             {stage ? "Save Changes" : "Create Stage"}
           </GlassButton>
         </div>
@@ -474,9 +474,9 @@ export function RunOfShowPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#1A1D23] md:text-3xl">Run of Show</h1>
-          <p className="mt-2 text-sm font-bold text-[#1A1D23]">{activeEvent?.name || "Event"}</p>
-          <p className="mt-1 text-xs font-semibold text-[#8E99A8]">
+          <h1 className="type-2xl weight-bold tracking-tight text-token-primary md:type-3xl">Run of Show</h1>
+          <p className="mt-2 type-sm weight-bold text-token-primary">{activeEvent?.name || "Event"}</p>
+          <p className="mt-1 type-xs weight-semibold text-token-muted">
             {(() => {
               const startDate = activeEvent?.startDate ? new Date(activeEvent.startDate) : null;
               const endDate = activeEvent?.endDate ? new Date(activeEvent.endDate) : null;
@@ -488,10 +488,10 @@ export function RunOfShowPage() {
                 : startLabel;
               return dateRange;
             })()}
-            <span className="mx-2 text-[#C4CBD4]">|</span>
+            <span className="mx-2 text-token-inverse-muted">|</span>
             {activeEvent?.startTime || "Start time not set"} – {activeEvent?.endTime || "End time not set"}
           </p>
-          <p className="mt-1 text-sm text-[#5A6577] font-medium">Master timeline, stage handovers, and live event progression.</p>
+          <p className="mt-1 type-sm text-token-secondary weight-medium">Master timeline, stage handovers, and live event progression.</p>
         </div>
         <div className="flex items-center gap-3">
           {isLead && !eventIsComplete && (
@@ -502,12 +502,12 @@ export function RunOfShowPage() {
                 setEditingStage(null);
                 setEditModalOpen(true);
               }}
-              className="rounded-full text-xs font-bold"
+              className="rounded-full type-xs weight-bold"
             >
               Add Stage
             </GlassButton>
           )}
-          <GlassButton variant="secondary" icon={<FileDown size={16} strokeWidth={2} />} className="rounded-full text-xs">
+          <GlassButton variant="secondary" icon={<FileDown size={16} strokeWidth={2} />} className="rounded-full type-xs">
             Export Schedule
           </GlassButton>
         </div>
@@ -515,14 +515,14 @@ export function RunOfShowPage() {
 
       {/* Filter controls */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex h-9 min-w-[240px] flex-1 items-center gap-2 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-medium text-[#1A1D23] focus-within:ring-1 focus-within:ring-[#3B6FD4]">
-          <Search size={15} strokeWidth={2} className="text-[#8E99A8] shrink-0" />
+        <div className="flex h-9 min-w-[240px] flex-1 items-center gap-2 rounded-full field-token border border-token px-3.5 type-xs weight-medium text-token-primary focus-within:ring-1 focus-within:ring-token-accent">
+          <Search size={15} strokeWidth={2} className="text-token-muted shrink-0" />
           <input
             type="text"
             placeholder="Search timeline stages, locations, leads..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-transparent outline-none text-xs font-medium text-[#1A1D23] placeholder:text-[#8E99A8]"
+            className="w-full bg-transparent outline-none type-xs weight-medium text-token-primary placeholder:text-token-muted"
             aria-label="Search run of show"
           />
         </div>
@@ -536,13 +536,13 @@ export function RunOfShowPage() {
 
       {/* Timeline stages list */}
       {!timelineLoading && eventIsComplete && (
-        <div className="flex items-center gap-4 rounded-3xl border border-[#22A65E]/20 bg-gradient-to-r from-[#22A65E]/10 via-white to-[#EBF0FA] px-6 py-4 shadow-[0_4px_16px_rgba(34,166,94,0.08)]">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#22A65E] text-white shadow-sm">
+        <div className="flex items-center gap-4 rounded-3xl border border-token-success/20 bg-gradient-to-r from-token-success/10 via-token-inverse to-token-accent-light px-6 py-4 shadow-token-success">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-token-success text-token-inverse shadow-sm">
             <CheckCircle2 size={20} strokeWidth={2.5} />
           </div>
           <div>
-            <p className="text-sm font-extrabold text-[#1A1D23]">Event completed</p>
-            <p className="mt-0.5 text-xs font-medium text-[#5A6577]">All timeline stages are complete. This schedule is now read-only.</p>
+            <p className="type-sm weight-extrabold text-token-primary">Event completed</p>
+            <p className="mt-0.5 type-xs weight-medium text-token-secondary">All timeline stages are complete. This schedule is now read-only.</p>
           </div>
         </div>
       )}
@@ -561,7 +561,7 @@ export function RunOfShowPage() {
           onAction={isLead && activeEvent ? () => { setEditingStage(null); setEditModalOpen(true); } : undefined}
         />
       ) : (
-        <div className="relative space-y-4 md:before:absolute md:before:bottom-8 md:before:left-[2.75rem] md:before:top-8 md:before:w-px md:before:bg-[#22A65E]/20">
+        <div className="relative space-y-4 md:before:absolute md:before:bottom-8 md:before:left-[2.75rem] md:before:top-8 md:before:w-px md:before:bg-token-success/20">
           {filteredStages.map((stg, idx) => {
             const isLive = stg.status === "LIVE";
             const displayIndex = String(stg.order || idx + 1).padStart(2, "0");
@@ -570,35 +570,35 @@ export function RunOfShowPage() {
               <div
                 key={stg.id}
                 className={cn(
-                  "group relative z-[1] flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-3xl border p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]",
+                  "group relative z-[1] flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-3xl border p-6 shadow-token-card",
                   isLive
-                    ? "bg-white border-[#3B6FD4]/40 ring-1 ring-[#3B6FD4]/20"
+                    ? "surface-card-token border-token-accent/40 ring-1 ring-token-accent/20"
                     : stg.status === "Completed"
-                      ? "bg-gradient-to-r from-[#F4FBF7] to-white border-[#22A65E]/20"
-                    : "bg-white border-[rgba(0,0,0,0.08)]"
+                      ? "bg-gradient-to-r from-token-success-light to-token-inverse border-token-success/20"
+                    : "surface-card-token border-token"
                 )}
               >
                 <div className="flex items-start gap-4 min-w-0 flex-1">
                   <div
                     className={cn(
-                      "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl font-mono text-sm font-bold",
-                      isLive ? "bg-[#EBF0FA] text-[#3B6FD4]" : stg.status === "Completed" ? "bg-[#22A65E] text-white" : "bg-[#F0F2F5] text-[#5A6577]"
+                      "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl font-mono type-sm weight-bold",
+                      isLive ? "accent-surface-token text-token-accent" : stg.status === "Completed" ? "bg-token-success text-token-inverse" : "field-token text-token-secondary"
                     )}
                   >
                     {stg.status === "Completed" ? <Check size={18} strokeWidth={3} /> : displayIndex}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-3">
-                      <h3 className="text-base font-bold text-[#1A1D23] truncate">{stg.title}</h3>
+                      <h3 className="type-base weight-bold text-token-primary truncate">{stg.title}</h3>
                       <StatusBadge status={stg.status} />
                     </div>
-                    <div className="mt-2.5 space-y-1.5 text-xs font-medium text-[#8E99A8]">
+                    <div className="mt-2.5 space-y-1.5 type-xs weight-medium text-token-muted">
                       {stg.location && (
-                        <span className="inline-flex items-center gap-1.5 font-mono font-bold text-[#3B6FD4]">
-                          <MapPin size={13} className="text-[#3B6FD4]" /> {stg.location}
+                        <span className="inline-flex items-center gap-1.5 font-mono weight-bold text-token-accent">
+                          <MapPin size={13} className="text-token-accent" /> {stg.location}
                         </span>
                       )}
-                      <span className="flex items-center gap-1.5 font-mono font-bold text-[#3B6FD4]">
+                      <span className="flex items-center gap-1.5 font-mono weight-bold text-token-accent">
                         <Clock size={13} /> {formatStageSchedule(stg)}
                       </span>
                     </div>
@@ -615,7 +615,7 @@ export function RunOfShowPage() {
                           setEditingStage(stg);
                           setEditModalOpen(true);
                         }}
-                        className="h-8 px-3 text-xs font-semibold rounded-full min-h-0 text-[#5A6577] hover:text-[#1A1D23]"
+                        className="h-8 px-3 type-xs weight-semibold rounded-full min-h-0 text-token-secondary hover:text-token-primary"
                       >
                         Edit Stage
                       </GlassButton>
@@ -625,7 +625,7 @@ export function RunOfShowPage() {
                         variant="secondary"
                         icon={<Check size={14} />}
                         onClick={() => handleUpdateStatus(stg.id, "Completed")}
-                        className="h-8 px-3.5 text-xs font-bold rounded-full min-h-0 text-[#22A65E]"
+                        className="h-8 px-3.5 type-xs weight-bold rounded-full min-h-0 text-token-success"
                       >
                         Mark Completed
                       </GlassButton>

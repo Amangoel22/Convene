@@ -5,12 +5,12 @@ export function ProgressTimeline({ progress, stages }) {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between gap-4">
-        <p className="text-sm font-semibold text-[#111827]">Run of Show Progress</p>
-        <p className="text-sm font-semibold text-[#6B7280]">{progress}% complete</p>
+        <p className="type-sm weight-semibold text-token-primary">Run of Show Progress</p>
+        <p className="type-sm weight-semibold text-token-secondary">{progress}% complete</p>
       </div>
-      <div className="relative h-2 rounded-full bg-white/55">
+      <div className="relative h-2 rounded-full surface-card-token/55">
         <motion.div
-          className="h-2 rounded-full bg-[#F6C445]"
+          className="h-2 rounded-full bg-token-gold"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.7, ease: "easeOut" }}
@@ -22,12 +22,12 @@ export function ProgressTimeline({ progress, stages }) {
             <div
               className={
                 stage.status === "current"
-                  ? "gold-glow rounded-xl border border-[#F6C445]/60 bg-[#F6C445]/24 px-2.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]"
-                  : "rounded-xl border border-white/45 bg-white/30 px-2.5 py-1.5"
+                  ? "gold-glow rounded-xl border border-token-gold/60 bg-token-gold/24 px-2.5 py-1.5 shadow-token-inset"
+                  : "rounded-xl border border-token-inverse/45 surface-card-token/30 px-2.5 py-1.5"
               }
             >
-              <p className="truncate text-xs font-semibold text-[#111827]">{stage.label}</p>
-              <p className="mt-0.5 text-[11px] font-medium capitalize text-[#6B7280]">{stage.status}</p>
+              <p className="truncate type-xs weight-semibold text-token-primary">{stage.label}</p>
+              <p className="mt-0.5 type-11 weight-medium capitalize text-token-secondary">{stage.status}</p>
             </div>
           </div>
         ))}

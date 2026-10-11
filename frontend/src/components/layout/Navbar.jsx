@@ -37,15 +37,15 @@ export function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-20 bg-[#F7F8FA] py-2 border-b border-[rgba(0,0,0,0.06)]">
+    <header className="sticky top-0 z-20 surface-token py-2 border-b border-subtle-token">
       <div className="flex h-12 items-center px-1">
         <GlassButton className="flex lg:hidden h-8 w-8 min-h-0 p-0" icon={<Menu size={18} strokeWidth={1.75} />} aria-label="Open navigation" />
 
         {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-[#5A6577]">
-          <span className="hover:text-[#1A1D23] cursor-pointer">Convene</span>
-          <span className="text-[#8E99A8]">/</span>
-          <span className="text-[#1A1D23] font-bold">Mission Control</span>
+        <div className="flex items-center gap-1.5 type-xs weight-semibold text-token-secondary">
+          <span className="hover:text-token-primary cursor-pointer">Convene</span>
+          <span className="text-token-muted">/</span>
+          <span className="text-token-primary weight-bold">Mission Control</span>
         </div>
 
         <div className="flex-1" />
@@ -53,12 +53,12 @@ export function Navbar() {
         {/* Right Section Controls */}
         <div className="flex items-center gap-3">
           {/* Search Bar */}
-          <div className="hidden sm:flex items-center gap-2.5 h-9 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-medium text-[#1A1D23] focus-within:ring-1 focus-within:ring-[#3B6FD4] transition-all w-52 lg:w-64">
-            <Search size={15} className="text-[#8E99A8] shrink-0" />
+          <div className="hidden sm:flex items-center gap-2.5 h-9 rounded-full field-token border border-token px-3.5 type-xs weight-medium text-token-primary focus-within:ring-1 focus-within:ring-token-accent transition-all w-52 lg:w-64">
+            <Search size={15} className="text-token-muted shrink-0" />
             <input
               type="text"
               placeholder="Search event..."
-              className="bg-transparent outline-none w-full text-[#1A1D23] placeholder:text-[#8E99A8] text-xs font-medium"
+              className="bg-transparent outline-none w-full text-token-primary placeholder:text-token-muted type-xs weight-medium"
             />
           </div>
 
@@ -67,18 +67,18 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setDropdownOpen((prev) => !prev)}
-              className="hidden md:flex items-center gap-2 h-9 rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-bold text-[#1A1D23] hover:bg-[#E8ECF1] cursor-pointer transition-colors"
+              className="hidden md:flex items-center gap-2 h-9 rounded-full field-token border border-token px-3.5 type-xs weight-bold text-token-primary hover:hover-token cursor-pointer transition-colors"
             >
               <span>{activeEvent?.name || "Select Event"}</span>
-              <ChevronDown size={13} className={cn("text-[#8E99A8] shrink-0 transition-transform", dropdownOpen && "rotate-180")} />
+              <ChevronDown size={13} className={cn("text-token-muted shrink-0 transition-transform", dropdownOpen && "rotate-180")} />
             </button>
 
             {/* Event Dropdown Menu */}
             {dropdownOpen && (
-              <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl bg-white border border-[rgba(0,0,0,0.08)] p-2 shadow-xl z-50">
-                <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#8E99A8]">Your Events</p>
+              <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl surface-card-token border border-token p-2 shadow-xl z-50">
+                <p className="px-3 py-1.5 type-10 weight-bold uppercase tracking-wider text-token-muted">Your Events</p>
                 {events.length === 0 ? (
-                  <p className="px-3 py-2 text-xs font-medium text-[#8E99A8]">No events found</p>
+                  <p className="px-3 py-2 type-xs weight-medium text-token-muted">No events found</p>
                 ) : (
                   events.map((evt) => (
                     <div
@@ -88,20 +88,20 @@ export function Navbar() {
                         setDropdownOpen(false);
                       }}
                       className={cn(
-                        "flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer transition-colors",
-                        evt.id === activeEvent?.id ? "bg-[#EBF0FA] text-[#3B6FD4]" : "text-[#5A6577] hover:bg-[#F0F2F5]"
+                        "flex items-center justify-between rounded-xl px-3 py-2 type-xs weight-semibold cursor-pointer transition-colors",
+                        evt.id === activeEvent?.id ? "accent-surface-token text-token-accent" : "text-token-secondary hover:field-token"
                       )}
                     >
                       <span className="truncate">{evt.name}</span>
-                      <span className="text-[10px] text-[#8E99A8] font-normal">{evt.type}</span>
+                      <span className="type-10 text-token-muted weight-normal">{evt.type}</span>
                     </div>
                   ))
                 )}
-                <div className="mt-2 pt-2 border-t border-[rgba(0,0,0,0.06)] space-y-1">
+                <div className="mt-2 pt-2 border-t border-subtle-token space-y-1">
                   <Link
                     to="/onboarding"
                     onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-bold text-[#3B6FD4] hover:bg-[#EBF0FA] transition-colors"
+                    className="flex items-center gap-2 rounded-xl px-3 py-1.5 type-xs weight-bold text-token-accent hover:accent-surface-token transition-colors"
                   >
                     <Plus size={14} /> Create New Event
                   </Link>
@@ -113,17 +113,17 @@ export function Navbar() {
           {/* Theme Toggle */}
           <ThemeToggle
             compact
-            className="h-9 w-9 min-h-0 px-0 text-[#5A6577] hover:text-[#1A1D23]"
+            className="h-9 w-9 min-h-0 px-0 text-token-secondary hover:text-token-primary"
           />
 
           {/* Notifications */}
-          <button className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23] transition-colors">
+          <button className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full field-token border border-token text-token-secondary hover:hover-token hover:text-token-primary transition-colors">
             <Bell size={16} />
           </button>
 
           {/* Actual event access */}
           <div
-            className="flex items-center gap-1.5 h-9 rounded-full bg-[#EBF0FA] border border-[#3B6FD4]/20 px-3 text-xs font-bold text-[#3B6FD4]"
+            className="flex items-center gap-1.5 h-9 rounded-full accent-surface-token border border-token-accent/20 px-3 type-xs weight-bold text-token-accent"
             title="Your access for the selected event"
           >
             <ShieldCheck size={14} />
@@ -131,7 +131,7 @@ export function Navbar() {
           </div>
 
           {/* Profile Avatar */}
-          <UserAvatar initials={isLead ? "AG" : "TM"} className="h-8 w-8 text-xs bg-[#EBF0FA] text-[#3B6FD4]" />
+          <UserAvatar initials={isLead ? "AG" : "TM"} className="h-8 w-8 type-xs accent-surface-token text-token-accent" />
         </div>
       </div>
     </header>

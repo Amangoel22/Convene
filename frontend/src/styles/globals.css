@@ -36,12 +36,169 @@
 .surface-subtle { background-color: var(--color-bg-primary); }
 .border-default { border-color: var(--color-border); }
 
+/* Purpose: token utilities are the only presentation names used by migrated components. */
+.text-token-primary { color: var(--color-text-primary); }
+.text-token-secondary { color: var(--color-text-secondary); }
+.text-token-muted { color: var(--color-text-muted); }
+.text-token-accent { color: var(--color-primary-accent); }
+.text-token-accent-dark { color: var(--color-powder-blue); }
+.text-token-success { color: var(--color-success); }
+.text-token-warning { color: var(--color-gold); }
+.text-token-error { color: #D6453D; }
+.text-token-inverse { color: #FFFFFF; }
+.text-token-black { color: #000000; }
+.text-token-warning-dark { color: #7A5A00; }
+.text-token-success-dark { color: #157F37; }
+.surface-token { background-color: var(--color-bg-primary); }
+.surface-card-token { background-color: var(--color-bg-secondary); }
+.field-token { background-color: var(--color-hover); }
+.hover-token { background-color: var(--color-selected); }
+.accent-surface-token { background-color: #EBF0FA; }
+.error-surface-token { background-color: #FEF2F2; }
+.bg-token-success { background-color: var(--color-success); }
+.bg-token-accent { background-color: var(--color-primary-accent); }
+.bg-token-error { background-color: #D6453D; }
+.bg-token-gold { background-color: #F6C445; }
+.bg-token-accent-dark { background-color: var(--color-powder-blue); }
+.bg-token-field { background-color: var(--color-hover); }
+.border-token { border-color: var(--color-border); }
+.border-subtle-token { border-color: rgba(0, 0, 0, 0.06); }
+.border-token-accent { border-color: var(--color-primary-accent); }
+.border-token-error { border-color: #D6453D; }
+.border-token-success { border-color: var(--color-success); }
+.border-token-gold { border-color: #F6C445; }
+.border-token-warning { border-color: var(--color-gold); }
+.border-token-dark { border-color: #293447; }
+.border-token-subtle { border-color: rgba(0, 0, 0, 0.08); }
+.border-token-inverse { border-color: #FFFFFF; }
+.ring-token-accent { --tw-ring-color: var(--color-primary-accent); }
+.ring-token-inverse { --tw-ring-color: #FFFFFF; }
+.shadow-token-card { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); }
+.divide-subtle-token { border-color: rgba(0, 0, 0, 0.06); }
+.divide-token-subtle { border-color: rgba(0, 0, 0, 0.05); }
+.divide-token-dark { border-color: #293447; }
+.border-token-medium { border-color: rgba(0, 0, 0, 0.12); }
+.border-token-light { border-color: rgba(0, 0, 0, 0.04); }
+.border-token-error-light { border-color: #FECACA; }
+.border-token-warning { border-color: var(--color-gold); }
+.border-token-info { border-color: #007AFF; }
+.ring-token-error { --tw-ring-color: #E53E3E; }
+.ring-token-warning { --tw-ring-color: var(--color-gold); }
+.ring-token-success { --tw-ring-color: var(--color-success); }
+.bg-token-page { background-color: #F6F7FB; }
+.bg-token-hover-dark { background-color: #202A3A; }
+.bg-token-panel-dark { background-color: #151C28; }
+.bg-token-warning { background-color: #FF9F0A; }
+.bg-token-warning-light { background-color: #FEFBF3; }
+.bg-token-header { background-color: #FAFAFC; }
+.bg-token-surface-light { background-color: #F8FAFC; }
+.bg-token-accent-light { background-color: #F5F8FF; }
+.bg-token-success-light { background-color: #F4FBF7; }
+.bg-token-success-dark { background-color: #1B8F50; }
+.bg-token-info { background-color: #007AFF; }
+.text-token-gold { color: #F6C445; }
+.text-token-inverse-muted { color: #C4CBD4; }
+.text-token-info { color: #38BDF8; }
+.text-token-success-light { color: #4ADE80; }
+.from-token-success-light { --tw-gradient-from: #F4FBF7 var(--tw-gradient-from-position); }
+.from-token-success { --tw-gradient-from: var(--color-success) var(--tw-gradient-from-position); }
+.to-token-accent-light { --tw-gradient-to: #EBF0FA var(--tw-gradient-to-position); }
+.shadow-token-elevated { box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06); }
+.shadow-token-soft { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); }
+.shadow-token-success { box-shadow: 0 4px 16px rgba(34, 166, 94, 0.08); }
+.shadow-token-small { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04); }
+.shadow-token-dropdown { box-shadow: 0 14px 38px rgba(31, 41, 55, 0.08); }
+.shadow-token-float { box-shadow: 0 10px 28px rgba(31, 41, 55, 0.08); }
+.shadow-token-accent { box-shadow: 0 0 12px rgba(59, 111, 212, 0.3); }
+.shadow-token-inset { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55); }
+.border-token-warning-soft { border-color: rgba(212, 147, 14, 0.25); }
+.border-token-strong { border-color: rgba(0, 0, 0, 0.15); }
+.via-token-inverse { --tw-gradient-via: #FFFFFF var(--tw-gradient-via-position); }
+.to-token-inverse { --tw-gradient-to: #FFFFFF var(--tw-gradient-to-position); }
+
+/* Purpose: supports semantic token opacity variants used in component class names. */
+[class~="bg-token-success/10"] { background-color: rgb(34 166 94 / 0.10); }
+[class~="bg-token-success/18"] { background-color: rgb(34 166 94 / 0.18); }
+[class~="bg-token-success/20"] { background-color: rgb(34 166 94 / 0.20); }
+[class~="bg-token-warning/10"] { background-color: rgb(212 147 14 / 0.10); }
+[class~="bg-token-warning/15"] { background-color: rgb(212 147 14 / 0.15); }
+[class~="bg-token-warning/20"] { background-color: rgb(212 147 14 / 0.20); }
+[class~="bg-token-error/10"] { background-color: rgb(214 69 61 / 0.10); }
+[class~="bg-token-error/18"] { background-color: rgb(214 69 61 / 0.18); }
+[class~="bg-token-accent/10"] { background-color: rgb(59 111 212 / 0.10); }
+[class~="bg-token-accent/18"] { background-color: rgb(59 111 212 / 0.18); }
+[class~="bg-token-info/18"] { background-color: rgb(0 122 255 / 0.18); }
+[class~="bg-token-black/20"] { background-color: rgb(0 0 0 / 0.20); }
+[class~="border-token-success/20"] { border-color: rgb(34 166 94 / 0.20); }
+[class~="border-token-success/25"] { border-color: rgb(34 166 94 / 0.25); }
+[class~="border-token-success/35"] { border-color: rgb(34 166 94 / 0.35); }
+[class~="border-token-warning/20"] { border-color: rgb(212 147 14 / 0.20); }
+[class~="border-token-warning/35"] { border-color: rgb(212 147 14 / 0.35); }
+[class~="border-token-error/20"] { border-color: rgb(214 69 61 / 0.20); }
+[class~="border-token-error/35"] { border-color: rgb(214 69 61 / 0.35); }
+[class~="border-token-accent/20"] { border-color: rgb(59 111 212 / 0.20); }
+[class~="border-token-accent/30"] { border-color: rgb(59 111 212 / 0.30); }
+[class~="border-token-accent/40"] { border-color: rgb(59 111 212 / 0.40); }
+[class~="border-token-info/35"] { border-color: rgb(0 122 255 / 0.35); }
+[class~="border-token-inverse/20"] { border-color: rgb(255 255 255 / 0.20); }
+[class~="border-token-inverse/45"] { border-color: rgb(255 255 255 / 0.45); }
+[class~="border-token-inverse/60"] { border-color: rgb(255 255 255 / 0.60); }
+[class~="border-token-inverse/70"] { border-color: rgb(255 255 255 / 0.70); }
+[class~="surface-card-token/10"] { background-color: rgb(255 255 255 / 0.10); }
+[class~="surface-card-token/20"] { background-color: rgb(255 255 255 / 0.20); }
+[class~="surface-card-token/30"] { background-color: rgb(255 255 255 / 0.30); }
+[class~="surface-card-token/35"] { background-color: rgb(255 255 255 / 0.35); }
+[class~="surface-card-token/45"] { background-color: rgb(255 255 255 / 0.45); }
+[class~="surface-card-token/48"] { background-color: rgb(255 255 255 / 0.48); }
+[class~="surface-card-token/55"] { background-color: rgb(255 255 255 / 0.55); }
+[class~="surface-card-token/60"] { background-color: rgb(255 255 255 / 0.60); }
+[class~="hover:border-token-accent/40"]:hover { border-color: rgb(59 111 212 / 0.40); }
+[class~="hover:border-token-success/40"]:hover { border-color: rgb(34 166 94 / 0.40); }
+[class~="hover:border-token-warning/40"]:hover { border-color: rgb(212 147 14 / 0.40); }
+[class~="hover:border-token-error/40"]:hover { border-color: rgb(214 69 61 / 0.40); }
+[class~="hover:bg-token-accent"]:hover { background-color: var(--color-primary-accent); }
+[class~="ring-token-accent/20"] { --tw-ring-color: rgb(59 111 212 / 0.20); }
+[class~="ring-token-success/20"] { --tw-ring-color: rgb(34 166 94 / 0.20); }
+[class~="ring-token-error/20"] { --tw-ring-color: rgb(214 69 61 / 0.20); }
+.type-10 { font-size: 10px; }
+.type-11 { font-size: 11px; }
+.type-xs { font-size: 12px; }
+.type-sm { font-size: 14px; }
+.type-base { font-size: 16px; }
+.type-lg { font-size: 18px; }
+.type-xl { font-size: 20px; }
+.type-2xl { font-size: 24px; }
+.type-3xl { font-size: 30px; }
+.type-4xl { font-size: 36px; }
+.type-5xl { font-size: 48px; }
+.weight-normal { font-weight: 400; }
+.weight-medium { font-weight: 500; }
+.weight-semibold { font-weight: 600; }
+.weight-bold { font-weight: 700; }
+.weight-extrabold { font-weight: 800; }
+.weight-black { font-weight: 900; }
+
 [data-theme="dark"] .text-primary-ink { color: #F3F6FB; }
 [data-theme="dark"] .text-secondary { color: #AEB9C9; }
 [data-theme="dark"] .text-muted { color: #8491A5; }
 [data-theme="dark"] .surface-card { background-color: #151B25; }
 [data-theme="dark"] .surface-subtle { background-color: #0E131B; }
 [data-theme="dark"] .border-default { border-color: #293447; }
+[data-theme="dark"] .surface-card-token { background-color: #151B25 !important; }
+[data-theme="dark"] .surface-token { background-color: #0E131B !important; }
+[data-theme="dark"] .field-token { background-color: #202733 !important; }
+[data-theme="dark"] .hover-token { background-color: #202A3A !important; }
+[data-theme="dark"] .accent-surface-token { background-color: #1B2A45 !important; }
+[data-theme="dark"] .error-surface-token { background-color: #382126 !important; }
+[data-theme="dark"] .bg-token-header,
+[data-theme="dark"] .bg-token-surface-light,
+[data-theme="dark"] .bg-token-accent-light,
+[data-theme="dark"] .bg-token-success-light,
+[data-theme="dark"] .bg-token-warning-light { background-color: #202733 !important; }
+[data-theme="dark"] .text-token-inverse { color: #F3F6FB; }
+[data-theme="dark"] .border-token-subtle,
+[data-theme="dark"] .divide-subtle-token { border-color: #293447; }
+[data-theme="dark"] .hover-surface-token:hover { background-color: #202A3A !important; }
 
 * {
   box-sizing: border-box;

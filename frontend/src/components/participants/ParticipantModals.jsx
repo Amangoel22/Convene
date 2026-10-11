@@ -60,7 +60,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
       onClose={onClose}
       title="Create Participant / Registration"
     >
-      <div className="grid grid-cols-3 gap-1 rounded-2xl bg-[#E8ECF1] p-1.5 border border-[rgba(0,0,0,0.06)] mb-6">
+      <div className="grid grid-cols-3 gap-1 rounded-2xl hover-token p-1.5 border border-subtle-token mb-6">
         {[
           ["newTeam", "Create Whole Team"],
           ["existingTeam", "Add to Existing Team"],
@@ -71,10 +71,10 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
             type="button"
             onClick={() => setMode(mKey)}
             className={cn(
-              "px-2 py-2 text-xs font-bold rounded-xl transition-all text-center",
+              "px-2 py-2 type-xs weight-bold rounded-xl transition-all text-center",
               mode === mKey
-                ? "bg-white text-[#3B6FD4] shadow-sm border border-[rgba(0,0,0,0.04)] font-extrabold"
-                : "text-[#5A6577] hover:text-[#1A1D23] font-semibold",
+                ? "surface-card-token text-token-accent shadow-sm border border-token-light weight-extrabold"
+                : "text-token-secondary hover:text-token-primary weight-semibold",
             )}
           >
             {label}
@@ -89,7 +89,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
         {mode === "newTeam" && (
           <>
             <div>
-              <label className="text-xs font-bold text-[#1A1D23]">
+              <label className="type-xs weight-bold text-token-primary">
                 Team Name
               </label>
               <input
@@ -98,11 +98,11 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                 placeholder="e.g. CyberKnights"
                 value={teamName}
                 onChange={(e) => setTeamName(e.target.value)}
-                className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-semibold text-[#1A1D23] outline-none"
+                className="mt-1 h-10 w-full rounded-2xl field-token border border-token px-3.5 type-xs weight-semibold text-token-primary outline-none"
               />
             </div>
             <div>
-              <label className="text-xs font-bold text-[#1A1D23]">
+              <label className="type-xs weight-bold text-token-primary">
                 College / Organization
               </label>
               <input
@@ -111,20 +111,20 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                 placeholder="e.g. IIT Bombay"
                 value={college}
                 onChange={(e) => setCollege(e.target.value)}
-                className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-semibold text-[#1A1D23] outline-none"
+                className="mt-1 h-10 w-full rounded-2xl field-token border border-token px-3.5 type-xs weight-semibold text-token-primary outline-none"
               />
             </div>
 
-            <div className="pt-2 border-t border-[rgba(0,0,0,0.06)] space-y-3">
+            <div className="pt-2 border-t border-subtle-token space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#3B6FD4]">
+                <span className="type-11 weight-bold uppercase tracking-wider text-token-accent">
                   Team Members ({teamMembers.length}/4)
                 </span>
                 {teamMembers.length < 4 && (
                   <button
                     type="button"
                     onClick={handleAddMember}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-[#3B6FD4] hover:text-[#2a54a7] transition-colors"
+                    className="inline-flex items-center gap-1 type-xs weight-bold text-token-accent hover:text-token-accent-dark transition-colors"
                   >
                     <Plus size={14} /> Add Teammate
                   </button>
@@ -134,10 +134,10 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
               {teamMembers.map((m, idx) => (
                 <div
                   key={idx}
-                  className="p-3 rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)] space-y-2.5"
+                  className="p-3 rounded-2xl surface-token border border-subtle-token space-y-2.5"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-[#1A1D23]">
+                    <span className="type-11 weight-bold text-token-primary">
                       {idx === 0
                         ? "Member 1 (Team Leader - Mandatory)"
                         : `Member ${idx + 1}`}
@@ -146,7 +146,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                       <button
                         type="button"
                         onClick={() => handleRemoveMember(idx)}
-                        className="text-xs font-bold text-[#D6453D] hover:underline"
+                        className="type-xs weight-bold text-token-error hover:underline"
                       >
                         Remove
                       </button>
@@ -163,7 +163,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                       onChange={(e) =>
                         handleMemberChange(idx, "name", e.target.value)
                       }
-                      className="h-9 rounded-xl bg-white border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
+                      className="h-9 rounded-xl surface-card-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none"
                     />
                     <input
                       type="tel"
@@ -177,7 +177,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                           e.target.value.replace(/\D/g, "").slice(0, 10),
                         )
                       }
-                      className="h-9 rounded-xl bg-white border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
+                      className="h-9 rounded-xl surface-card-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none"
                     />
                   </div>
                   <input
@@ -187,7 +187,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                     onChange={(e) =>
                       handleMemberChange(idx, "email", e.target.value)
                     }
-                    className="h-9 w-full rounded-xl bg-white border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
+                    className="h-9 w-full rounded-xl surface-card-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none"
                   />
                 </div>
               ))}
@@ -198,19 +198,19 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
         {mode === "existingTeam" && (
           <>
             <div>
-              <label className="text-xs font-bold text-[#1A1D23]">
+              <label className="type-xs weight-bold text-token-primary">
                 Select Existing Target Team
               </label>
               <select
                 value={targetTeamId}
                 onChange={(e) => setTargetTeamId(e.target.value)}
-                className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none cursor-pointer"
+                className="mt-1 h-10 w-full rounded-2xl field-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none cursor-pointer"
               >
                 {teams.map((t) => (
                   <option
                     key={t.id}
                     value={t.id}
-                    className="bg-white text-[#1A1D23]"
+                    className="surface-card-token text-token-primary"
                   >
                     {t.team}: {t.teamName} ({t.college})
                   </option>
@@ -218,7 +218,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
               </select>
             </div>
             <div>
-              <label className="text-xs font-bold text-[#1A1D23]">
+              <label className="type-xs weight-bold text-token-primary">
                 New Teammate Name
               </label>
               <input
@@ -227,7 +227,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                 placeholder="Full Name"
                 value={memberName}
                 onChange={(e) => setMemberName(e.target.value)}
-                className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-semibold text-[#1A1D23] outline-none"
+                className="mt-1 h-10 w-full rounded-2xl field-token border border-token px-3.5 type-xs weight-semibold text-token-primary outline-none"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -237,7 +237,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                 placeholder="Email Address"
                 value={memberEmail}
                 onChange={(e) => setMemberEmail(e.target.value)}
-                className="h-10 rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
+                className="h-10 rounded-2xl field-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none"
               />
               <input
                 type="tel"
@@ -248,7 +248,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                 onChange={(e) =>
                   setMemberPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
                 }
-                className="h-10 rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
+                className="h-10 rounded-2xl field-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none"
               />
             </div>
           </>
@@ -257,7 +257,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
         {mode === "individual" && (
           <>
             <div>
-              <label className="text-xs font-bold text-[#1A1D23]">
+              <label className="type-xs weight-bold text-token-primary">
                 Individual Participant Name
               </label>
               <input
@@ -266,11 +266,11 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                 placeholder="Full Name"
                 value={memberName}
                 onChange={(e) => setMemberName(e.target.value)}
-                className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-semibold text-[#1A1D23] outline-none"
+                className="mt-1 h-10 w-full rounded-2xl field-token border border-token px-3.5 type-xs weight-semibold text-token-primary outline-none"
               />
             </div>
             <div>
-              <label className="text-xs font-bold text-[#1A1D23]">
+              <label className="type-xs weight-bold text-token-primary">
                 College / Organization
               </label>
               <input
@@ -278,7 +278,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                 placeholder="e.g. Stanford University"
                 value={college}
                 onChange={(e) => setCollege(e.target.value)}
-                className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-semibold text-[#1A1D23] outline-none"
+                className="mt-1 h-10 w-full rounded-2xl field-token border border-token px-3.5 type-xs weight-semibold text-token-primary outline-none"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -288,7 +288,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                 placeholder="Email Address"
                 value={memberEmail}
                 onChange={(e) => setMemberEmail(e.target.value)}
-                className="h-10 rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
+                className="h-10 rounded-2xl field-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none"
               />
               <input
                 type="tel"
@@ -299,7 +299,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
                 onChange={(e) =>
                   setMemberPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
                 }
-                className="h-10 rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none"
+                className="h-10 rounded-2xl field-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none"
               />
             </div>
           </>
@@ -309,7 +309,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
           <GlassButton
             type="button"
             onClick={onClose}
-            className="h-9 text-xs rounded-full"
+            className="h-9 type-xs rounded-full"
           >
             Cancel
           </GlassButton>
@@ -317,7 +317,7 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
             type="submit"
             variant="primary"
             icon={<Plus size={15} />}
-            className="h-9 text-xs rounded-full"
+            className="h-9 type-xs rounded-full"
           >
             Save Participant
           </GlassButton>
@@ -332,43 +332,43 @@ export function ImportModal({ open, onClose }) {
   return (
     <GlassModal
       open={open}
-      className="w-[min(720px,calc(100vw-32px))] max-w-none bg-white border border-[rgba(0,0,0,0.08)] rounded-3xl p-6 text-[#1A1D23]"
+      className="w-[min(720px,calc(100vw-32px))] max-w-none surface-card-token border border-token rounded-3xl p-6 text-token-primary"
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-[#1A1D23]">
+          <h2 className="type-xl weight-bold text-token-primary">
             Import participants
           </h2>
-          <p className="mt-1 text-xs font-medium text-[#5A6577]">
+          <p className="mt-1 type-xs weight-medium text-token-secondary">
             Upload a CSV exported from your registration platform.
           </p>
         </div>
         <button
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F0F2F5] text-[#5A6577] hover:bg-[#E8ECF1] hover:text-[#1A1D23]"
+          className="flex h-9 w-9 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary"
           onClick={onClose}
           aria-label="Close import modal"
         >
           <X size={18} strokeWidth={2} />
         </button>
       </div>
-      <div className="mt-6 rounded-2xl border-2 border-dashed border-[rgba(0,0,0,0.12)] bg-[#F7F8FA] p-8 text-center">
-        <Upload className="mx-auto text-[#3B6FD4]" size={30} strokeWidth={2} />
-        <p className="mt-3 text-sm font-bold text-[#1A1D23]">Drop CSV here</p>
-        <p className="mt-1 text-xs font-medium text-[#8E99A8]">
+      <div className="mt-6 rounded-2xl border-2 border-dashed border-token-medium surface-token p-8 text-center">
+        <Upload className="mx-auto text-token-accent" size={30} strokeWidth={2} />
+        <p className="mt-3 type-sm weight-bold text-token-primary">Drop CSV here</p>
+        <p className="mt-1 type-xs weight-medium text-token-muted">
           Team, leader, college, and members columns supported.
         </p>
       </div>
-      <div className="mt-5 overflow-hidden rounded-2xl bg-[#F7F8FA] border border-[rgba(0,0,0,0.06)]">
+      <div className="mt-5 overflow-hidden rounded-2xl surface-token border border-subtle-token">
         {previewRows.map((row) => (
           <div
             key={row.id}
-            className="grid grid-cols-[1fr_1fr_0.8fr] gap-3 border-b border-[rgba(0,0,0,0.06)] px-4 py-3 text-xs last:border-b-0"
+            className="grid grid-cols-[1fr_1fr_0.8fr] gap-3 border-b border-subtle-token px-4 py-3 type-xs last:border-b-0"
           >
-            <span className="truncate font-semibold text-[#1A1D23]">
+            <span className="truncate weight-semibold text-token-primary">
               {row.team}: {row.teamName}
             </span>
-            <span className="truncate text-[#5A6577]">{row.college}</span>
-            <span className="truncate text-[#8E99A8]">
+            <span className="truncate text-token-secondary">{row.college}</span>
+            <span className="truncate text-token-muted">
               {row.members.length} members
             </span>
           </div>

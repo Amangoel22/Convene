@@ -66,11 +66,11 @@ export function IssuesPage() {
   };
 
   return (
-    <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1 text-[#1A1D23]">
+    <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1 text-token-primary">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#1A1D23] md:text-3xl">Operational Issues</h1>
-          <p className="mt-1 text-sm text-[#5A6577] font-medium">
+          <h1 className="type-2xl weight-bold tracking-tight text-token-primary md:type-3xl">Operational Issues</h1>
+          <p className="mt-1 type-sm text-token-secondary weight-medium">
             Log operational issues. Anyone can report an incident or resolve an issue with mandatory feedback.
           </p>
         </div>
@@ -97,33 +97,33 @@ export function IssuesPage() {
           {issues.map((iss) => (
             <div
               key={iss.id}
-              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl bg-white border border-[rgba(0,0,0,0.08)] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl surface-card-token border border-token p-5 shadow-token-card"
             >
               <div className="flex items-start gap-4 min-w-0">
                 <div
                   className={cn(
                     "flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl",
                     iss.status === "Resolved"
-                      ? "bg-[#22A65E]/10 text-[#22A65E]"
-                      : "bg-[#D6453D]/10 text-[#D6453D]"
+                      ? "bg-token-success/10 text-token-success"
+                      : "bg-token-error/10 text-token-error"
                   )}
                 >
                   {iss.status === "Resolved" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
                 </div>
                 <div className="min-w-0 space-y-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-bold text-[#1A1D23] truncate">{iss.title}</h4>
-                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#F0F2F5] text-[#5A6577]">
+                    <h4 className="type-sm weight-bold text-token-primary truncate">{iss.title}</h4>
+                    <span className="type-10 weight-extrabold uppercase px-2 py-0.5 rounded-full field-token text-token-secondary">
                       {iss.priority}
                     </span>
                   </div>
-                  <p className="text-xs font-medium text-[#8E99A8]">
-                    Reported by <span className="font-bold text-[#1A1D23]">{iss.reporter}</span>
+                  <p className="type-xs weight-medium text-token-muted">
+                    Reported by <span className="weight-bold text-token-primary">{iss.reporter}</span>
                   </p>
-                  {iss.notes && <p className="text-xs font-medium text-[#5A6577]">{iss.notes}</p>}
+                  {iss.notes && <p className="type-xs weight-medium text-token-secondary">{iss.notes}</p>}
                   {iss.status === "Resolved" && iss.resolutionFeedback && (
-                    <p className="text-xs font-medium text-[#22A65E] bg-[#22A65E]/10 p-2 rounded-xl mt-1">
-                      <span className="font-bold">Resolution Note:</span> {iss.resolutionFeedback}
+                    <p className="type-xs weight-medium text-token-success bg-token-success/10 p-2 rounded-xl mt-1">
+                      <span className="weight-bold">Resolution Note:</span> {iss.resolutionFeedback}
                     </p>
                   )}
                 </div>
@@ -132,10 +132,10 @@ export function IssuesPage() {
               <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
                 <span
                   className={cn(
-                    "rounded-full px-3 py-1 text-xs font-bold border",
+                    "rounded-full px-3 py-1 type-xs weight-bold border",
                     iss.status === "Resolved"
-                      ? "bg-[#22A65E]/10 text-[#22A65E] border-[#22A65E]/20"
-                      : "bg-[#F0F2F5] text-[#1A1D23] border-[rgba(0,0,0,0.08)]"
+                      ? "bg-token-success/10 text-token-success border-token-success/20"
+                      : "field-token text-token-primary border-token"
                   )}
                 >
                   {iss.status}
@@ -146,7 +146,7 @@ export function IssuesPage() {
                     variant="success"
                     icon={<CheckCircle2 size={14} />}
                     onClick={() => handleOpenResolve(iss)}
-                    className="h-8 px-3.5 text-xs font-bold rounded-full min-h-0"
+                    className="h-8 px-3.5 type-xs weight-bold rounded-full min-h-0"
                   >
                     Resolve
                   </GlassButton>
@@ -161,24 +161,24 @@ export function IssuesPage() {
       <GlassModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} title="Report Operational Issue">
         <form onSubmit={handleCreateIssue} className="space-y-4 pt-2">
           <div>
-            <label className="text-xs font-bold text-[#1A1D23]">Issue Summary / Title</label>
+            <label className="type-xs weight-bold text-token-primary">Issue Summary / Title</label>
             <input
               type="text"
               required
               placeholder="e.g. WiFi latency drop in Lab C"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-semibold text-[#1A1D23] outline-none"
+              className="mt-1 h-10 w-full rounded-2xl field-token border border-token px-3.5 type-xs weight-semibold text-token-primary outline-none"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-bold text-[#1A1D23]">Priority</label>
+              <label className="type-xs weight-bold text-token-primary">Priority</label>
               <select
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value)}
-                className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3 text-xs font-semibold text-[#1A1D23] outline-none cursor-pointer"
+                className="mt-1 h-10 w-full rounded-2xl field-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none cursor-pointer"
               >
                 <option value="Critical">Critical</option>
                 <option value="High">High</option>
@@ -188,33 +188,33 @@ export function IssuesPage() {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-[#1A1D23]">Reporting Team / Member</label>
+              <label className="type-xs weight-bold text-token-primary">Reporting Team / Member</label>
               <input
                 type="text"
                 placeholder="e.g. Tech Team"
                 value={newReporter}
                 onChange={(e) => setNewReporter(e.target.value)}
-                className="mt-1 h-10 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] px-3.5 text-xs font-semibold text-[#1A1D23] outline-none"
+                className="mt-1 h-10 w-full rounded-2xl field-token border border-token px-3.5 type-xs weight-semibold text-token-primary outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-bold text-[#1A1D23]">Incident Details / Notes</label>
+            <label className="type-xs weight-bold text-token-primary">Incident Details / Notes</label>
             <textarea
               rows={3}
               placeholder="Describe what happened and affected venue location..."
               value={newNotes}
               onChange={(e) => setNewNotes(e.target.value)}
-              className="mt-1 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] p-3 text-xs font-medium text-[#1A1D23] outline-none resize-none"
+              className="mt-1 w-full rounded-2xl field-token border border-token p-3 type-xs weight-medium text-token-primary outline-none resize-none"
             />
           </div>
 
           <div className="mt-6 flex justify-end gap-3 pt-2">
-            <GlassButton type="button" onClick={() => setCreateModalOpen(false)} className="h-9 text-xs rounded-full">
+            <GlassButton type="button" onClick={() => setCreateModalOpen(false)} className="h-9 type-xs rounded-full">
               Cancel
             </GlassButton>
-            <GlassButton type="submit" variant="primary" icon={<Plus size={15} />} className="h-9 text-xs rounded-full">
+            <GlassButton type="submit" variant="primary" icon={<Plus size={15} />} className="h-9 type-xs rounded-full">
               Submit Issue
             </GlassButton>
           </div>
@@ -224,27 +224,27 @@ export function IssuesPage() {
       {/* MANDATORY RESOLUTION FEEDBACK MODAL */}
       <GlassModal open={resolveModalOpen} onClose={() => setResolveModalOpen(false)} title="Close Issue & Submit Feedback">
         <form onSubmit={handleConfirmResolve} className="space-y-4 pt-2">
-          <p className="text-xs font-medium text-[#5A6577]">
-            Please enter mandatory resolution feedback explaining how <span className="font-bold text-[#1A1D23]">"{targetIssue?.title}"</span> was fixed.
+          <p className="type-xs weight-medium text-token-secondary">
+            Please enter mandatory resolution feedback explaining how <span className="weight-bold text-token-primary">"{targetIssue?.title}"</span> was fixed.
           </p>
 
           <div>
-            <label className="text-xs font-bold text-[#1A1D23]">Resolution Feedback (Mandatory)</label>
+            <label className="type-xs weight-bold text-token-primary">Resolution Feedback (Mandatory)</label>
             <textarea
               rows={4}
               required
               placeholder="e.g. Replaced router power cord and reset Access Point 3."
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              className="mt-1 w-full rounded-2xl bg-[#F0F2F5] border border-[rgba(0,0,0,0.08)] p-3.5 text-xs font-medium text-[#1A1D23] outline-none resize-none"
+              className="mt-1 w-full rounded-2xl field-token border border-token p-3.5 type-xs weight-medium text-token-primary outline-none resize-none"
             />
           </div>
 
           <div className="mt-6 flex justify-end gap-3 pt-2">
-            <GlassButton type="button" onClick={() => setResolveModalOpen(false)} className="h-9 text-xs rounded-full">
+            <GlassButton type="button" onClick={() => setResolveModalOpen(false)} className="h-9 type-xs rounded-full">
               Cancel
             </GlassButton>
-            <GlassButton type="submit" variant="success" icon={<CheckCircle2 size={15} />} className="h-9 text-xs rounded-full">
+            <GlassButton type="submit" variant="success" icon={<CheckCircle2 size={15} />} className="h-9 type-xs rounded-full">
               Resolve Issue
             </GlassButton>
           </div>

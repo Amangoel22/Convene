@@ -22,6 +22,7 @@ import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { useAppStore } from "@/store/useAppStore";
 import { PageTitle } from "@/components/ui/PageTitle";
+import { getApiBase } from "@/lib/api";
 
 const initialOrganizerDuties = [];
 const initialOrganizerTasks = [];
@@ -72,7 +73,7 @@ export function MissionControlPage() {
     }
     setTasksLoading(true);
     const token = localStorage.getItem("convene_token");
-    const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+    const apiBase = getApiBase();
     Promise.all([
       fetch(`${apiBase}/events/${activeEvent.id}/tasks`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -227,7 +228,7 @@ export function MissionControlPage() {
     const token = localStorage.getItem("convene_token");
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/tasks/${taskId}/status`,
+        `${getApiBase()}/tasks/${taskId}/status`,
         {
           method: "PATCH",
           headers: {

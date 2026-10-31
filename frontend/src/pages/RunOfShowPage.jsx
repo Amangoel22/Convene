@@ -88,6 +88,9 @@ function SelectFilter({ value, onChange, options, label }) {
 }
 
 import { useAppStore } from "@/store/useAppStore";
+import { getApiBase } from "@/lib/api";
+
+const API_BASE = getApiBase();
 
 function StageDrawer({ stage, onClose, onUpdateStatus }) {
   const navigate = useNavigate();
@@ -388,7 +391,7 @@ export function RunOfShowPage() {
     const token = localStorage.getItem("convene_token");
     if (token && stageId && !stageId.startsWith("stg-")) {
       try {
-        await fetch(`http://localhost:8000/api/stages/${stageId}`, {
+        await fetch(`${API_BASE}/stages/${stageId}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -409,7 +412,7 @@ export function RunOfShowPage() {
       updateStageDetails(stageData.id, stageData);
       if (token && stageData.id && !stageData.id.startsWith("stg-")) {
         try {
-          await fetch(`http://localhost:8000/api/stages/${stageData.id}`, {
+          await fetch(`${API_BASE}/stages/${stageData.id}`, {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
@@ -433,7 +436,7 @@ export function RunOfShowPage() {
 
       if (token && activeEvent?.id) {
         try {
-          const res = await fetch(`http://localhost:8000/api/events/${activeEvent.id}/stages`, {
+          const res = await fetch(`${API_BASE}/events/${activeEvent.id}/stages`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

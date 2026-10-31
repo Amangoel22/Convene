@@ -3,9 +3,9 @@ import { PageTitle } from "@/components/ui/PageTitle";
 import { ThemePicker } from "@/components/ui/ThemePicker";
 import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
+import { getApiBase } from "@/lib/api";
 
-const configuredApiUrl = (import.meta.env.VITE_API_URL?.trim() || "http://localhost:8000/api").replace(/\/+$/, "");
-const API_BASE = configuredApiUrl.endsWith("/api") ? configuredApiUrl : `${configuredApiUrl}/api`;
+const API_BASE = getApiBase();
 
 // Reads a saved local preference without allowing malformed values through.
 function readPreference(key, fallback) {

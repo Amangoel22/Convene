@@ -36,3 +36,137 @@
 .login-form-card { width: min(100%, 480px); }
 @media (max-width: 900px) { .login-layout { grid-template-columns: minmax(0, .92fr) minmax(420px, 1fr); }.login-story { padding: 34px; }.login-story-copy h1 { font-size: clamp(2.8rem, 5vw, 4.4rem); } }
 @media (max-width: 700px) { .login-layout { display: block; }.login-story { min-height: auto; padding: 25px 22px 35px; }.login-story-copy { margin: 48px 0 15px; }.login-story-copy h1 { font-size: clamp(2.8rem, 12vw, 4rem); }.login-story-preview { margin: 28px 8px 24px 0; padding: 16px; }.login-preview-update { right: -8px; }.login-story-foot { display: none; }.login-form-side { min-height: auto; padding: 25px 18px 40px; }.login-form-card { padding: 25px !important; } }
+
+/* Preserves the desktop-style story/form split on narrow phones without stacking the form below. */
+@media (max-width: 700px) {
+  .login-layout {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr);
+    align-items: stretch;
+  }
+
+  .login-story {
+    min-height: 100svh;
+    padding: 18px 12px 22px;
+  }
+
+  .login-story-brand {
+    gap: 5px;
+    font-size: 13px;
+  }
+
+  .login-story-brand > span {
+    width: 25px;
+    height: 25px;
+    border-radius: 9px;
+  }
+
+  .login-story-copy {
+    width: 100%;
+    margin: 24px 0 12px;
+  }
+
+  .login-story-eyebrow {
+    font-size: 7px;
+    letter-spacing: 1px;
+  }
+
+  .login-story-copy h1 {
+    margin: 12px 0;
+    font-size: clamp(1.45rem, 8vw, 2.5rem);
+    line-height: .98;
+  }
+
+  .login-story-copy > p:not(.login-story-eyebrow) {
+    font-size: 10px;
+    line-height: 1.55;
+  }
+
+  .login-story-preview {
+    margin: 20px 0 10px;
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .login-preview-heading {
+    gap: 5px;
+  }
+
+  .login-preview-mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+  }
+
+  .login-preview-heading b {
+    font-size: 10px;
+  }
+
+  .login-preview-heading small,
+  .login-preview-heading > i,
+  .login-preview-labels {
+    font-size: 6px;
+  }
+
+  .login-preview-heading > i {
+    padding: 4px 5px;
+  }
+
+  .login-preview-track {
+    margin: 16px 0 7px;
+  }
+
+  .login-preview-track > span {
+    width: 14px;
+    height: 14px;
+    flex-basis: 14px;
+    font-size: 7px;
+  }
+
+  .login-preview-track > span.is-current b {
+    width: 4px;
+    height: 4px;
+  }
+
+  .login-preview-update {
+    right: -5px;
+    bottom: -16px;
+    gap: 5px;
+    padding: 7px 8px;
+    border-radius: 10px;
+  }
+
+  .login-preview-update > span {
+    width: 17px;
+    height: 17px;
+    border-radius: 5px;
+  }
+
+  .login-preview-update b,
+  .login-preview-update small {
+    font-size: 6px;
+  }
+
+  .login-story-foot {
+    display: none;
+  }
+
+  .login-form-side {
+    min-height: 100svh;
+    padding: 12px 8px 18px;
+  }
+
+  .login-form-card {
+    padding: 14px !important;
+    border-radius: 18px !important;
+  }
+
+  .login-form-card h1 {
+    font-size: 1.1rem;
+  }
+
+  .login-form-card .type-xs {
+    font-size: 9px;
+  }
+}

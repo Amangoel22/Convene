@@ -662,3 +662,87 @@ body,
 @media (prefers-reduced-motion: reduce) {
   .theme-toggle-icon { animation: none; }
 }
+
+/* Prevent narrow screens from compressing controls and cards into overlapping columns. */
+@media (max-width: 639px) {
+  html,
+  body,
+  #root {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .app-background > .flex {
+    padding: 0.5rem;
+  }
+
+  .app-background > .flex > .flex-1 {
+    width: 100%;
+    min-width: 0;
+    gap: 0.75rem;
+  }
+
+  .app-content-container {
+    width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+  }
+
+  .app-navbar > div {
+    min-width: 0;
+    gap: 0.5rem;
+  }
+
+  .app-navbar .app-navbar-breadcrumb {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .app-navbar .app-navbar-controls {
+    flex: 0 0 auto;
+    gap: 0.35rem;
+  }
+
+  .app-navbar .app-access-pill {
+    width: 2.25rem;
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .app-navbar .app-access-label {
+    display: none;
+  }
+
+  .app-navbar .app-navbar-controls > * {
+    flex-shrink: 0;
+  }
+
+  /* Two- and three-column summaries/forms become readable single-column stacks. */
+  .grid-cols-2,
+  .grid-cols-3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Search controls with desktop minimum widths fill the phone viewport instead. */
+  [class~="min-w-[220px]"],
+  [class~="min-w-[240px]"] {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .app-content-container .flex-wrap {
+    row-gap: 0.625rem;
+  }
+
+  .app-content-container table {
+    font-size: 0.75rem;
+  }
+
+  /* Drawers and dialogs keep safe edges and never exceed the visual viewport. */
+  [role="dialog"],
+  .fixed.z-50 {
+    max-width: calc(100vw - 1rem);
+  }
+}

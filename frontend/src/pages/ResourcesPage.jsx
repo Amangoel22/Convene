@@ -9,7 +9,8 @@ import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { PageTitle } from "@/components/ui/PageTitle";
 import { isEventComplete } from "@/lib/utils";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+import { getApiBase } from "@/lib/api";
+const API_BASE = getApiBase();
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_FILE_TYPES = ".pdf,.jpg,.jpeg,.png,.csv,.xls,.xlsx";
 

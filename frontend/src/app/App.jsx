@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import { AppShell } from "@/layouts/AppShell";
 import { useAppStore } from "@/store/useAppStore";
+import { getApiBase } from "@/lib/api";
 
 // Purpose: load named page exports only when their route is opened.
 const lazyPage = (loader, exportName) => lazy(() => loader().then((module) => ({ default: module[exportName] })));
@@ -54,7 +55,7 @@ function ProtectedRoute({ children }) {
       }
 
       try {
-        const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+        const API_BASE = getApiBase();
         const res = await fetch(`${API_BASE}/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`

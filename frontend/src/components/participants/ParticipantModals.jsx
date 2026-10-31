@@ -5,7 +5,8 @@ import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
 import { cn } from "@/lib/utils";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+import { getApiBase } from "@/lib/api";
+const API_BASE = getApiBase();
 const MAX_IMPORT_SIZE = 5 * 1024 * 1024;
 
 export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {

@@ -50,12 +50,12 @@ export function Navbar({ onMenuOpen }) {
   }, []);
 
   return (
-    <header className={cn("sticky top-0 z-20 surface-token py-2 border-b border-subtle-token transition-colors", scrolled && "app-navbar-scrolled")}>
+    <header className={cn("app-navbar sticky top-0 z-20 surface-token py-2 border-b border-subtle-token transition-colors", scrolled && "app-navbar-scrolled")}>
       <div className="flex h-12 items-center px-1">
         <GlassButton onClick={onMenuOpen} className="flex lg:hidden h-8 w-8 min-h-0 p-0" icon={<Menu size={18} strokeWidth={1.75} />} aria-label="Open navigation" />
 
         {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 type-xs weight-semibold text-token-secondary">
+        <div className="app-navbar-breadcrumb flex items-center gap-1.5 type-xs weight-semibold text-token-secondary">
           <span className="text-token-muted">Convene</span>
           <span className="text-token-muted">/</span>
           <span className="text-token-primary weight-bold">{pageTitle}</span>
@@ -64,7 +64,7 @@ export function Navbar({ onMenuOpen }) {
         <div className="flex-1" />
 
         {/* Right Section Controls */}
-        <div className="flex items-center gap-3">
+        <div className="app-navbar-controls flex items-center gap-3">
           {/* Search Bar */}
           <div className="hidden sm:flex items-center gap-2.5 h-9 rounded-full field-token border border-token px-3.5 type-xs weight-medium text-token-primary focus-within:ring-1 focus-within:ring-token-accent transition-all w-52 lg:w-64">
             <Search size={15} className="text-token-muted shrink-0" />
@@ -130,11 +130,11 @@ export function Navbar({ onMenuOpen }) {
 
           {/* Actual event access */}
           <div
-            className="flex items-center gap-1.5 h-9 rounded-full accent-surface-token border border-token-accent/20 px-3 type-xs weight-bold text-token-accent"
+            className="app-access-pill flex items-center gap-1.5 h-9 rounded-full accent-surface-token border border-token-accent/20 px-3 type-xs weight-bold text-token-accent"
             title="Your access for the selected event"
           >
             <ShieldCheck size={14} />
-            <span>{isLead ? "Lead Organizer" : "Team Member"}</span>
+            <span className="app-access-label">{isLead ? "Lead Organizer" : "Team Member"}</span>
           </div>
 
           {/* Profile Avatar */}

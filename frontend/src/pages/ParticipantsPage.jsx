@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { PageTitle } from "@/components/ui/PageTitle";
 import { useAppStore } from "@/store/useAppStore";
 import { isEventComplete } from "@/lib/utils";
+import { getApiBase } from "@/lib/api";
 import { ParticipantDrawer } from "@/components/participants/ParticipantDrawer";
 import {
   CreateParticipantModal,
@@ -20,7 +21,7 @@ import {
   StatusPill,
 } from "@/components/participants/ParticipantsComponents";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+const API_BASE = getApiBase();
 
 function useDebouncedValue(value, delay = 180) {
   const [debounced, setDebounced] = useState(value);
@@ -58,7 +59,7 @@ export function ParticipantsPage() {
 
     try {
       if (!eventId && token) {
-        const eventsRes = await fetch("http://localhost:8000/api/events", {
+        const eventsRes = await fetch(`${API_BASE}/events`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (eventsRes.ok) {
@@ -75,7 +76,7 @@ export function ParticipantsPage() {
         return;
       }
 
-      const res = await fetch(`http://localhost:8000/api/events/${eventId}`, {
+      const res = await fetch(`${API_BASE}/events/${eventId}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
@@ -267,7 +268,7 @@ export function ParticipantsPage() {
     const token = localStorage.getItem("convene_token");
     try {
       await fetch(
-        `http://localhost:8000/api/participants/teams/${teamId}/status`,
+        `${API_BASE}/participants/teams/${teamId}/status`,
         {
           method: "PATCH",
           headers: {
@@ -300,7 +301,7 @@ export function ParticipantsPage() {
 
     const token = localStorage.getItem("convene_token");
     try {
-      await fetch(`http://localhost:8000/api/participants/${memberId}/status`, {
+      await fetch(`${API_BASE}/participants/${memberId}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -352,7 +353,7 @@ export function ParticipantsPage() {
     if (eventId) {
       try {
         const res = await fetch(
-          `http://localhost:8000/api/participants/${eventId}/register`,
+          `${API_BASE}/participants/${eventId}/register`,
           {
             method: "POST",
             headers: {
@@ -390,7 +391,7 @@ export function ParticipantsPage() {
 
       try {
         await fetch(
-          `http://localhost:8000/api/participants/${memberId}/status`,
+          `${API_BASE}/participants/${memberId}/status`,
           {
             method: "PATCH",
             headers: {
@@ -416,7 +417,7 @@ export function ParticipantsPage() {
 
       try {
         await fetch(
-          `http://localhost:8000/api/participants/teams/${teamId}/notes`,
+          `${API_BASE}/participants/teams/${teamId}/notes`,
           {
             method: "PATCH",
             headers: {

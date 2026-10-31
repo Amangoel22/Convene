@@ -11,7 +11,8 @@ import { PageTitle } from "@/components/ui/PageTitle";
 import { isEventComplete } from "@/lib/utils";
 
 const initialInventory = [];
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+import { getApiBase } from "@/lib/api";
+const API_BASE = getApiBase();
 
 import { useEffect } from "react";
 

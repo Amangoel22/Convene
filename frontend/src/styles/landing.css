@@ -424,3 +424,93 @@ html { scroll-behavior: smooth; scroll-padding-top: 92px; }
 .landing-orbit-item.node-e, .landing-orbit-item.node-f, .landing-orbit-item.node-g, .landing-orbit-item.node-h { width: 84px; height: 84px; }
 @keyframes landing-step-fill { 0% { width: 0; background-color: var(--landing-accent); } 99% { width: 100%; background-color: var(--landing-accent); } 100% { width: 100%; background-color: var(--color-success); } }
 @media (max-width: 700px) { .landing-why-visual { min-height: 410px; }.landing-orbit, .landing-orbit-contents { width: min(88vw, 360px); }.landing-orbit-item.node-e, .landing-orbit-item.node-f, .landing-orbit-item.node-g, .landing-orbit-item.node-h { width: 70px; height: 70px; }.landing-orbit-item.node-e { top: 12%; right: 12%; }.landing-orbit-item.node-f { right: 12%; bottom: 12%; }.landing-orbit-item.node-g { bottom: 12%; left: 12%; }.landing-orbit-item.node-h { top: 12%; left: 12%; } }
+/* Keeps section 03 readable on narrow phones without changing desktop composition. */
+@media (max-width: 480px) {
+  .landing-how,
+  .landing-how .landing-section-main,
+  .landing-how .landing-steps,
+  .landing-how .landing-step {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .landing-how .landing-section-index {
+    width: 100%;
+  }
+
+  .landing-how .landing-section-index span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .landing-how .landing-section-kicker {
+    display: block;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+  }
+
+  .landing-how .landing-section-title {
+    max-width: 100%;
+    font-size: clamp(2.75rem, 14vw, 4rem);
+    line-height: .98;
+    overflow-wrap: anywhere;
+  }
+
+  .landing-how .landing-section-intro {
+    max-width: 100%;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  .landing-how .landing-steps {
+    margin-top: 30px;
+    gap: 18px;
+  }
+
+  .landing-how .landing-step {
+    min-height: 140px;
+    padding: 22px 14px 26px 58px;
+  }
+
+  .landing-how .landing-step h3 {
+    font-size: 1.1rem;
+  }
+
+  .landing-how .landing-step p {
+    max-width: 100%;
+    font-size: .8rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+
+  .landing-how .landing-step-progress {
+    right: 14px;
+    left: 58px;
+  }
+}
+
+/* Keeps the login action discoverable in the compact landing navigation. */
+@media (max-width: 900px) {
+  .landing-nav-actions {
+    gap: 10px;
+  }
+
+  .landing-login-link {
+    display: inline-flex;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-login-link {
+    font-size: 10px;
+  }
+
+  .landing-nav-cta {
+    padding-inline: 10px;
+    font-size: 11px;
+  }
+}

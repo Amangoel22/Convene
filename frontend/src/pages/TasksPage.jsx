@@ -33,7 +33,8 @@ const statuses = [
   "In Progress",
   "Completed",
 ];
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+import { getApiBase } from "@/lib/api";
+const API_BASE = getApiBase();
 
 function formatTask(task) {
   const member = task.assignedOrgMember;

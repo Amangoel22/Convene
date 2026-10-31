@@ -7,6 +7,13 @@ import { ConveneMark } from "@/components/brand/ConveneMark";
 import { LogIn, UserPlus, Sparkles, AlertCircle, ShieldCheck } from "lucide-react";
 import "@/styles/login.css";
 
+// Resolves the API origin consistently for local and Render deployments.
+function getApiBase() {
+  const configuredUrl = import.meta.env.VITE_API_URL?.trim() || "http://localhost:8000/api";
+  const normalizedUrl = configuredUrl.replace(/\/+$/, "");
+  return normalizedUrl.endsWith("/api") ? normalizedUrl : `${normalizedUrl}/api`;
+}
+
 export function LoginPage() {
   const navigate = useNavigate();
   const setUserSession = useAppStore((state) => state.setUserSession);
@@ -26,7 +33,7 @@ export function LoginPage() {
   const [regPhone, setRegPhone] = useState("");
   const [regInviteKey, setRegInviteKey] = useState("");
 
-  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+  const API_BASE = getApiBase();
 
   const handleSubmit = async (e) => {
     e.preventDefault();

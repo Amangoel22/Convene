@@ -184,6 +184,8 @@ app.get("/docs", (req, res) => {
 
 // Mounting API Routes
 app.use("/api/auth", authRoutes);
+// Backward-compatible auth mount for older frontend bundles that omit the /api prefix.
+app.use("/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/events", taskRoutes);
 app.use("/api/stages", stageRoutes);

@@ -134,7 +134,8 @@ function ProtectedRoute({ children }) {
   }
 
   if (!isValid) {
-    return <Navigate to="/login" replace />;
+    // Send unauthenticated deep links back to the public landing page.
+    return <Navigate to="/" replace />;
   }
 
   return children;

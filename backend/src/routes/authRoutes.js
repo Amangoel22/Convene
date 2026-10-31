@@ -133,4 +133,32 @@ router.get("/me", authenticate, (req, res) => {
   return res.status(200).json({ user: req.user });
 });
 
+// -------------------------------------------------------------
+// PATCH /api/auth/password - Change the authenticated user's password
+// -------------------------------------------------------------
+// Verifies the current password before persisting a newly hashed password.
+router.patch("/password", authenticate, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: "Current password and new password are required." });
+  }
+  if (typeof newPassword !== "string" || newPassword.length < 8) {
+    return res.status(400).json({ error: "New password must be at least 8 characters long." });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({ where: { id: req.user.id }, select: { passwordHash: true } });
+    if (!user || !(await comparePassword(currentPassword, user.passwordHash))) {
+      return res.status(401).json({ error: "Current password is incorrect." });
+    }
+
+    const passwordHash = await hashPassword(newPassword);
+    await prisma.user.update({ where: { id: req.user.id }, data: { passwordHash } });
+    return res.status(200).json({ message: "Password changed successfully." });
+  } catch (error) {
+    return res.status(500).json({ error: "Password change failed.", details: error.message });
+  }
+});
+
 export default router;

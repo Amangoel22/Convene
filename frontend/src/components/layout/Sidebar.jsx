@@ -52,7 +52,7 @@ const navSections = [
   }
 ];
 
-export function Sidebar() {
+export function Sidebar({ mobileOpen = false, onClose }) {
   const navigate = useNavigate();
   const role = useAppStore((state) => state.role);
   const currentUser = useAppStore((state) => state.currentUser);
@@ -65,7 +65,9 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 flex-col surface-card-token border-r border-token px-5 py-6 font-sans lg:flex">
+    <>
+    {mobileOpen && <button type="button" aria-label="Close navigation" onClick={onClose} className="mobile-sidebar-backdrop fixed inset-0 z-30 lg:hidden" />}
+    <aside className={cn("fixed left-0 top-0 z-40 h-screen w-64 flex-col surface-card-token border-r border-token px-5 py-6 font-sans transition-transform lg:flex", mobileOpen ? "flex translate-x-0" : "hidden -translate-x-full lg:translate-x-0")}>
       {/* Brand Header */}
       <div className="flex items-center gap-3 px-2 mb-8">
         <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-token-accent text-token-inverse shadow-md">
@@ -89,6 +91,7 @@ export function Sidebar() {
                 <NavLink
                   key={item.label}
                   to={item.href}
+                  onClick={onClose}
                   className={({ isActive }) =>
                     cn(
                       "group relative flex h-10 items-center gap-3.5 rounded-full px-4 type-xs weight-semibold transition-colors duration-200",
@@ -140,5 +143,6 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }

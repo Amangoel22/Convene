@@ -7,7 +7,7 @@ import { GlassButton } from "@/components/glass/GlassButton";
 import { useAppStore } from "@/store/useAppStore";
 import { cn } from "@/lib/utils";
 
-export function Navbar() {
+export function Navbar({ onMenuOpen }) {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -52,7 +52,7 @@ export function Navbar() {
   return (
     <header className={cn("sticky top-0 z-20 surface-token py-2 border-b border-subtle-token transition-colors", scrolled && "app-navbar-scrolled")}>
       <div className="flex h-12 items-center px-1">
-        <GlassButton className="flex lg:hidden h-8 w-8 min-h-0 p-0" icon={<Menu size={18} strokeWidth={1.75} />} aria-label="Open navigation" />
+        <GlassButton onClick={onMenuOpen} className="flex lg:hidden h-8 w-8 min-h-0 p-0" icon={<Menu size={18} strokeWidth={1.75} />} aria-label="Open navigation" />
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-1.5 type-xs weight-semibold text-token-secondary">

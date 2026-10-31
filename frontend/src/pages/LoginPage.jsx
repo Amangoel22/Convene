@@ -45,7 +45,17 @@ export function LoginPage() {
         body: JSON.stringify(payload)
       });
 
-      const data = await res.json();
+      // Parse the response defensively so a misconfigured deployment reports the API problem clearly.
+      const responseText = await res.text();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        if (responseText.trimStart().startsWith("<!DOCTYPE") || responseText.trimStart().startsWith("<html")) {
+          throw new Error("The frontend is not connected to the backend API. Set VITE_API_URL to the deployed backend URL and rebuild the frontend.");
+        }
+        throw new Error("The server returned an invalid authentication response.");
+      }
 
       if (!res.ok) {
         throw new Error(data.error || "Authentication failed.");

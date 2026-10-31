@@ -338,6 +338,9 @@ select::-ms-expand {
   pointer-events: none;
 }
 
+/* Purpose: provide a readable mobile navigation layer without affecting desktop layout. */
+.mobile-sidebar-backdrop { background: rgb(15 23 42 / 0.32); }
+
 /* Provides the subtle glass treatment used while the workspace scrolls. */
 .app-navbar-scrolled {
   background-color: color-mix(in srgb, var(--color-bg-primary) 88%, transparent);

@@ -1,7 +1,7 @@
 // Purpose: AppLayout implements this source module.
 import { AnimatePresence } from "framer-motion";
 import { Outlet } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ContentContainer } from "@/components/layout/ContentContainer";
 import { Navbar } from "@/components/layout/Navbar";
 import { PageTransition } from "@/components/layout/PageTransition";
@@ -10,6 +10,7 @@ import { useAppStore } from "@/store/useAppStore";
 
 export function AppLayout() {
   const themePalette = useAppStore((state) => state.themePalette);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.dataset.theme = "convene";
@@ -19,9 +20,9 @@ export function AppLayout() {
   return (
     <div className="app-background min-h-screen" data-theme="convene" data-convene-palette={themePalette}>
       <div className="flex min-h-screen w-full px-4 py-4 md:px-6 lg:px-8">
-        <Sidebar />
+        <Sidebar mobileOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
         <div className="flex min-w-0 flex-1 flex-col gap-6 pl-0 lg:pl-64">
-          <Navbar />
+          <Navbar onMenuOpen={() => setMobileNavOpen(true)} />
           <AnimatePresence mode="wait">
             <PageTransition>
               <ContentContainer>

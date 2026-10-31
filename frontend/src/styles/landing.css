@@ -283,6 +283,29 @@ html { scroll-behavior: smooth; scroll-padding-top: 92px; }
 @keyframes landing-rule-sweep { from { transform: translateX(-110%); } to { transform: translateX(280%); } }
 @media (max-width: 1100px) { .landing-what .landing-section-main, .landing-capabilities .landing-section-main { grid-template-columns: minmax(230px, .9fr) minmax(240px, 1fr); align-items: start; }.landing-section-intro-block { grid-column: 1; grid-row: 1; }.landing-feature-stage, .landing-capability-stage { grid-column: 1; grid-row: 2; min-height: 220px; }.landing-feature-grid, .landing-capability-grid { grid-column: 2; grid-row: 1 / span 2; }.landing-team-band { grid-template-columns: minmax(80px, .2fr) 1fr 1fr; gap: 25px; padding-inline: 6vw; } }
 @media (max-width: 700px) { html { scroll-padding-top: 72px; }.landing-title { font-size: clamp(3.7rem, 17vw, 6rem); }.landing-what .landing-section-main, .landing-capabilities .landing-section-main { grid-template-columns: 1fr; gap: 22px; }.landing-section-intro-block, .landing-feature-stage, .landing-capability-stage, .landing-feature-grid, .landing-capability-grid { grid-column: 1; grid-row: auto; }.landing-feature-stage, .landing-capability-stage { min-height: 185px; }.landing-feature-grid, .landing-capability-grid { gap: 8px; }.landing-feature-card { padding: 12px; }.landing-how .landing-steps { gap: 14px; }.landing-steps::before { top: 18px; right: auto; bottom: 22px; left: 19px; width: 1px; height: auto; }.landing-step { min-height: 145px; padding: 22px 14px 28px 62px; }.landing-step-number { top: 17px; }.landing-step-progress { left: 62px; }.landing-team-band { grid-template-columns: 1fr; gap: 22px; padding-inline: 22px; }.landing-team-band .landing-section-index, .landing-team-band .landing-team-copy, .landing-team-band .landing-role-stack { grid-column: 1; }.landing-team-band .landing-section-index { min-height: 48px; }.landing-team-band .landing-section-index::after { top: 41px; bottom: auto; height: 30px; }.landing-team-band .landing-team-copy h2 { font-size: clamp(3rem, 13vw, 5rem); }.landing-why-visual { min-height: 390px; }.landing-orbit, .landing-orbit-contents { width: min(88vw, 340px); }.landing-orbit-item, .landing-orbit-item.node-a, .landing-orbit-item.node-c { width: 70px; height: 70px; }.landing-orbit-item.node-a { left: calc(50% - 35px); }.landing-orbit-item.node-c { left: calc(50% - 35px); }.landing-orbit-item.node-b { top: calc(50% - 35px); }.landing-orbit-item.node-d { top: calc(50% - 35px); }.landing-orbit-node { width: 43px; height: 43px; }.landing-why-core { width: 142px; height: 142px; }.landing-float-task.float-position-0 { top: 0; right: 0; }.landing-float-task.float-position-1 { right: 0; bottom: 0; }.landing-float-task.float-position-2 { top: 0; left: 0; }.landing-float-task.float-position-3 { bottom: 0; left: 0; } }
+
+/* Keeps the landing experience usable on phones and narrow tablets. */
+@media (max-width: 900px) {
+  .landing-nav { height: 72px; padding-inline: 20px; }
+  .landing-nav-links { display: none; }
+  .landing-nav-actions { gap: 12px; }
+  .landing-login-link { display: none; }
+  .landing-nav-cta { min-height: 38px; padding-inline: 14px; }
+  .landing-hero { min-height: auto; padding: 126px 24px 78px; }
+  .landing-title { font-size: clamp(3.4rem, 12vw, 5.5rem); }
+  .landing-hero-subtitle { font-size: 15px; }
+  .landing-product-visual { min-height: 430px; }
+}
+
+/* Prevents the palette menu from extending beyond a phone viewport. */
+@media (max-width: 480px) {
+  .theme-picker-menu { right: 0; width: min(17rem, calc(100vw - 24px)); }
+  .landing-nav { padding-inline: 14px; }
+  .landing-brand { font-size: 18px; }
+  .landing-nav-cta { min-height: 36px; padding-inline: 12px; }
+  .landing-hero { padding-inline: 18px; }
+  .landing-title { font-size: clamp(3rem, 15vw, 4.5rem); }
+}
 /* Tightens the section rail and lets section 01's card hover replace its copy. */
 .landing-section { column-gap: clamp(22px, 3vw, 52px); padding-inline: clamp(22px, 8vw, 132px); }
 .landing-nav { position: fixed; transition: transform 260ms ease, background-color 260ms ease, border-color 260ms ease; }

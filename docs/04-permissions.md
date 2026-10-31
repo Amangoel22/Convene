@@ -10,6 +10,8 @@
 | View participant own QR | future API | yes |
 | Verify entry QR | yes, same event only | no |
 | Edit participant check-in | yes | no |
+| Report an issue | yes | yes |
+| Close an issue | yes | yes |
 
 ## Organizer access
 
@@ -30,3 +32,4 @@
 - Check membership for that exact event.
 - Never trust an event ID supplied only in a body when the target record already has an event.
 - QR verification must check organizer membership for the participant's event.
+- Issue reporting derives the reporter from the authenticated JWT; the client cannot choose another reporter.

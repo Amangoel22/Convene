@@ -17,7 +17,7 @@ Participants see only events they belong to. They can view event information, ve
 2. A user must have event membership before reading event data.
 3. Organizing teams are event-specific. A person can have one primary organizing team per event.
 4. Pre-event tasks may be assigned to any organizing member; team context is optional.
-5. Event-day duties are separate from teams. They use categories such as Registration, Food, Security, and Technical and may have multiple assignees.
+5. Event-day duties are separate from teams and may have multiple assignees.
 6. Participants cannot access organizer tools or another event.
 7. Venue records are reusable inside an event and contain optional map data and images.
 
@@ -25,4 +25,4 @@ Participants see only events they belong to. They can view event information, ve
 Authentication, events, organizer teams and members, participant teams, participant QR/check-in, venues, run of show, tasks, duties, resources, issues, and mission-control dashboard.
 
 ## Later
-Inventory transactions, announcements, notifications, analytics, realtime updates, imports, and participant feedback.
+Inventory transactions, announcements, browser notification delivery, analytics, realtime updates, and participant feedback workflows.

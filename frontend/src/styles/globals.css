@@ -46,8 +46,8 @@ html[data-convene-reduced-motion="true"] *::after {
   --landing-accent: #3B6FD4;
   --landing-line: rgba(20, 35, 54, 0.12);
   --landing-glow: rgba(59, 111, 212, 0.16);
-  --landing-display-size: clamp(3.75rem, 8.2vw, 7.5rem);
-  --landing-section-size: clamp(3.4rem, 5.6vw, 6rem);
+  --landing-display-size: clamp(3.25rem, 6.8vw, 6rem);
+  --landing-section-size: clamp(3.1rem, 5vw, 5.25rem);
   --landing-heading-compact: 1.25rem;
   --landing-body-size: 1rem;
   --landing-body-compact: 0.875rem;

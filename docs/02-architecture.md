@@ -6,7 +6,8 @@
 - Backend: Node.js + Express
 - Database: PostgreSQL through Prisma
 - Authentication: JWT and bcrypt
-- File storage: external object storage; database stores URLs only
+- File storage: private Supabase Storage; database stores object paths and resource metadata while the API returns short-lived signed URLs
+- Spreadsheet processing: SheetJS (`xlsx`) in the backend
 
 ## Boundaries
 
@@ -20,7 +21,7 @@ Use transactions when a request changes multiple related records.
 
 ## Frontend flow
 
-The active event is selected from the authenticated user's memberships. Pages request data for that event only. Server state should eventually move to TanStack Query; the current app uses a Zustand store for session and active-event UI state.
+The active event is selected from the authenticated user's memberships. Pages request data for that event only. The app uses a Zustand store for session, active-event, and theme UI state; route-level page loading uses React lazy loading and Suspense.
 
 ## Important distinction
 

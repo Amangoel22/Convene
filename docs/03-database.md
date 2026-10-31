@@ -24,10 +24,10 @@
 - `Venue`: reusable event location with address, map coordinates, and map URL.
 - `VenueImage`: ordered venue image URLs.
 - `Stage`: run-of-show item with `startAt`, `endAt`, optional venue, and optional owning org team.
-- `Duty`: event-day shift with `DutyCategory`, timestamps, optional venue, and notes.
+- `Duty`: event-day shift with timestamps, optional venue, notes, and assignments.
 - `DutyAssignment`: many-to-many assignment of users to duties.
 - `EventResource`: event file metadata and external URL.
-- `Issue`: operational incident with optional org team, reporter, assignee, status, and resolution feedback.
+- `Issue`: operational incident with reporter, priority, status, notes, and resolution feedback. Issues are not assigned to users.
 
 ## Design decisions
 

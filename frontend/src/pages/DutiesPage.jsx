@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
-import { cn, isEventComplete } from "@/lib/utils";
+import { cn, formatDisplayTime, isEventComplete } from "@/lib/utils";
 import { PageTitle } from "@/components/ui/PageTitle";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
@@ -28,7 +28,7 @@ function timeLabel(value) {
   const date = new Date(value);
   return Number.isNaN(date.getTime())
     ? "Time not set"
-    : date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    : formatDisplayTime(date);
 }
 // Extracts the event date used for new duty times.
 function datePart(value) {

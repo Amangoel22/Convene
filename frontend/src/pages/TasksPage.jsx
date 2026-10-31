@@ -754,7 +754,7 @@ export function TasksPage() {
       </div>
 
       {/* Onboarding-style Task Metric Overview Banner */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         <div className="rounded-3xl surface-card-token border border-token p-4 shadow-token-card">
           <p className="type-10 weight-bold uppercase tracking-wider text-token-muted">
             Total Assigned

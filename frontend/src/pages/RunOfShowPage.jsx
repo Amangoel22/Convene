@@ -23,7 +23,7 @@ import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
 import { PageTitle } from "@/components/ui/PageTitle";
-import { cn, formatTimeString, getStageStatus, isEventComplete, parseTimeString, addHoursToTimeString } from "@/lib/utils";
+import { cn, formatDisplayTime, formatTimeString, getStageStatus, isEventComplete, parseTimeString, addHoursToTimeString } from "@/lib/utils";
 
 const statusStyles = {
   LIVE: "bg-token-success/10 text-token-success",
@@ -60,12 +60,11 @@ function formatStageSchedule(stage) {
   if (!start || Number.isNaN(start.getTime())) return stage.timeWindow || "Schedule not set";
 
   const dateOptions = { day: "numeric", month: "short", year: "numeric" };
-  const timeOptions = { hour: "numeric", minute: "2-digit" };
   const startDate = start.toLocaleDateString("en-IN", dateOptions);
   const endDate = end && !Number.isNaN(end.getTime()) ? end.toLocaleDateString("en-IN", dateOptions) : startDate;
   const dateRange = end && start.toDateString() !== end.toDateString() ? `${startDate} – ${endDate}` : startDate;
-  const startTime = start.toLocaleTimeString("en-IN", timeOptions);
-  const endTime = end && !Number.isNaN(end.getTime()) ? end.toLocaleTimeString("en-IN", timeOptions) : "—";
+  const startTime = formatDisplayTime(start);
+  const endTime = end && !Number.isNaN(end.getTime()) ? formatDisplayTime(end) : "—";
   return `${dateRange} | ${startTime} – ${endTime}`;
 }
 

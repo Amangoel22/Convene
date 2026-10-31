@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   cn,
+  formatDisplayTime,
   getStageStatus,
   isEventComplete,
   parseTimeString,
@@ -37,7 +38,7 @@ function formatDashboardDuty(duty) {
   const end = new Date(duty.endAt);
   const time =
     !Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime())
-      ? `${start.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} – ${end.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
+      ? `${formatDisplayTime(start)} – ${formatDisplayTime(end)}`
       : "Time not set";
   return {
     ...duty,

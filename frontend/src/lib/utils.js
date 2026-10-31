@@ -35,6 +35,24 @@ export function formatTimeString(inputStr) {
   return str.toUpperCase();
 }
 
+// Formats a Date using the user's saved 12-hour or 24-hour clock preference.
+export function formatDisplayTime(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+  const use24Hour = typeof window !== "undefined" && window.localStorage.getItem("convene_time_format") === "24h";
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: !use24Hour,
+  });
+}
+
+// Formats a persisted time string using the user's saved clock preference.
+export function formatDisplayTimeString(inputStr) {
+  const parsed = parseTimeString(inputStr);
+  if (!parsed) return inputStr || "";
+  return formatDisplayTime(parsed);
+}
+
 /**
  * Parse 12h/24h time string (e.g., "10:00 AM", "01:00 PM", "14:00") into a Date object for a given base date
  */

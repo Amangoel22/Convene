@@ -111,38 +111,38 @@ html[data-theme="convene"][data-convene-palette="obsidian-copper"] {
 }
 
 html[data-theme="convene"][data-convene-palette="plum-prestige"] {
-  --color-bg-primary: #FAF8FC;
-  --color-bg-secondary: #FFFFFF;
-  --color-sidebar: #F3EFF7;
-  --color-navbar: #FCFAFD;
+  --color-bg-primary: #F8F5FB;
+  --color-bg-secondary: #FFFCFF;
+  --color-sidebar: #EDE6F4;
+  --color-navbar: #FBF9FD;
   --color-hero: #FFFFFF;
-  --color-hover: #F1EBF4;
-  --color-selected: #E9DDED;
-  --color-selected-text: #2E112D;
-  --color-border: rgba(64, 35, 64, 0.14);
-  --color-gold: #B4873B;
-  --color-primary-accent: #E15F41;
-  --color-powder-blue: #9B3E36;
+  --color-hover: #EEE6F5;
+  --color-selected: #E1D4EC;
+  --color-selected-text: #2B1D3B;
+  --color-border: rgba(62, 38, 89, 0.16);
+  --color-gold: #B7791F;
+  --color-primary-accent: #8B5CF6;
+  --color-powder-blue: #6D28D9;
   --color-success: #0E6251;
-  --color-error: #B23B49;
-  --color-info: #806A82;
-  --color-text-primary: #2E112D;
-  --color-text-secondary: #524352;
-  --color-text-muted: #8D8290;
-  --color-loading-base: #EDE6F0;
+  --color-error: #BE4B68;
+  --color-info: #7C3AED;
+  --color-text-primary: #2B1D3B;
+  --color-text-secondary: #5B4B6A;
+  --color-text-muted: #8A7D96;
+  --color-loading-base: #E7DDF0;
   --color-loading-highlight: #FCFAFD;
-  --landing-ink: #2E112D;
-  --landing-paper: #FAF8FC;
-  --landing-card: #FFFFFF;
-  --landing-muted: #524352;
-  --landing-accent: #E15F41;
-  --landing-line: rgba(64, 35, 64, 0.15);
-  --landing-glow: rgba(225, 95, 65, 0.13);
-  --color-app-glow: rgba(225, 95, 65, 0.05);
-  --color-card-hover-shadow: 0 18px 42px rgba(71, 38, 62, 0.13);
-  --color-card-hover-border: rgba(225, 95, 65, 0.34);
-  --page-title-start: #2E112D;
-  --page-title-end: #E15F41;
+  --landing-ink: #2B1D3B;
+  --landing-paper: #F8F5FB;
+  --landing-card: #FFFCFF;
+  --landing-muted: #5B4B6A;
+  --landing-accent: #8B5CF6;
+  --landing-line: rgba(62, 38, 89, 0.16);
+  --landing-glow: rgba(139, 92, 246, 0.15);
+  --color-app-glow: rgba(139, 92, 246, 0.06);
+  --color-card-hover-shadow: 0 18px 42px rgba(65, 42, 93, 0.16);
+  --color-card-hover-border: rgba(139, 92, 246, 0.38);
+  --page-title-start: #2B1D3B;
+  --page-title-end: #8B5CF6;
 }
 
 html[data-theme="convene"][data-convene-palette="nordic-marigold"] {

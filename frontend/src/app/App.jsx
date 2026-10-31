@@ -1,23 +1,38 @@
 // Purpose: App implements this source module.
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import { AppShell } from "@/layouts/AppShell";
-import { MissionControlPage } from "@/pages/MissionControlPage";
-import { ParticipantsPage } from "@/pages/ParticipantsPage";
-import { TasksPage } from "@/pages/TasksPage";
-import { TeamsPage } from "@/pages/TeamsPage";
-import { RunOfShowPage } from "@/pages/RunOfShowPage";
-import { InventoryPage } from "@/pages/InventoryPage";
-import { ResourcesPage } from "@/pages/ResourcesPage";
-import { IssuesPage } from "@/pages/IssuesPage";
-import { SettingsPage } from "@/pages/SettingsPage";
-import { OnboardingPage } from "@/pages/OnboardingPage";
-import { DutiesPage } from "@/pages/DutiesPage";
-import { LoginPage } from "@/pages/LoginPage";
-import { LandingPage } from "@/pages/LandingPage";
 import { useAppStore } from "@/store/useAppStore";
 
-import { useEffect, useState } from "react";
+// Purpose: load named page exports only when their route is opened.
+const lazyPage = (loader, exportName) => lazy(() => loader().then((module) => ({ default: module[exportName] })));
+
+const LandingPage = lazyPage(() => import("@/pages/LandingPage"), "LandingPage");
+const LoginPage = lazyPage(() => import("@/pages/LoginPage"), "LoginPage");
+const OnboardingPage = lazyPage(() => import("@/pages/OnboardingPage"), "OnboardingPage");
+const MissionControlPage = lazyPage(() => import("@/pages/MissionControlPage"), "MissionControlPage");
+const ParticipantsPage = lazyPage(() => import("@/pages/ParticipantsPage"), "ParticipantsPage");
+const TasksPage = lazyPage(() => import("@/pages/TasksPage"), "TasksPage");
+const DutiesPage = lazyPage(() => import("@/pages/DutiesPage"), "DutiesPage");
+const TeamsPage = lazyPage(() => import("@/pages/TeamsPage"), "TeamsPage");
+const RunOfShowPage = lazyPage(() => import("@/pages/RunOfShowPage"), "RunOfShowPage");
+const InventoryPage = lazyPage(() => import("@/pages/InventoryPage"), "InventoryPage");
+const ResourcesPage = lazyPage(() => import("@/pages/ResourcesPage"), "ResourcesPage");
+const IssuesPage = lazyPage(() => import("@/pages/IssuesPage"), "IssuesPage");
+const SettingsPage = lazyPage(() => import("@/pages/SettingsPage"), "SettingsPage");
+
+// Purpose: preserve the app layout while a route chunk is loading.
+function RouteLoader() {
+  return (
+    <div className="min-h-screen bg-token-page flex items-center justify-center">
+      <div className="flex items-center gap-3 type-xs weight-bold text-token-secondary">
+        <span className="h-4 w-4 rounded-full border-2 border-token-accent border-t-transparent animate-spin" />
+        Loading Convene...
+      </div>
+    </div>
+  );
+}
 
 function ProtectedRoute({ children }) {
   const token = useAppStore((state) => state.token) || localStorage.getItem("convene_token");
@@ -128,38 +143,40 @@ function ProtectedRoute({ children }) {
 export function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/onboarding"
-          element={
-            <ProtectedRoute>
-              <OnboardingPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          element={
-            <ProtectedRoute>
-              <AppShell />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/dashboard" element={<MissionControlPage />} />
-          <Route path="/participants" element={<ParticipantsPage />} />
-          <Route path="/tasks" element={<TasksPage />} />
-          <Route path="/duties" element={<DutiesPage />} />
-          <Route path="/teams" element={<TeamsPage />} />
-          <Route path="/departments" element={<Navigate to="/teams" replace />} />
-          <Route path="/run-of-show" element={<RunOfShowPage />} />
-          <Route path="/inventory" element={<InventoryPage />} />
-          <Route path="/resources" element={<ResourcesPage />} />
-          <Route path="/issues" element={<IssuesPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Route>
-      </Routes>
+      <Suspense fallback={<RouteLoader />}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/onboarding"
+            element={
+              <ProtectedRoute>
+                <OnboardingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            element={
+              <ProtectedRoute>
+                <AppShell />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/dashboard" element={<MissionControlPage />} />
+            <Route path="/participants" element={<ParticipantsPage />} />
+            <Route path="/tasks" element={<TasksPage />} />
+            <Route path="/duties" element={<DutiesPage />} />
+            <Route path="/teams" element={<TeamsPage />} />
+            <Route path="/departments" element={<Navigate to="/teams" replace />} />
+            <Route path="/run-of-show" element={<RunOfShowPage />} />
+            <Route path="/inventory" element={<InventoryPage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/issues" element={<IssuesPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

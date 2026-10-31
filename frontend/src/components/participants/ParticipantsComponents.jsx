@@ -31,7 +31,6 @@ export function StatusPill({ status }) {
     Absent: `bg-[${COLORS.grayMuted}]/10 text-[${COLORS.grayText}] border-[${COLORS.grayMuted}]/20`,
     Withdrawn: `bg-[${COLORS.purple}]/10 text-[${COLORS.purple}] border-[${COLORS.purple}]/20`,
     Rejected: `bg-[${COLORS.error}]/10 text-[${COLORS.error}] border-[${COLORS.error}]/20`,
-    Blocked: `bg-[${COLORS.error}]/10 text-[${COLORS.error}] border-[${COLORS.error}]/20`,
   };
 
   return (
@@ -46,18 +45,35 @@ export function StatusPill({ status }) {
   );
 }
 
-export function ParticipantStatusSelect({ status, onChange, isLead = true }) {
+// Purpose: render a participant status as restrained text without a filled chip.
+export function StatusText({ status }) {
   const statusColors = {
-    Unconfirmed: `text-[${COLORS.warning}] bg-[${COLORS.warning}]/10 border-[${COLORS.warning}]/30`,
-    Confirmed: `text-[${COLORS.success}] bg-[${COLORS.success}]/10 border-[${COLORS.success}]/30`,
-    "Checked In": `text-[${COLORS.primary}] bg-[${COLORS.primary}]/10 border-[${COLORS.primary}]/30`,
-    Absent: `text-[${COLORS.grayText}] bg-[${COLORS.grayMuted}]/10 border-[${COLORS.grayMuted}]/30`,
-    Withdrawn: `text-[${COLORS.purple}] bg-[${COLORS.purple}]/10 border-[${COLORS.purple}]/30`,
-    Rejected: `text-[${COLORS.error}] bg-[${COLORS.error}]/10 border-[${COLORS.error}]/30`,
-    Blocked: `text-[${COLORS.error}] bg-[${COLORS.error}]/10 border-[${COLORS.error}]/30`,
+    Unconfirmed: "text-token-warning",
+    Confirmed: "text-token-success",
+    "Checked In": "text-token-success",
+    Absent: "text-token-secondary",
+    Withdrawn: "text-token-secondary",
+    Rejected: "text-token-error",
   };
 
-  if (!isLead) {
+  return (
+    <span className={cn("type-xs weight-bold", statusColors[status] || "text-token-secondary")}>
+      {status || "Confirmed"}
+    </span>
+  );
+}
+
+export function ParticipantStatusSelect({ status, onChange, isLead = true, disabled = false }) {
+  const statusColors = {
+    Unconfirmed: "text-token-warning bg-token-warning/10 border-token-warning/30",
+    Confirmed: "text-token-success bg-token-success/10 border-token-success/30",
+    "Checked In": "text-token-accent bg-token-accent/10 border-token-accent/30",
+    Absent: "text-token-secondary bg-token-field border-token-subtle",
+    Withdrawn: "text-token-info bg-token-info/18 border-token-info/35",
+    Rejected: "text-token-error bg-token-error/10 border-token-error/30",
+  };
+
+  if (!isLead || disabled) {
     return (
       <span
         className={cn(
@@ -78,6 +94,7 @@ export function ParticipantStatusSelect({ status, onChange, isLead = true }) {
       <select
         value={status || "Confirmed"}
         onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
         className={cn(
           "h-7 cursor-pointer appearance-none rounded-full pl-2.5 pr-6 type-10 weight-black uppercase tracking-wider border outline-none transition-all shadow-sm",
           statusColors[status] || "bg-token-field text-token-secondary border-token-subtle",
@@ -88,7 +105,6 @@ export function ParticipantStatusSelect({ status, onChange, isLead = true }) {
         <option value="Unconfirmed" className="surface-card-token text-token-primary font-sans weight-semibold capitalize">Unconfirmed</option>
         <option value="Absent" className="surface-card-token text-token-primary font-sans weight-semibold capitalize">Absent</option>
         <option value="Withdrawn" className="surface-card-token text-token-primary font-sans weight-semibold capitalize">Withdrawn</option>
-        <option value="Blocked" className="surface-card-token text-token-primary font-sans weight-semibold capitalize">Blocked</option>
         <option value="Rejected" className="surface-card-token text-token-primary font-sans weight-semibold capitalize">Rejected</option>
       </select>
     </div>

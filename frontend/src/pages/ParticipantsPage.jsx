@@ -5,8 +5,9 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { cn } from "@/lib/utils";
-import { UserAvatar } from "@/components/ui/UserAvatar";
+import { PageTitle } from "@/components/ui/PageTitle";
 import { useAppStore } from "@/store/useAppStore";
+import { isEventComplete } from "@/lib/utils";
 import { ParticipantDrawer } from "@/components/participants/ParticipantDrawer";
 import {
   CreateParticipantModal,
@@ -14,8 +15,8 @@ import {
 } from "@/components/participants/ParticipantModals";
 import {
   MiniBadge,
-  ParticipantStatusSelect,
   SelectFilter,
+  StatusText,
   StatusPill,
 } from "@/components/participants/ParticipantsComponents";
 
@@ -46,6 +47,7 @@ export function ParticipantsPage() {
   const role = useAppStore((state) => state.role);
   const activeEvent = useAppStore((state) => state.activeEvent);
   const isLead = role === "lead";
+  const eventIsComplete = isEventComplete(activeEvent, new Date());
 
   const loadEventTeams = useCallback(async () => {
     setLoading(true);
@@ -432,15 +434,13 @@ export function ParticipantsPage() {
     <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="type-2xl weight-bold tracking-tight text-token-primary md:type-3xl">
-            Participants
-          </h1>
+          <PageTitle>Participants</PageTitle>
           <p className="mt-1 type-sm text-token-secondary weight-medium">
             Manage teams, check-ins, and event operations.
           </p>
         </div>
         <div className="flex flex-wrap gap-2.5">
-          {isLead && (
+          {isLead && !eventIsComplete && (
             <GlassButton
               variant="secondary"
               icon={<FileUp size={16} strokeWidth={2} />}
@@ -457,7 +457,7 @@ export function ParticipantsPage() {
           >
             Export
           </GlassButton>
-          {isLead && (
+          {isLead && !eventIsComplete && (
             <GlassButton
               variant="primary"
               icon={<Plus size={16} strokeWidth={2} />}
@@ -683,12 +683,7 @@ export function ParticipantsPage() {
                       }}
                       className="group grid grid-cols-1 sm:grid-cols-[200px_1fr_130px_150px_130px_80px] items-center gap-3 px-6 py-3 type-xs transition-colors hover-surface-token cursor-pointer"
                     >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <UserAvatar
-                          initials={member.initials}
-                          image={member.avatar}
-                          className="h-7 w-7 type-10 accent-surface-token text-token-accent shrink-0"
-                        />
+                      <div className="flex items-center min-w-0">
                         <p className="weight-bold text-token-primary truncate">
                           {member.name}
                         </p>
@@ -712,21 +707,8 @@ export function ParticipantsPage() {
                         </span>
                       </div>
 
-                      <div
-                        className="shrink-0"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ParticipantStatusSelect
-                          status={member.status || "Confirmed"}
-                          isLead={isLead}
-                          onChange={(newStatus) =>
-                            handleUpdateMemberStatus(
-                              team.id,
-                              member.id,
-                              newStatus,
-                            )
-                          }
-                        />
+                      <div className="shrink-0">
+                        <StatusText status={member.status || "Confirmed"} />
                       </div>
 
                       <div className="text-left sm:text-right shrink-0">
@@ -749,7 +731,7 @@ export function ParticipantsPage() {
         team={selectedTeam}
         member={selectedMember}
         onClose={handleCloseDrawer}
-        isLead={isLead}
+        isLead={isLead && !eventIsComplete}
         onUpdateTeamStatus={handleUpdateTeamStatus}
         onUpdateMemberStatus={handleUpdateMemberStatus}
         onSaveNotes={handleSaveNotes}

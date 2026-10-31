@@ -40,6 +40,9 @@
   --landing-body-size: 1rem;
   --landing-body-compact: 0.875rem;
   --landing-label-size: 0.6875rem;
+  --color-app-glow: rgba(59, 111, 212, 0.055);
+  --color-card-hover-shadow: 0 16px 40px rgba(31, 55, 96, 0.10);
+  --color-card-hover-border: rgba(59, 111, 212, 0.24);
 }
 
 /* Purpose: semantic color classes keep component markup free of literal color values. */
@@ -295,14 +298,50 @@ select::-ms-expand {
 }
 
 .app-background {
-  background: #F7F8FA;
-  transition: background 150ms ease, color 150ms ease;
+  background: var(--color-bg-primary);
   position: relative;
+  isolation: isolate;
+}
+
+/* Adds a low-contrast ambient glow behind operational screens. */
+.app-background::before {
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  width: min(72vw, 980px);
+  height: 560px;
+  background: radial-gradient(ellipse at top right, var(--color-app-glow), transparent 68%);
+  content: "";
+  pointer-events: none;
+}
+
+/* Slides the selected navigation surface between sections. */
+.sidebar-active-pill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-selected);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary-accent) 12%, transparent);
+  pointer-events: none;
+}
+
+/* Provides the subtle glass treatment used while the workspace scrolls. */
+.app-navbar-scrolled {
+  background-color: color-mix(in srgb, var(--color-bg-primary) 88%, transparent);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-text-primary) 5%, transparent);
 }
 
 .glass-surface {
   background: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: background-color 240ms ease, border-color 240ms ease, box-shadow 240ms ease;
+}
+
+.glass-surface.cursor-pointer:hover {
+  border-color: var(--color-card-hover-border);
+  box-shadow: var(--color-card-hover-shadow);
 }
 
 .glass-elevation-hero {
@@ -354,6 +393,9 @@ select::-ms-expand {
   --landing-accent: #82AEFF;
   --landing-line: rgba(255, 255, 255, 0.12);
   --landing-glow: rgba(80, 130, 220, 0.20);
+  --color-app-glow: rgba(80, 130, 220, 0.09);
+  --color-card-hover-shadow: 0 18px 44px rgba(0, 0, 0, 0.28), 0 0 26px rgba(80, 130, 220, 0.08);
+  --color-card-hover-border: rgba(130, 174, 255, 0.28);
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
 }
@@ -524,6 +566,77 @@ select::-ms-expand {
 .theme-toggle-icon {
   display: inline-flex;
   animation: theme-icon-in 220ms ease both;
+}
+
+/* Gives workspace page titles the same blue-to-ink display treatment as landing. */
+.workspace-page-title {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.workspace-page-title,
+.workspace-page-title-hero {
+  color: transparent !important;
+  background-image: linear-gradient(108deg, var(--page-title-start) 10%, var(--page-title-end) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Keeps app surfaces in sync during theme changes without animating layout. */
+html,
+body,
+#root,
+.app-background,
+.surface-card-token,
+.surface-token,
+.field-token,
+.hover-token,
+.accent-surface-token,
+.bg-token-header,
+.bg-token-surface-light,
+.bg-token-accent-light,
+.bg-token-success-light,
+.bg-token-warning-light,
+.text-token-primary,
+.text-token-secondary,
+.text-token-muted,
+.text-token-accent,
+.glass-surface,
+.glass-sidebar,
+.glass-navbar {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 240ms;
+  transition-timing-function: ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  #root,
+  .app-background,
+  .surface-card-token,
+  .surface-token,
+  .field-token,
+  .hover-token,
+  .accent-surface-token,
+  .bg-token-header,
+  .bg-token-surface-light,
+  .bg-token-accent-light,
+  .bg-token-success-light,
+  .bg-token-warning-light,
+  .text-token-primary,
+  .text-token-secondary,
+  .text-token-muted,
+  .text-token-accent,
+  .glass-surface,
+  .glass-sidebar,
+  .glass-navbar {
+    transition-duration: 0ms;
+  }
 }
 
 @keyframes theme-icon-in {

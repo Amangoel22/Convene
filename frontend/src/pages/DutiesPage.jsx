@@ -7,7 +7,8 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
-import { cn } from "@/lib/utils";
+import { cn, isEventComplete } from "@/lib/utils";
+import { PageTitle } from "@/components/ui/PageTitle";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
@@ -73,6 +74,7 @@ export function DutiesPage() {
   const eventsHydrated = useAppStore((state) => state.eventsHydrated);
   const role = useAppStore((state) => state.role);
   const isLead = role === "lead";
+  const eventIsComplete = isEventComplete(activeEvent, new Date());
   const [duties, setDuties] = useState([]);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -295,16 +297,14 @@ export function DutiesPage() {
     <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1 text-token-primary">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="type-2xl weight-bold tracking-tight md:type-3xl">
-            Shift Duties
-          </h1>
+          <PageTitle>Shift Duties</PageTitle>
           <p className="mt-1 type-sm text-token-secondary weight-medium">
             {isLead
               ? "Assign ground shift duties to organizing team members."
               : "View your assigned shift responsibilities and locations."}
           </p>
         </div>
-        {isLead && (
+        {isLead && !eventIsComplete && (
           <GlassButton
             variant="primary"
             icon={<Plus size={16} />}
@@ -547,7 +547,7 @@ export function DutiesPage() {
                 </div>
               </div>
               <div className="flex justify-end gap-2">
-                {isLead && (
+                {isLead && !eventIsComplete && (
                   <GlassButton
                     onClick={beginEditDuty}
                     icon={<Pencil size={14} />}

@@ -24,11 +24,12 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { PageTitle } from "@/components/ui/PageTitle";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
-import { cn } from "@/lib/utils";
+import { cn, isEventComplete } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -718,6 +719,7 @@ export function TeamsPage() {
   const isLead = role === "lead";
   const activeEvent = useAppStore((state) => state.activeEvent);
   const eventsHydrated = useAppStore((state) => state.eventsHydrated);
+  const eventIsComplete = isEventComplete(activeEvent, new Date());
 
   useEffect(() => {
     if (!activeEvent?.id) {
@@ -931,14 +933,12 @@ export function TeamsPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="type-2xl weight-bold tracking-tight text-token-primary md:type-3xl">
-            Teams
-          </h1>
+          <PageTitle>Teams</PageTitle>
           <p className="mt-1 type-sm text-token-secondary weight-medium">
             Coordinate organizing teams and monitor responsibilities.
           </p>
         </div>
-        {isLead && (
+        {isLead && !eventIsComplete && (
           <div className="flex items-center gap-3">
             <GlassButton
               variant="primary"
@@ -1059,17 +1059,17 @@ export function TeamsPage() {
         onAddMember={handleAddMember}
         onRemoveMember={handleRemoveMember}
         onViewKey={setViewingMemberKey}
-        isLead={isLead}
+        isLead={isLead && !eventIsComplete}
       />
       <InviteKeyModal member={isLead ? viewingMemberKey : null} onClose={() => setViewingMemberKey(null)} onRegenerate={handleRegenerateKey} />
       <EditMemberModal
-        member={isLead ? editingMember : null}
+        member={isLead && !eventIsComplete ? editingMember : null}
         teams={teams}
         onClose={() => setEditingMember(null)}
         onSave={handleSaveMember}
       />
       <EditMemberModal
-        member={isLead ? addingMember : null}
+        member={isLead && !eventIsComplete ? addingMember : null}
         teams={teams}
         onClose={() => setAddingMember(null)}
         onSave={handleSaveNewMember}

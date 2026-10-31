@@ -11,12 +11,11 @@ export const hoverAnimation = {
   scale: 1.01
 };
 
+// Lifts interactive cards while leaving their theme colors to CSS tokens.
 export const cardAnimation = {
   whileHover: {
-    y: -3,
-    scale: 1.01,
-    backgroundColor: "rgba(240,240,240,0.72)",
-    boxShadow: "0 14px 42px rgba(0,0,0,0.085)"
+    y: -4,
+    scale: 1.008,
   },
   transition: { type: "spring", stiffness: 320, damping: 26, mass: 0.8 }
 };

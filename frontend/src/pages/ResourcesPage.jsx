@@ -6,6 +6,8 @@ import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
 import { useAppStore } from "@/store/useAppStore";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { PageTitle } from "@/components/ui/PageTitle";
+import { isEventComplete } from "@/lib/utils";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -27,6 +29,7 @@ export function ResourcesPage() {
   const isLead = role === "lead";
   const token = useAppStore((state) => state.token);
   const activeEvent = useAppStore((state) => state.activeEvent);
+  const eventIsComplete = isEventComplete(activeEvent, new Date());
 
   // Purpose: load persisted event resources whenever the active event changes.
   useEffect(() => {
@@ -100,15 +103,13 @@ export function ResourcesPage() {
     <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="type-2xl weight-bold tracking-tight text-token-primary md:type-3xl">
-            Resource Vault
-          </h1>
+          <PageTitle>Resource Vault</PageTitle>
           <p className="mt-1 type-sm text-token-secondary weight-medium">
             Shared repository for event documents, rulebooks, logos, and digital
             assets.
           </p>
         </div>
-        {isLead && (
+        {isLead && !eventIsComplete && (
           <GlassButton
             variant="primary"
             icon={<Upload size={16} strokeWidth={2} />}

@@ -23,7 +23,8 @@ import { StatusBadge } from "@/components/common/StatusBadge";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
-import { cn } from "@/lib/utils";
+import { PageTitle } from "@/components/ui/PageTitle";
+import { cn, isEventComplete } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -31,7 +32,6 @@ const statuses = [
   "All Statuses",
   "Todo",
   "In Progress",
-  "Blocked",
   "Completed",
 ];
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
@@ -101,6 +101,7 @@ function TaskDrawer({
   teams,
   members,
   isLead,
+  readOnly = false,
 }) {
   const [draftTask, setDraftTask] = useState(null);
   useEffect(
@@ -168,7 +169,7 @@ function TaskDrawer({
               <select
                 value={task.status}
                 onChange={(e) => handleStatusChange(e.target.value)}
-                disabled={task.status === "Completed"}
+                disabled={readOnly || task.status === "Completed"}
                 className="mt-1 w-full bg-transparent type-xs weight-bold text-token-primary outline-none cursor-pointer"
               >
                 {statuses.slice(1).map((s) => (
@@ -203,6 +204,7 @@ function TaskDrawer({
                   setDraftTask({ ...task, priority: event.target.value })
                 }
                 className="mt-1 w-full bg-transparent type-xs weight-bold text-token-primary outline-none"
+                disabled={readOnly}
               >
                 {["Critical", "High", "Medium", "Low"].map((value) => (
                   <option key={value} value={value}>
@@ -222,6 +224,7 @@ function TaskDrawer({
                   setDraftTask({ ...task, dueAt: event.target.value || null })
                 }
                 className="mt-1 w-full bg-transparent type-xs weight-bold text-token-primary outline-none"
+                disabled={readOnly}
               />
             </label>
           </div>
@@ -246,7 +249,7 @@ function TaskDrawer({
             </span>
           </div>
 
-          {isLead && (
+          {isLead && !readOnly && (
             <label className="block rounded-2xl surface-token p-3 type-11 weight-semibold text-token-muted">
               Assigned To
               <select
@@ -310,7 +313,7 @@ function TaskDrawer({
         </div>
 
         {/* Save changes footer */}
-        <div className="shrink-0 border-t border-subtle-token pt-4 flex items-center gap-3">
+        {!readOnly && <div className="shrink-0 border-t border-subtle-token pt-4 flex items-center gap-3">
           <GlassButton
             variant="primary"
             className="flex-1 h-9 type-xs justify-center rounded-full"
@@ -336,7 +339,7 @@ function TaskDrawer({
           >
             {task.status === "Completed" ? "Reopen Task" : "Save Changes"}
           </GlassButton>
-        </div>
+        </div>}
       </motion.aside>
     </AnimatePresence>
   );
@@ -514,6 +517,7 @@ export function TasksPage() {
   const activeEvent = useAppStore((state) => state.activeEvent);
   const eventsHydrated = useAppStore((state) => state.eventsHydrated);
   const isLead = role === "lead";
+  const eventIsComplete = isEventComplete(activeEvent, new Date());
 
   useEffect(() => {
     if (!activeEvent?.id) {
@@ -632,6 +636,7 @@ export function TasksPage() {
   };
 
   const handleUpdateTask = async (updatedTask) => {
+    if (eventIsComplete) return;
     const existingTask = tasksList.find((task) => task.id === updatedTask.id);
     const token = localStorage.getItem("convene_token");
     const headers = {
@@ -682,7 +687,7 @@ export function TasksPage() {
   };
 
   const handleCreateTask = async (newTask) => {
-    if (!activeEvent?.id) return;
+    if (!activeEvent?.id || eventIsComplete) return;
     const token = localStorage.getItem("convene_token");
     const res = await fetch(`${API_BASE}/events/${activeEvent.id}/tasks`, {
       method: "POST",
@@ -706,15 +711,13 @@ export function TasksPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="type-2xl weight-bold tracking-tight text-token-primary md:type-3xl">
-            Tasks
-          </h1>
+          <PageTitle>Tasks</PageTitle>
           <p className="mt-1 type-sm text-token-secondary weight-medium">
             Assign, monitor and complete operational work.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
-          {isLead && (
+          {isLead && !eventIsComplete && (
             <GlassButton
               variant="primary"
               icon={<Plus size={16} strokeWidth={2} />}
@@ -769,18 +772,6 @@ export function TasksPage() {
           </p>
           <span className="type-11 weight-medium text-token-secondary">
             Awaiting execution
-          </span>
-        </div>
-
-        <div className="rounded-3xl surface-card-token border border-token p-4 shadow-token-card">
-          <p className="type-10 weight-bold uppercase tracking-wider text-token-error">
-            Blocked / Impended
-          </p>
-          <p className="mt-1 type-2xl weight-extrabold text-token-error font-mono">
-            {filteredTasks.filter((t) => t.status === "Blocked").length}
-          </p>
-          <span className="type-11 weight-medium text-token-secondary">
-            Requires resolution
           </span>
         </div>
 
@@ -961,6 +952,7 @@ export function TasksPage() {
                             : "field-token text-token-success hover:hover-token",
                         )}
                         onClick={(e) => handleToggleComplete(e, task.id)}
+                        disabled={eventIsComplete}
                         aria-label={`Toggle complete ${task.title}`}
                       >
                         <Check size={13} strokeWidth={2.5} />
@@ -974,7 +966,7 @@ export function TasksPage() {
         ) : (
           /* Kanban Board View */
           <div className="p-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4 overflow-x-auto">
-            {["Todo", "In Progress", "Blocked", "Completed"].map(
+            {["Todo", "In Progress", "Completed"].map(
               (columnStatus) => {
                 const columnTasks = filteredTasks.filter(
                   (t) => t.status === columnStatus,
@@ -1050,6 +1042,7 @@ export function TasksPage() {
         teams={teamsList}
         members={membersList}
         isLead={isLead}
+        readOnly={eventIsComplete}
       />
 
       {/* New Task Modal */}
@@ -1057,7 +1050,7 @@ export function TasksPage() {
         <p className="type-sm weight-semibold text-token-error">{error}</p>
       )}
       <NewTaskModal
-        open={newTaskOpen}
+        open={newTaskOpen && !eventIsComplete}
         onClose={() => setNewTaskOpen(false)}
         onCreateTask={handleCreateTask}
         teams={teamsList}

@@ -1,11 +1,16 @@
 // Purpose: SettingsPage implements this source module.
 import { GlassButton } from "@/components/glass/GlassButton";
+import { PageTitle } from "@/components/ui/PageTitle";
+import { isEventComplete } from "@/lib/utils";
+import { useAppStore } from "@/store/useAppStore";
 
 export function SettingsPage() {
+  const activeEvent = useAppStore((state) => state.activeEvent);
+  const eventIsComplete = isEventComplete(activeEvent, new Date());
   return (
     <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
       <div>
-        <h1 className="type-2xl weight-bold tracking-tight text-token-primary md:type-3xl">Workspace Settings</h1>
+        <PageTitle>Workspace Settings</PageTitle>
         <p className="mt-1 type-sm text-token-secondary weight-medium">
           Manage event preferences, access controls, notifications, and integration webhooks.
         </p>
@@ -17,7 +22,7 @@ export function SettingsPage() {
             <h4 className="type-base weight-bold text-token-primary">Event Name & Branding</h4>
             <p className="mt-0.5 type-xs weight-medium text-token-muted">Configure event title, logo, and theme accent colors.</p>
           </div>
-          <GlassButton variant="primary" className="rounded-full type-xs">Edit Details</GlassButton>
+          {!eventIsComplete && <GlassButton variant="primary" className="rounded-full type-xs">Edit Details</GlassButton>}
         </div>
 
         <div className="flex items-center justify-between border-b border-subtle-token pb-5">

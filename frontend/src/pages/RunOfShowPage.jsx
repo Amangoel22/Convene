@@ -23,6 +23,7 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
+import { PageTitle } from "@/components/ui/PageTitle";
 import { cn, formatTimeString, getStageStatus, isEventComplete, parseTimeString, addHoursToTimeString } from "@/lib/utils";
 
 const statusStyles = {
@@ -474,7 +475,7 @@ export function RunOfShowPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="type-2xl weight-bold tracking-tight text-token-primary md:type-3xl">Run of Show</h1>
+          <PageTitle>Run of Show</PageTitle>
           <p className="mt-2 type-sm weight-bold text-token-primary">{activeEvent?.name || "Event"}</p>
           <p className="mt-1 type-xs weight-semibold text-token-muted">
             {(() => {
@@ -557,8 +558,8 @@ export function RunOfShowPage() {
           icon={CalendarClock}
           title="No timeline stages configured"
           description="Create timeline stages to track live event progression, venues, and stage leads."
-          actionLabel={isLead && activeEvent ? "Add Stage" : undefined}
-          onAction={isLead && activeEvent ? () => { setEditingStage(null); setEditModalOpen(true); } : undefined}
+          actionLabel={isLead && activeEvent && !eventIsComplete ? "Add Stage" : undefined}
+          onAction={isLead && activeEvent && !eventIsComplete ? () => { setEditingStage(null); setEditModalOpen(true); } : undefined}
         />
       ) : (
         <div className="relative space-y-4 md:before:absolute md:before:bottom-8 md:before:left-[2.75rem] md:before:top-8 md:before:w-px md:before:bg-token-success/20">
@@ -594,18 +595,18 @@ export function RunOfShowPage() {
                     </div>
                     <div className="mt-2.5 space-y-1.5 type-xs weight-medium text-token-muted">
                       {stg.location && (
-                        <span className="inline-flex items-center gap-1.5 font-mono weight-bold text-token-accent">
-                          <MapPin size={13} className="text-token-accent" /> {stg.location}
+                        <span className="inline-flex items-center gap-1.5 font-mono weight-semibold text-token-secondary">
+                          <MapPin size={13} className="text-token-muted" /> {stg.location}
                         </span>
                       )}
-                      <span className="flex items-center gap-1.5 font-mono weight-bold text-token-accent">
-                        <Clock size={13} /> {formatStageSchedule(stg)}
+                      <span className="flex items-center gap-1.5 font-mono weight-semibold text-token-secondary">
+                        <Clock size={13} className="text-token-muted" /> {formatStageSchedule(stg)}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {isLead && (
+                {isLead && !eventIsComplete && (
                   <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
                     {!eventIsComplete && stg.status !== "Completed" && (
                       <GlassButton

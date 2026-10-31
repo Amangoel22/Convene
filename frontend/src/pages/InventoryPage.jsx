@@ -7,6 +7,8 @@ import { GlassModal } from "@/components/glass/GlassModal";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { useAppStore } from "@/store/useAppStore";
+import { PageTitle } from "@/components/ui/PageTitle";
+import { isEventComplete } from "@/lib/utils";
 
 const initialInventory = [];
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
@@ -154,6 +156,7 @@ export function InventoryPage() {
   const token = useAppStore((state) => state.token);
   const activeEvent = useAppStore((state) => state.activeEvent);
   const isLead = role === "lead";
+  const eventIsComplete = isEventComplete(activeEvent, new Date());
 
   // Purpose: load event inventory from the backend whenever the active event changes.
   useEffect(() => {
@@ -175,20 +178,20 @@ export function InventoryPage() {
   }, [activeEvent?.id, token]);
 
   const handleOpenEdit = (item) => {
-    if (!isLead) return;
+    if (!isLead || eventIsComplete) return;
     setEditingItem(item);
     setModalOpen(true);
   };
 
   const handleOpenAdd = () => {
-    if (!isLead) return;
+    if (!isLead || eventIsComplete) return;
     setEditingItem({ name: "", totalNeeded: 0, available: 0, defective: 0 });
     setModalOpen(true);
   };
 
   // Purpose: persist a new or edited inventory item and refresh the local view from its response.
   const handleSaveItem = async (savedItem) => {
-    if (!activeEvent?.id || !token) return;
+    if (!activeEvent?.id || !token || eventIsComplete) return;
     setError("");
     const isExisting = Boolean(savedItem.id);
     const endpoint = isExisting
@@ -211,12 +214,12 @@ export function InventoryPage() {
     <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="type-2xl weight-bold tracking-tight text-token-primary md:type-3xl">Hardware & Asset Inventory</h1>
+          <PageTitle>Hardware &amp; Asset Inventory</PageTitle>
           <p className="mt-1 type-sm text-token-secondary weight-medium">
             Track physical equipment total requirements, available stock, and defective items.
           </p>
         </div>
-        {isLead && (
+        {isLead && !eventIsComplete && (
           <GlassButton variant="primary" icon={<Plus size={16} strokeWidth={2} />} onClick={handleOpenAdd} className="rounded-full">
             Add Equipment
           </GlassButton>
@@ -244,7 +247,7 @@ export function InventoryPage() {
               <div>
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="type-base weight-bold text-token-primary leading-snug">{item.name}</h3>
-                  {isLead && (
+                  {isLead && !eventIsComplete && (
                     <button
                       onClick={() => handleOpenEdit(item)}
                       className="flex h-8 w-8 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary shrink-0"

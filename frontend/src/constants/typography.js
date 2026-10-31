@@ -5,6 +5,8 @@ export const TYPOGRAPHY = {
     mono: ["JetBrains Mono", "monospace"],
   },
   fontSize: {
+    pageTitle: "clamp(1.8rem, 2.35vw, 2.35rem)",
+    pageTitleHero: "clamp(2.4rem, 4vw, 3.5rem)",
     badge: "10px",
     xs: "12px",
     sm: "14px",
@@ -20,5 +22,12 @@ export const TYPOGRAPHY = {
     semibold: 600,
     bold: 700,
     black: 900,
+    pageTitle: 800,
+  },
+  letterSpacing: {
+    pageTitle: "-0.055em",
+  },
+  lineHeight: {
+    pageTitle: 1.08,
   },
 };

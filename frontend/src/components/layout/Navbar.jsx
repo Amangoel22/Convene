@@ -1,7 +1,7 @@
 // Purpose: Navbar implements this source module.
 import { Bell, ChevronDown, Menu, Plus, Search, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { GlassButton } from "@/components/glass/GlassButton";
@@ -9,6 +9,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
+  const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -18,6 +19,19 @@ export function Navbar() {
   const activeEvent = useAppStore((state) => state.activeEvent);
   const setActiveEvent = useAppStore((state) => state.setActiveEvent);
   const isLead = role === "lead";
+  // Maps the active route to its breadcrumb label.
+  const pageTitle = {
+    "/dashboard": "Dashboard",
+    "/participants": "Participants",
+    "/tasks": "Tasks",
+    "/duties": "Duties",
+    "/teams": "Teams",
+    "/run-of-show": "Run of Show",
+    "/inventory": "Inventory",
+    "/resources": "Resources",
+    "/issues": "Issues",
+    "/settings": "Settings",
+  }[location.pathname] || "Mission Control";
 
   useEffect(() => {
     const updateScrolled = () => setScrolled(window.scrollY > 8);
@@ -37,15 +51,15 @@ export function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-20 surface-token py-2 border-b border-subtle-token">
+    <header className={cn("sticky top-0 z-20 surface-token py-2 border-b border-subtle-token transition-colors", scrolled && "app-navbar-scrolled")}>
       <div className="flex h-12 items-center px-1">
         <GlassButton className="flex lg:hidden h-8 w-8 min-h-0 p-0" icon={<Menu size={18} strokeWidth={1.75} />} aria-label="Open navigation" />
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-1.5 type-xs weight-semibold text-token-secondary">
-          <span className="hover:text-token-primary cursor-pointer">Convene</span>
+          <span className="text-token-muted">Convene</span>
           <span className="text-token-muted">/</span>
-          <span className="text-token-primary weight-bold">Mission Control</span>
+          <span className="text-token-primary weight-bold">{pageTitle}</span>
         </div>
 
         <div className="flex-1" />

@@ -30,6 +30,12 @@ export const COLORS = {
   redDark: "#A92F2A",
   gray1: "#F0F2F5",
   gray2: "#F7F8FA",
+
+  // Shared page-title gradient, paired with the active theme.
+  pageTitleStart: "#172033",
+  pageTitleEnd: "#3B6FD4",
+  pageTitleStartDark: "#F3F6FB",
+  pageTitleEndDark: "#82AEFF",
 };
 
 export const COLOR_CLASSES = {

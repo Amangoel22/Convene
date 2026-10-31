@@ -5,7 +5,6 @@ import { COLORS } from "@/constants/colors";
 const statusTextStyles = {
   Todo: `text-[${COLORS.grayMuted}]`,
   "In Progress": `text-[${COLORS.primary}]`,
-  Blocked: `text-[${COLORS.warning}]`,
   Done: `text-[${COLORS.success}]`,
   Unconfirmed: `text-[${COLORS.warning}]`,
   Registered: `text-[${COLORS.warning}]`,

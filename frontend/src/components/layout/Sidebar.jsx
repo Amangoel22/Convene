@@ -91,7 +91,7 @@ export function Sidebar() {
                   to={item.href}
                   className={({ isActive }) =>
                     cn(
-                      "flex h-10 items-center gap-3.5 rounded-full px-4 type-xs weight-semibold transition-colors duration-150",
+                      "group relative flex h-10 items-center gap-3.5 rounded-full px-4 type-xs weight-semibold transition-colors duration-200",
                       isActive
                         ? "accent-surface-token text-token-accent weight-bold"
                         : "text-token-secondary hover:field-token hover:text-token-primary"
@@ -99,10 +99,15 @@ export function Sidebar() {
                   }
                   aria-label={item.label}
                 >
-                  <item.icon className="h-4 w-4 shrink-0" strokeWidth={2} />
-                  <span className="truncate whitespace-nowrap">
-                    {item.label}
-                  </span>
+                  {({ isActive }) => (
+                    <>
+                      {isActive && <motion.span layoutId="sidebar-active-pill" className="sidebar-active-pill" transition={{ type: "spring", stiffness: 360, damping: 32 }} />}
+                      <item.icon className="relative z-[1] h-4 w-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2} />
+                      <span className="relative z-[1] truncate whitespace-nowrap">
+                        {item.label}
+                      </span>
+                    </>
+                  )}
                 </NavLink>
               ))}
             </div>

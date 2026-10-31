@@ -20,6 +20,7 @@ import { StatusBadge } from "@/components/common/StatusBadge";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { useAppStore } from "@/store/useAppStore";
+import { PageTitle } from "@/components/ui/PageTitle";
 
 const initialOrganizerDuties = [];
 const initialOrganizerTasks = [];
@@ -264,10 +265,10 @@ export function MissionControlPage() {
     <div className="space-y-9 w-full max-w-[1360px] mx-auto pb-16 pt-2">
       {/* Header */}
       <div>
-        <h1 className="type-4xl md:type-5xl weight-extrabold tracking-tight text-token-primary">
+        <PageTitle size="hero" className="weight-extrabold">
           Good morning
           {currentUser?.name ? `, ${currentUser.name.split(" ")[0]}` : ""}
-        </h1>
+        </PageTitle>
         <p className="mt-2 type-base text-token-secondary weight-medium">
           Here is what requires your operational focus for{" "}
           <span className="weight-bold text-token-accent">

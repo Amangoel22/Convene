@@ -1,25 +1,25 @@
 // Purpose: theme implements this source module.
 export const colors = {
   background: {
-    primary: "#F5F6F8",
-    secondary: "#EEF2F7",
-    glass: "rgba(255,255,255,0.55)",
-    glassStrong: "rgba(255,255,255,0.72)"
+    primary: "#F5F1EA",
+    secondary: "#FFFDF8",
+    glass: "rgba(255,253,248,0.62)",
+    glassStrong: "rgba(255,253,248,0.86)"
   },
   accent: {
-    gold: "#F6C445",
-    goldHover: "#E9B72D"
+    gold: "#A9792F",
+    goldHover: "#8E6424"
   },
   state: {
-    success: "#34C759",
-    warning: "#FF9F0A",
-    error: "#FF453A",
-    info: "#007AFF"
+    success: "#4F7A62",
+    warning: "#A9792F",
+    error: "#B04A3A",
+    info: "#8B6F5A"
   },
   text: {
-    primary: "#111827",
-    secondary: "#6B7280",
-    muted: "#9CA3AF"
+    primary: "#2A2622",
+    secondary: "#6E665C",
+    muted: "#9A9084"
   }
 };
 
@@ -51,11 +51,11 @@ export const blur = {
 };
 
 export const shadows = {
-  card: "0 8px 32px rgba(0,0,0,.06)",
-  cardHover: "0 14px 42px rgba(0,0,0,.085)",
-  hero: "0 18px 48px rgba(31,41,55,.1)",
-  sidebar: "0 18px 48px rgba(31,41,55,.105)",
-  gold: "0 0 0 1px rgba(246,196,69,.55), 0 14px 34px rgba(246,196,69,.18)"
+  card: "0 8px 32px rgba(83,60,42,.06)",
+  cardHover: "0 14px 42px rgba(83,60,42,.12)",
+  hero: "0 18px 48px rgba(83,60,42,.1)",
+  sidebar: "0 18px 48px rgba(83,60,42,.105)",
+  gold: "0 0 0 1px rgba(169,121,47,.45), 0 14px 34px rgba(169,121,47,.16)"
 };
 
 export const animations = {

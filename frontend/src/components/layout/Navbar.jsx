@@ -3,7 +3,6 @@ import { Bell, ChevronDown, Menu, Plus, Search, ShieldCheck } from "lucide-react
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { UserAvatar } from "@/components/ui/UserAvatar";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { useAppStore } from "@/store/useAppStore";
 import { cn } from "@/lib/utils";
@@ -123,12 +122,6 @@ export function Navbar() {
               </div>
             )}
           </div>
-
-          {/* Theme Toggle */}
-          <ThemeToggle
-            compact
-            className="h-9 w-9 min-h-0 px-0 text-token-secondary hover:text-token-primary"
-          />
 
           {/* Notifications */}
           <button className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full field-token border border-token text-token-secondary hover:hover-token hover:text-token-primary transition-colors">

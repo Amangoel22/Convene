@@ -9,16 +9,15 @@ import {
   ClipboardList,
   Clock3,
   FileText,
-  Moon,
   PackageCheck,
   Radio,
   ShieldCheck,
-  Sun,
   Users,
   Zap,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ConveneMark } from "@/components/brand/ConveneMark";
+import { ThemePicker } from "@/components/ui/ThemePicker";
 import { useAppStore } from "@/store/useAppStore";
 import "@/styles/landing.css";
 
@@ -142,10 +141,8 @@ function Reveal({ children, className = "", delay = 0 }) {
 
 // Renders Convene's public, theme-aware product landing page.
 export function LandingPage() {
-  const theme = useAppStore((state) => state.theme);
-  const toggleTheme = useAppStore((state) => state.toggleTheme);
+  const themePalette = useAppStore((state) => state.themePalette);
   const reduceMotion = useReducedMotion();
-  const isDark = theme === "dark";
   const [activityIndex, setActivityIndex] = useState(0);
   const [activityPosition, setActivityPosition] = useState(0);
   const [teamPosition, setTeamPosition] = useState(3);
@@ -159,10 +156,11 @@ export function LandingPage() {
   const ActivityIcon = activity.icon;
   const CapabilityIcon = capabilityGroups[activeCapability].icon;
 
-  // Applies the saved theme while the landing page is outside the app shell.
+  // Applies the single Convene visual system while the landing page is outside the app shell.
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
+    document.documentElement.dataset.theme = "convene";
+    document.documentElement.dataset.convenePalette = themePalette;
+  }, [themePalette]);
 
   // Reveals the navbar when scrolling upward and hides it while scrolling down.
   useEffect(() => {
@@ -226,7 +224,7 @@ export function LandingPage() {
 
   return (
     <main className="landing-page">
-      {/* Landing navigation and theme control. */}
+      {/* Landing navigation. */}
       <header className={`landing-nav ${navVisible ? "is-visible" : "is-hidden"}`}>
         <a className="landing-brand" href="#top" aria-label="Convene home">
           <span className="landing-brand-mark">
@@ -243,15 +241,7 @@ export function LandingPage() {
           <a href="#why-us">Why Convene</a>
         </nav>
         <div className="landing-nav-actions">
-          <button
-            type="button"
-            className="landing-theme-toggle"
-            onClick={toggleTheme}
-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {isDark ? <Sun size={17} /> : <Moon size={17} />}
-          </button>
+          <ThemePicker compact className="theme-picker-landing" />
           <Link className="landing-login-link" to="/login">
             Log in
           </Link>

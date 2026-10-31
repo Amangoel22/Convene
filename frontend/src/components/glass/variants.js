@@ -27,7 +27,7 @@ export const glassCardVariants = cva("glass-surface rounded-[20px]", {
 });
 
 export const glassButtonVariants = cva(
-  "inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 type-xs weight-semibold transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B6FD4] disabled:opacity-50",
+  "inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 type-xs weight-semibold transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B85C38] disabled:opacity-50",
   {
     variants: {
       variant: {

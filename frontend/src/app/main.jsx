@@ -3,19 +3,12 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import "@/styles/globals.css";
-import { useAppStore } from "@/store/useAppStore";
+import "@/styles/convene-theme.css";
+import { getInitialConveneTheme } from "@/constants/conveneTheme";
 
-const savedTheme = window.localStorage.getItem("convene_theme");
-const systemTheme = window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-document.documentElement.dataset.theme = savedTheme === "dark" || savedTheme === "light" ? savedTheme : systemTheme;
-
-// Keeps the app aligned with OS appearance until the user explicitly chooses a theme.
-window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
-  if (window.localStorage.getItem("convene_theme")) return;
-  const theme = event.matches ? "dark" : "light";
-  document.documentElement.dataset.theme = theme;
-  useAppStore.setState({ theme });
-});
+// Applies the single Convene visual system before the first render to avoid a theme flash.
+document.documentElement.dataset.theme = "convene";
+document.documentElement.dataset.convenePalette = getInitialConveneTheme();
 
 const rootElement = document.getElementById("root");
 

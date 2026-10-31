@@ -1,0 +1,396 @@
+/* Purpose: provide the unified Convene visual layer without deleting the legacy theme files. */
+
+/* Purpose: keep the product palette warm, calm, and consistent on every route. */
+html[data-theme="convene"] {
+  color-scheme: light;
+  --color-bg-primary: #F5F1EA;
+  --color-bg-secondary: #FFFDF8;
+  --color-sidebar: #EEE8DE;
+  --color-navbar: #F8F4EE;
+  --color-hero: #FFFDF8;
+  --color-hover: #EDE6DC;
+  --color-selected: #E7D8C9;
+  --color-selected-text: #2A2622;
+  --color-border: rgba(72, 58, 45, 0.14);
+  --color-gold: #A9792F;
+  --color-primary-accent: #B85C38;
+  --color-powder-blue: #8E432B;
+  --color-success: #4F7A62;
+  --color-error: #B04A3A;
+  --color-info: #8B6F5A;
+  --color-text-primary: #2A2622;
+  --color-text-secondary: #6E665C;
+  --color-text-muted: #9A9084;
+  --color-loading-base: #E8E0D5;
+  --color-loading-highlight: #F8F4EE;
+  --landing-ink: #2A2622;
+  --landing-paper: #F5F1EA;
+  --landing-card: #FFFDF8;
+  --landing-muted: #6E665C;
+  --landing-accent: #B85C38;
+  --landing-line: rgba(72, 58, 45, 0.15);
+  --landing-glow: rgba(184, 92, 56, 0.14);
+  --color-app-glow: rgba(184, 92, 56, 0.055);
+  --color-card-hover-shadow: 0 18px 42px rgba(83, 60, 42, 0.14);
+  --color-card-hover-border: rgba(184, 92, 56, 0.34);
+  --page-title-start: #2A2622;
+  --page-title-end: #B85C38;
+  --page-title-start-dark: #2A2622;
+  --page-title-end-dark: #B85C38;
+}
+
+/* Purpose: define the alternative presets while reusing the same app-wide token names. */
+html[data-theme="convene"][data-convene-palette="forest-authority"] {
+  --color-bg-primary: #F5F7F5;
+  --color-bg-secondary: #FFFFFF;
+  --color-sidebar: #E7EFEA;
+  --color-navbar: #F8FAF8;
+  --color-hero: #FFFFFF;
+  --color-hover: #E8F0EB;
+  --color-selected: #D8E9E0;
+  --color-selected-text: #1F2E29;
+  --color-border: rgba(34, 70, 56, 0.14);
+  --color-gold: #A68A3A;
+  --color-primary-accent: #0F766E;
+  --color-powder-blue: #064E3B;
+  --color-success: #059669;
+  --color-error: #B04A48;
+  --color-info: #0F766E;
+  --color-text-primary: #1F2937;
+  --color-text-secondary: #4B5563;
+  --color-text-muted: #7A8A84;
+  --color-loading-base: #DFE9E3;
+  --color-loading-highlight: #F7FAF8;
+  --landing-ink: #1F2937;
+  --landing-paper: #F5F7F5;
+  --landing-card: #FFFFFF;
+  --landing-muted: #4B5563;
+  --landing-accent: #0F766E;
+  --landing-line: rgba(34, 70, 56, 0.15);
+  --landing-glow: rgba(15, 118, 110, 0.13);
+  --color-app-glow: rgba(15, 118, 110, 0.05);
+  --color-card-hover-shadow: 0 18px 42px rgba(22, 72, 58, 0.13);
+  --color-card-hover-border: rgba(15, 118, 110, 0.34);
+  --page-title-start: #064E3B;
+  --page-title-end: #0F766E;
+}
+
+html[data-theme="convene"][data-convene-palette="obsidian-copper"] {
+  --color-bg-primary: #F8F9FA;
+  --color-bg-secondary: #FFFFFF;
+  --color-sidebar: #EEF0F1;
+  --color-navbar: #FAFBFB;
+  --color-hero: #FFFFFF;
+  --color-hover: #E9ECEF;
+  --color-selected: #F4D7C8;
+  --color-selected-text: #1A1D20;
+  --color-border: rgba(26, 29, 32, 0.14);
+  --color-gold: #B7791F;
+  --color-primary-accent: #D94E1F;
+  --color-powder-blue: #A83B18;
+  --color-success: #0E6251;
+  --color-error: #B83B2F;
+  --color-info: #A83B18;
+  --color-text-primary: #1A1D20;
+  --color-text-secondary: #495057;
+  --color-text-muted: #7A8188;
+  --color-loading-base: #E4E7E9;
+  --color-loading-highlight: #FBFCFC;
+  --landing-ink: #1A1D20;
+  --landing-paper: #F8F9FA;
+  --landing-card: #FFFFFF;
+  --landing-muted: #495057;
+  --landing-accent: #D94E1F;
+  --landing-line: rgba(26, 29, 32, 0.15);
+  --landing-glow: rgba(217, 78, 31, 0.13);
+  --color-app-glow: rgba(217, 78, 31, 0.05);
+  --color-card-hover-shadow: 0 18px 42px rgba(53, 42, 35, 0.13);
+  --color-card-hover-border: rgba(217, 78, 31, 0.34);
+  --page-title-start: #1A1D20;
+  --page-title-end: #D94E1F;
+}
+
+html[data-theme="convene"][data-convene-palette="plum-prestige"] {
+  --color-bg-primary: #FAF8FC;
+  --color-bg-secondary: #FFFFFF;
+  --color-sidebar: #F3EFF7;
+  --color-navbar: #FCFAFD;
+  --color-hero: #FFFFFF;
+  --color-hover: #F1EBF4;
+  --color-selected: #E9DDED;
+  --color-selected-text: #2E112D;
+  --color-border: rgba(64, 35, 64, 0.14);
+  --color-gold: #B4873B;
+  --color-primary-accent: #E15F41;
+  --color-powder-blue: #9B3E36;
+  --color-success: #0E6251;
+  --color-error: #B23B49;
+  --color-info: #806A82;
+  --color-text-primary: #2E112D;
+  --color-text-secondary: #524352;
+  --color-text-muted: #8D8290;
+  --color-loading-base: #EDE6F0;
+  --color-loading-highlight: #FCFAFD;
+  --landing-ink: #2E112D;
+  --landing-paper: #FAF8FC;
+  --landing-card: #FFFFFF;
+  --landing-muted: #524352;
+  --landing-accent: #E15F41;
+  --landing-line: rgba(64, 35, 64, 0.15);
+  --landing-glow: rgba(225, 95, 65, 0.13);
+  --color-app-glow: rgba(225, 95, 65, 0.05);
+  --color-card-hover-shadow: 0 18px 42px rgba(71, 38, 62, 0.13);
+  --color-card-hover-border: rgba(225, 95, 65, 0.34);
+  --page-title-start: #2E112D;
+  --page-title-end: #E15F41;
+}
+
+html[data-theme="convene"][data-convene-palette="nordic-marigold"] {
+  --color-bg-primary: #F9F9F8;
+  --color-bg-secondary: #FFFFFF;
+  --color-sidebar: #F1F1ED;
+  --color-navbar: #FDFDFC;
+  --color-hero: #FFFFFF;
+  --color-hover: #F0F0EB;
+  --color-selected: #F2E7C8;
+  --color-selected-text: #18181B;
+  --color-border: rgba(45, 45, 39, 0.14);
+  --color-gold: #D97706;
+  --color-primary-accent: #D97706;
+  --color-powder-blue: #A65305;
+  --color-success: #0F766E;
+  --color-error: #B45309;
+  --color-info: #A65305;
+  --color-text-primary: #18181B;
+  --color-text-secondary: #525252;
+  --color-text-muted: #7A7A73;
+  --color-loading-base: #E9E9E3;
+  --color-loading-highlight: #FDFDFC;
+  --landing-ink: #18181B;
+  --landing-paper: #F9F9F8;
+  --landing-card: #FFFFFF;
+  --landing-muted: #525252;
+  --landing-accent: #D97706;
+  --landing-line: rgba(45, 45, 39, 0.15);
+  --landing-glow: rgba(217, 119, 6, 0.13);
+  --color-app-glow: rgba(217, 119, 6, 0.05);
+  --color-card-hover-shadow: 0 18px 42px rgba(73, 63, 41, 0.13);
+  --color-card-hover-border: rgba(217, 119, 6, 0.34);
+  --page-title-start: #18181B;
+  --page-title-end: #D97706;
+}
+
+html[data-theme="convene"][data-convene-palette="blue-daylight"] {
+  --color-bg-primary: #F7F8FA;
+  --color-bg-secondary: #FFFFFF;
+  --color-sidebar: #FFFFFF;
+  --color-navbar: #FFFFFF;
+  --color-hero: #FFFFFF;
+  --color-hover: #F0F2F5;
+  --color-selected: #E8ECF1;
+  --color-selected-text: #1A1D23;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-gold: #D4930E;
+  --color-primary-accent: #3B6FD4;
+  --color-powder-blue: #2C5EBF;
+  --color-success: #22A65E;
+  --color-error: #D6453D;
+  --color-info: #3B6FD4;
+  --color-text-primary: #1A1D23;
+  --color-text-secondary: #5A6577;
+  --color-text-muted: #8E99A8;
+  --color-loading-base: #E8ECF1;
+  --color-loading-highlight: #F7F8FA;
+  --landing-ink: #111923;
+  --landing-paper: #F7F8FA;
+  --landing-card: #FFFFFF;
+  --landing-muted: #647184;
+  --landing-accent: #3B6FD4;
+  --landing-line: rgba(20, 35, 54, 0.12);
+  --landing-glow: rgba(59, 111, 212, 0.16);
+  --color-app-glow: rgba(59, 111, 212, 0.055);
+  --color-card-hover-shadow: 0 16px 40px rgba(31, 55, 96, 0.10);
+  --color-card-hover-border: rgba(59, 111, 212, 0.24);
+  --page-title-start: #172033;
+  --page-title-end: #3B6FD4;
+}
+
+/* Purpose: style the compact theme control used in the landing navbar and the full settings control. */
+.theme-picker { position: relative; z-index: 40; }
+.theme-picker-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-secondary);
+  cursor: pointer;
+  transition: border-color 180ms ease, color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+.theme-picker-trigger:hover { color: var(--color-primary-accent); border-color: var(--color-card-hover-border); background: var(--color-hover); }
+.theme-picker-compact .theme-picker-trigger { width: 2.4rem; padding: 0; border-radius: 50%; }
+.theme-picker-chevron { transition: transform 180ms ease; }
+.theme-picker-chevron.is-open { transform: rotate(180deg); }
+.theme-picker-menu {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  right: 0;
+  width: 17rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-bg-secondary);
+  box-shadow: var(--color-card-hover-shadow);
+}
+.theme-picker-heading { padding: 0.45rem 0.65rem 0.55rem; color: var(--color-text-muted); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.theme-picker-option { display: flex; width: 100%; align-items: center; gap: 0.65rem; padding: 0.55rem 0.65rem; border: 0; border-radius: 0.75rem; color: var(--color-text-primary); background: transparent; text-align: left; cursor: pointer; }
+.theme-picker-option:hover, .theme-picker-option.is-selected { background: var(--color-hover); }
+.theme-picker-swatch { width: 1.15rem; height: 1.15rem; flex: 0 0 auto; border: 2px solid color-mix(in srgb, var(--theme-swatch) 35%, white); border-radius: 50%; background: var(--theme-swatch); }
+.theme-picker-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; }
+.theme-picker-label { font-size: 0.78rem; font-weight: 700; }
+.theme-picker-description { margin-top: 0.1rem; color: var(--color-text-muted); font-size: 0.68rem; }
+.theme-picker-check { color: var(--color-primary-accent); }
+.theme-picker-landing .theme-picker-trigger { color: var(--landing-ink); border-color: var(--landing-line); background: transparent; }
+.theme-picker-landing .theme-picker-trigger:hover { color: var(--landing-accent); border-color: var(--landing-accent); background: transparent; }
+
+/* Purpose: replace hard-coded surface primitives with the unified palette. */
+html[data-theme="convene"] body,
+html[data-theme="convene"] #root,
+html[data-theme="convene"] .app-background {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+html[data-theme="convene"] .glass-surface,
+html[data-theme="convene"] .glass-elevation-hero,
+html[data-theme="convene"] .glass-elevation-main,
+html[data-theme="convene"] .surface-card,
+html[data-theme="convene"] .surface-card-token {
+  background-color: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+}
+
+html[data-theme="convene"] .glass-sidebar {
+  background-color: var(--color-sidebar) !important;
+  border-color: var(--color-border) !important;
+}
+
+html[data-theme="convene"] .glass-navbar,
+html[data-theme="convene"] .surface-token {
+  background-color: var(--color-navbar) !important;
+  border-color: var(--color-border) !important;
+}
+
+html[data-theme="convene"] .app-navbar-scrolled {
+  background-color: color-mix(in srgb, var(--color-navbar) 90%, transparent) !important;
+}
+
+/* Purpose: remap semantic utilities so existing screens inherit the new tone. */
+html[data-theme="convene"] .text-token-primary,
+html[data-theme="convene"] .text-primary-ink { color: var(--color-text-primary) !important; }
+html[data-theme="convene"] .text-token-secondary,
+html[data-theme="convene"] .text-secondary { color: var(--color-text-secondary) !important; }
+html[data-theme="convene"] .text-token-muted,
+html[data-theme="convene"] .text-muted { color: var(--color-text-muted) !important; }
+html[data-theme="convene"] .text-token-accent,
+html[data-theme="convene"] .text-accent { color: var(--color-primary-accent) !important; }
+html[data-theme="convene"] .text-token-accent-dark { color: var(--color-powder-blue) !important; }
+html[data-theme="convene"] .text-token-success { color: var(--color-success) !important; }
+html[data-theme="convene"] .text-token-warning,
+html[data-theme="convene"] .text-token-gold { color: var(--color-gold) !important; }
+html[data-theme="convene"] .text-token-error { color: var(--color-error) !important; }
+html[data-theme="convene"] .text-token-info { color: var(--color-info) !important; }
+html[data-theme="convene"] .text-token-inverse { color: var(--color-bg-secondary) !important; }
+
+html[data-theme="convene"] .surface-token { background-color: var(--color-bg-primary) !important; }
+html[data-theme="convene"] .field-token,
+html[data-theme="convene"] .bg-token-field { background-color: var(--color-hover) !important; }
+html[data-theme="convene"] .hover-token { background-color: var(--color-selected) !important; }
+html[data-theme="convene"] .accent-surface-token { background-color: color-mix(in srgb, var(--color-primary-accent) 12%, var(--color-bg-secondary)) !important; }
+html[data-theme="convene"] .error-surface-token { background-color: color-mix(in srgb, var(--color-error) 10%, var(--color-bg-secondary)) !important; }
+html[data-theme="convene"] .bg-token-accent,
+html[data-theme="convene"] .bg-token-info { background-color: var(--color-primary-accent) !important; }
+html[data-theme="convene"] .bg-token-success { background-color: var(--color-success) !important; }
+html[data-theme="convene"] .bg-token-error { background-color: var(--color-error) !important; }
+html[data-theme="convene"] .bg-token-gold,
+html[data-theme="convene"] .bg-token-warning { background-color: var(--color-gold) !important; }
+html[data-theme="convene"] .bg-token-page { background-color: var(--color-bg-primary) !important; }
+html[data-theme="convene"] .bg-token-hover-dark { background-color: var(--color-hover) !important; }
+html[data-theme="convene"] .bg-token-panel-dark,
+html[data-theme="convene"] .bg-token-header,
+html[data-theme="convene"] .bg-token-surface-light { background-color: var(--color-bg-secondary) !important; }
+html[data-theme="convene"] .bg-token-accent-light { background-color: color-mix(in srgb, var(--color-primary-accent) 10%, var(--color-bg-secondary)) !important; }
+html[data-theme="convene"] .bg-token-success-light { background-color: color-mix(in srgb, var(--color-success) 10%, var(--color-bg-secondary)) !important; }
+html[data-theme="convene"] .bg-token-warning-light { background-color: color-mix(in srgb, var(--color-gold) 10%, var(--color-bg-secondary)) !important; }
+html[data-theme="convene"] .bg-token-success-dark { background-color: var(--color-success) !important; }
+html[data-theme="convene"] .text-token-success-dark { color: var(--color-success) !important; }
+html[data-theme="convene"] .text-token-warning-dark { color: var(--color-gold) !important; }
+html[data-theme="convene"] .border-token,
+html[data-theme="convene"] .border-default,
+html[data-theme="convene"] .border-subtle-token,
+html[data-theme="convene"] .border-token-subtle,
+html[data-theme="convene"] .border-token-medium,
+html[data-theme="convene"] .border-token-light,
+html[data-theme="convene"] .divide-subtle-token,
+html[data-theme="convene"] .divide-token-subtle { border-color: var(--color-border) !important; }
+html[data-theme="convene"] .border-token-accent { border-color: var(--color-primary-accent) !important; }
+html[data-theme="convene"] .border-token-success { border-color: var(--color-success) !important; }
+html[data-theme="convene"] .border-token-warning,
+html[data-theme="convene"] .border-token-gold { border-color: var(--color-gold) !important; }
+html[data-theme="convene"] .border-token-error { border-color: var(--color-error) !important; }
+html[data-theme="convene"] .ring-token-accent { --tw-ring-color: var(--color-primary-accent) !important; }
+html[data-theme="convene"] .shadow-token-accent { box-shadow: 0 0 12px color-mix(in srgb, var(--color-primary-accent) 30%, transparent) !important; }
+html[data-theme="convene"] .from-token-success-light { --tw-gradient-from: color-mix(in srgb, var(--color-success) 10%, var(--color-bg-secondary)) var(--tw-gradient-from-position) !important; }
+html[data-theme="convene"] .to-token-accent-light { --tw-gradient-to: color-mix(in srgb, var(--color-primary-accent) 10%, var(--color-bg-secondary)) var(--tw-gradient-to-position) !important; }
+html[data-theme="convene"] .via-token-inverse { --tw-gradient-via: var(--color-bg-secondary) var(--tw-gradient-via-position) !important; }
+html[data-theme="convene"] .to-token-inverse { --tw-gradient-to: var(--color-bg-secondary) var(--tw-gradient-to-position) !important; }
+
+/* Purpose: keep status surfaces softly colored instead of turning every accent blue. */
+html[data-theme="convene"] [class~="bg-token-accent/10"] { background-color: color-mix(in srgb, var(--color-primary-accent) 10%, transparent) !important; }
+html[data-theme="convene"] [class~="bg-token-accent/18"] { background-color: color-mix(in srgb, var(--color-primary-accent) 18%, transparent) !important; }
+html[data-theme="convene"] [class~="bg-token-info/18"] { background-color: color-mix(in srgb, var(--color-primary-accent) 18%, transparent) !important; }
+html[data-theme="convene"] [class~="border-token-accent/20"],
+html[data-theme="convene"] [class~="border-token-accent/30"],
+html[data-theme="convene"] [class~="border-token-accent/40"] { border-color: color-mix(in srgb, var(--color-primary-accent) 30%, transparent) !important; }
+html[data-theme="convene"] [class~="ring-token-accent/20"] { --tw-ring-color: color-mix(in srgb, var(--color-primary-accent) 20%, transparent) !important; }
+html[data-theme="convene"] [class~="hover:border-token-accent/40"]:hover { border-color: color-mix(in srgb, var(--color-primary-accent) 40%, transparent) !important; }
+
+/* Purpose: translate the remaining legacy blue utility classes without changing component files. */
+html[data-theme="convene"] [class~="bg-[#3B6FD4]"],
+html[data-theme="convene"] [class~="bg-[#2C5EBF]"],
+html[data-theme="convene"] [class~="bg-[#007AFF]"],
+html[data-theme="convene"] [class~="bg-blue-600"] { background-color: var(--color-primary-accent) !important; }
+html[data-theme="convene"] [class~="text-[#3B6FD4]"],
+html[data-theme="convene"] [class~="text-[#2C5EBF]"],
+html[data-theme="convene"] [class~="text-[#007AFF]"],
+html[data-theme="convene"] [class~="text-blue-600"] { color: var(--color-primary-accent) !important; }
+html[data-theme="convene"] [class~="border-[#3B6FD4]"],
+html[data-theme="convene"] [class~="border-blue-600"] { border-color: var(--color-primary-accent) !important; }
+html[data-theme="convene"] [class~="bg-[#EBF0FA]"],
+html[data-theme="convene"] [class~="bg-[#F5F8FF]"],
+html[data-theme="convene"] [class~="bg-blue-50"] { background-color: color-mix(in srgb, var(--color-primary-accent) 12%, var(--color-bg-secondary)) !important; }
+html[data-theme="convene"] [class~="text-[#1A1D23]"],
+html[data-theme="convene"] [class~="text-[#111827]"] { color: var(--color-text-primary) !important; }
+html[data-theme="convene"] [class~="text-[#5A6577]"],
+html[data-theme="convene"] [class~="text-[#6B7280]"] { color: var(--color-text-secondary) !important; }
+html[data-theme="convene"] [class~="text-[#8E99A8]"],
+html[data-theme="convene"] [class~="text-[#9CA3AF]"] { color: var(--color-text-muted) !important; }
+
+/* Purpose: make native fields and loading buffers feel part of the same material system. */
+html[data-theme="convene"] input,
+html[data-theme="convene"] textarea,
+html[data-theme="convene"] select {
+  color: var(--color-text-primary);
+  background-color: var(--color-hover);
+  border-color: var(--color-border);
+}
+html[data-theme="convene"] input::placeholder,
+html[data-theme="convene"] textarea::placeholder { color: var(--color-text-muted); }
+html[data-theme="convene"] .loading-skeleton {
+  background: linear-gradient(110deg, var(--color-loading-base) 8%, var(--color-loading-highlight) 18%, var(--color-loading-base) 33%);
+  background-size: 200% 100%;
+}

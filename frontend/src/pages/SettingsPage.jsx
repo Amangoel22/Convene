@@ -1,5 +1,6 @@
 // Purpose: SettingsPage implements this source module.
 import { GlassButton } from "@/components/glass/GlassButton";
+import { ThemePicker } from "@/components/ui/ThemePicker";
 import { PageTitle } from "@/components/ui/PageTitle";
 import { isEventComplete } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -20,9 +21,17 @@ export function SettingsPage() {
         <div className="flex items-center justify-between border-b border-subtle-token pb-5">
           <div>
             <h4 className="type-base weight-bold text-token-primary">Event Name & Branding</h4>
-            <p className="mt-0.5 type-xs weight-medium text-token-muted">Configure event title, logo, and theme accent colors.</p>
+            <p className="mt-0.5 type-xs weight-medium text-token-muted">Configure event title, logo, and workspace details.</p>
           </div>
           {!eventIsComplete && <GlassButton variant="primary" className="rounded-full type-xs">Edit Details</GlassButton>}
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-subtle-token pb-5">
+          <div>
+            <h4 className="type-base weight-bold text-token-primary">Workspace appearance</h4>
+            <p className="mt-0.5 type-xs weight-medium text-token-muted">Choose the color tone that feels right for your command center.</p>
+          </div>
+          <ThemePicker />
         </div>
 
         <div className="flex items-center justify-between border-b border-subtle-token pb-5">

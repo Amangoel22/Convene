@@ -1,21 +1,18 @@
 // Purpose: useAppStore implements this source module.
 import { create } from "zustand";
+import { getInitialConveneTheme, isConveneTheme } from "@/constants/conveneTheme";
 
 export const initialEvents = [];
 
-// Uses an explicit saved choice first, then follows the operating-system appearance.
-const getInitialTheme = () => {
-  if (typeof window === "undefined") return "light";
-  const savedTheme = window.localStorage.getItem("convene_theme");
-  if (savedTheme === "dark" || savedTheme === "light") return savedTheme;
-  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-};
+// Keeps the legacy store field stable while the product uses one unified visual system.
+const getInitialTheme = () => "convene";
 
 export const useAppStore = create((set) => ({
   currentUser: null,
   token: null,
   sidebarExpanded: true,
   theme: getInitialTheme(),
+  themePalette: getInitialConveneTheme(),
   role: "lead", // "lead" | "member"
   events: [],
   eventsHydrated: false,
@@ -28,6 +25,14 @@ export const useAppStore = create((set) => ({
     set({ currentUser: null, token: null, events: [], eventsHydrated: false, activeEvent: null });
   },
   setRole: (role) => set({ role }),
+  setThemePalette: (themePalette) => {
+    if (!isConveneTheme(themePalette)) return;
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("convene_palette", themePalette);
+      document.documentElement.dataset.convenePalette = themePalette;
+    }
+    set({ themePalette });
+  },
   setActiveEvent: (event) => set({ activeEvent: event, role: event?.accessLevel === "lead" ? "lead" : "member" }),
   addEvent: (newEvent) =>
     set((state) => {
@@ -87,9 +92,6 @@ export const useAppStore = create((set) => ({
   completeOnboarding: () => set({ hasOnboarded: true }),
   resetOnboarding: () => set({ hasOnboarded: false }),
   setSidebarExpanded: (expanded) => set({ sidebarExpanded: expanded }),
-  toggleTheme: () => set((state) => {
-    const theme = state.theme === "light" ? "dark" : "light";
-    window.localStorage.setItem("convene_theme", theme);
-    return { theme };
-  })
+  // Keeps old callers safe without allowing a second visual mode to return.
+  toggleTheme: () => set({ theme: "convene" })
 }));

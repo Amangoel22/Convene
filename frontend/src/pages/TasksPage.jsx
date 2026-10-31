@@ -25,7 +25,6 @@ import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
 import { PageTitle } from "@/components/ui/PageTitle";
 import { cn, isEventComplete } from "@/lib/utils";
-import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
 
 const statuses = [
@@ -706,6 +705,22 @@ export function TasksPage() {
     setNewTaskOpen(false);
   };
 
+  // Purpose: download the current event task register for reporting and handoff.
+  const handleExport = async () => {
+    if (!activeEvent?.id) return;
+    const response = await fetch(`${API_BASE}/events/${activeEvent.id}/tasks/export`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("convene_token")}` },
+    });
+    if (!response.ok) return;
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${activeEvent.name || "event"}-tasks.xlsx`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
       {/* Header */}
@@ -731,6 +746,7 @@ export function TasksPage() {
             variant="secondary"
             icon={<Download size={16} strokeWidth={2} />}
             className="rounded-full"
+            onClick={handleExport}
           >
             Export
           </GlassButton>
@@ -917,16 +933,9 @@ export function TasksPage() {
                     </td>
 
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <UserAvatar
-                          initials={task.assignee.initials}
-                          image={task.assignee.avatar}
-                          className="h-6 w-6 type-10 accent-surface-token text-token-accent"
-                        />
-                        <span className="type-xs weight-semibold text-token-primary">
-                          {task.assignee.name}
-                        </span>
-                      </div>
+                      <span className="type-xs weight-semibold text-token-primary">
+                        {task.assignee.name}
+                      </span>
                     </td>
 
                     <td className="px-4 py-3">
@@ -1001,16 +1010,9 @@ export function TasksPage() {
                             {task.title}
                           </p>
                           <div className="mt-3 flex items-center justify-between border-t border-subtle-token pt-2 type-11">
-                            <div className="flex items-center gap-1.5">
-                              <UserAvatar
-                                initials={task.assignee.initials}
-                                image={task.assignee.avatar}
-                                className="h-5 w-5 type-9 accent-surface-token text-token-accent"
-                              />
-                              <span className="weight-semibold text-token-secondary truncate max-w-[90px]">
-                                {task.assignee.name}
-                              </span>
-                            </div>
+                            <span className="weight-semibold text-token-secondary truncate max-w-[120px]">
+                              {task.assignee.name}
+                            </span>
                             <button
                               className={cn(
                                 "flex h-5 w-5 min-h-0 items-center justify-center rounded-full transition-colors",

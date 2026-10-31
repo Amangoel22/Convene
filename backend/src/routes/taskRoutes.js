@@ -2,9 +2,12 @@
 import express from "express";
 import { prisma } from "../config/prisma.js";
 import { authenticate, authorizeEventMembership, authorizeOrgLead } from "../middlewares/auth.js";
+import { createWorkbookBuffer } from "../utils/workbook.js";
 
 const router = express.Router();
 const memberInclude = { user: { select: { id: true, name: true, email: true, phone: true, avatarUrl: true } }, orgTeam: { select: { id: true, name: true } } };
+
+const TASK_WORKBOOK_HEADERS = ["Task ID", "Task Title", "Description", "Team", "Assigned To", "Assigned Phone", "Status", "Priority", "Due Date", "Created At", "Updated At"];
 
 // Links an explicitly self-assigned pending member to the authenticated account.
 async function linkMatchingSelf(member, userId, userPhone) {
@@ -21,6 +24,38 @@ router.get("/:eventId/tasks", authenticate, authorizeEventMembership(), async (r
     const tasks = await prisma.task.findMany({ where: { eventId: req.params.eventId, ...(orgTeamId && { orgTeamId }), ...(status && { status }), ...(priority && { priority }) }, include: { orgTeam: true, assignedOrgMember: { include: memberInclude } }, orderBy: { createdAt: "desc" } });
     return res.json({ tasks });
   } catch (error) { return res.status(500).json({ error: "Failed to fetch tasks.", details: error.message }); }
+});
+
+// Purpose: export event tasks into a readable workbook for operational reporting.
+router.get("/:eventId/tasks/export", authenticate, authorizeEventMembership(), async (req, res) => {
+  try {
+    const event = await prisma.event.findUnique({ where: { id: req.params.eventId }, select: { name: true } });
+    if (!event) return res.status(404).json({ error: "Event not found." });
+    const tasks = await prisma.task.findMany({
+      where: { eventId: req.params.eventId },
+      include: { orgTeam: true, assignedOrgMember: { include: { user: true } } },
+      orderBy: { createdAt: "asc" },
+    });
+    const rows = tasks.map((task) => ({
+      "Task ID": task.id,
+      "Task Title": task.title,
+      Description: task.description || "",
+      Team: task.orgTeam?.name || "",
+      "Assigned To": task.assignedOrgMember?.user?.name || task.assignedOrgMember?.name || "",
+      "Assigned Phone": task.assignedOrgMember?.user?.phone || task.assignedOrgMember?.phone || "",
+      Status: task.status === "In_Progress" ? "In Progress" : task.status,
+      Priority: task.priority,
+      "Due Date": task.dueAt ? task.dueAt.toISOString() : "",
+      "Created At": task.createdAt.toISOString(),
+      "Updated At": task.updatedAt.toISOString(),
+    }));
+    const buffer = createWorkbookBuffer("Tasks", TASK_WORKBOOK_HEADERS, rows);
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", `attachment; filename="${event.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-tasks.xlsx"`);
+    return res.send(buffer);
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to export tasks.", details: error.message });
+  }
 });
 
 // Handles router.post.

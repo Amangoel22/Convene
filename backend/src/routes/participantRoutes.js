@@ -1,11 +1,34 @@
 // Purpose: participantRoutes implements this source module.
 import express from "express";
 import crypto from "node:crypto";
+import multer from "multer";
 import { prisma } from "../config/prisma.js";
-import { authenticate, authorizeEventMembership } from "../middlewares/auth.js";
+import { authenticate, authorizeEventMembership, authorizeOrgLead } from "../middlewares/auth.js";
 import { hashPassword } from "../utils/auth.js";
+import {
+  createWorkbookBuffer,
+  parseParticipantWorkbook,
+  PARTICIPANT_WORKBOOK_HEADERS,
+  normalizeParticipantStatus,
+} from "../utils/workbook.js";
 
 const router = express.Router();
+const workbookUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+
+// Purpose: format database status values for the participant workbook.
+function exportParticipantStatus(status) {
+  return status === "Checked_In" ? "Checked In" : status || "Unconfirmed";
+}
+
+// Purpose: create a safe fallback email when an imported row only has a phone number.
+function generatedParticipantEmail(phone) {
+  return `participant_${phone || crypto.randomBytes(6).toString("hex")}@convene.test`;
+}
+
+// Purpose: translate workbook status labels into Prisma enum values.
+function databaseParticipantStatus(status) {
+  return normalizeParticipantStatus(status) === "Checked In" ? "Checked_In" : normalizeParticipantStatus(status);
+}
 
 // -------------------------------------------------------------
 // POST /api/participants/:eventId/register - Register participant(s) / team for an event
@@ -288,6 +311,164 @@ router.post("/:eventId/register", authenticate, async (req, res) => {
       .json({ error: "Event registration failed.", details: error.message });
   }
 });
+
+// Purpose: import one normalized workbook and group rows into event participant teams.
+router.post(
+  "/:eventId/participants/import",
+  authenticate,
+  authorizeEventMembership(["organizer"]),
+  authorizeOrgLead(),
+  workbookUpload.single("file"),
+  async (req, res) => {
+    if (!req.file) return res.status(400).json({ error: "An XLSX, XLS, or CSV file is required." });
+    const extension = req.file.originalname.toLowerCase().split(".").pop();
+    if (!["xlsx", "xls", "csv"].includes(extension)) return res.status(400).json({ error: "Only XLSX, XLS, and CSV files are supported." });
+
+    const { rows, errors } = parseParticipantWorkbook(req.file.buffer);
+    if (errors.length) return res.status(422).json({ error: "The workbook could not be imported.", errors });
+
+    try {
+      const defaultPasswordHash = await hashPassword("password123");
+      const result = await prisma.$transaction(async (tx) => {
+        const teams = new Map();
+        let importedParticipants = 0;
+
+        for (const row of rows) {
+          let team = teams.get(row.teamCode);
+          if (!team) {
+            team = await tx.participantTeam.upsert({
+              where: { unique_event_participant_team_code: { eventId: req.params.eventId, teamCode: row.teamCode } },
+              create: {
+                eventId: req.params.eventId,
+                teamCode: row.teamCode,
+                name: row.teamName,
+                description: row.teamCollege || row.college || null,
+                status: row.teamStatus || "Unconfirmed",
+                internalNotes: row.teamNotes || null,
+              },
+              update: {
+                name: row.teamName,
+                description: row.teamCollege || row.college || undefined,
+                status: row.teamStatus || undefined,
+                internalNotes: row.teamNotes || undefined,
+              },
+            });
+            teams.set(row.teamCode, team);
+          }
+
+          let user = row.email ? await tx.user.findUnique({ where: { email: row.email } }) : null;
+          if (!user && row.phone) user = await tx.user.findFirst({ where: { phone: row.phone } });
+          if (!user) {
+            user = await tx.user.create({
+              data: {
+                name: row.participantName,
+                email: row.email || generatedParticipantEmail(row.phone),
+                phone: row.phone || null,
+                passwordHash: defaultPasswordHash,
+              },
+            });
+          } else {
+            user = await tx.user.update({
+              where: { id: user.id },
+              data: { name: row.participantName || user.name, ...(row.phone ? { phone: row.phone } : {}) },
+            });
+          }
+
+          await tx.eventMembership.upsert({
+            where: { unique_event_user: { eventId: req.params.eventId, userId: user.id } },
+            create: { eventId: req.params.eventId, userId: user.id, role: "participant" },
+            update: {},
+          });
+
+          await tx.eventParticipant.upsert({
+            where: { unique_event_participant: { eventId: req.params.eventId, userId: user.id } },
+            create: {
+              eventId: req.params.eventId,
+              userId: user.id,
+              participantCode: row.participantCode || `${row.teamCode}-${importedParticipants + 1}`,
+              qrToken: crypto.randomBytes(32).toString("hex"),
+              checkInStatus: databaseParticipantStatus(row.participantStatus),
+              internalNotes: row.notes || null,
+            },
+            update: {
+              checkInStatus: databaseParticipantStatus(row.participantStatus),
+              internalNotes: row.notes || null,
+              ...(row.participantCode ? { participantCode: row.participantCode } : {}),
+            },
+          });
+
+          await tx.participantTeamMember.upsert({
+            where: { unique_participant_team_user: { participantTeamId: team.id, userId: user.id } },
+            create: { participantTeamId: team.id, userId: user.id, role: row.role },
+            update: { role: row.role },
+          });
+          importedParticipants += 1;
+        }
+        return { teams: teams.size, participants: importedParticipants };
+      });
+
+      return res.status(201).json({ message: "Participants imported successfully.", ...result });
+    } catch (error) {
+      return res.status(500).json({ error: "Failed to import participants.", details: error.message });
+    }
+  },
+);
+
+// Purpose: export event teams and participants into the same single-sheet import format.
+router.get(
+  "/:eventId/participants/export",
+  authenticate,
+  authorizeEventMembership(),
+  async (req, res) => {
+    try {
+      const event = await prisma.event.findUnique({
+        where: { id: req.params.eventId },
+        include: {
+          participantTeams: {
+            orderBy: { createdAt: "asc" },
+            include: { members: { include: { user: true }, orderBy: { createdAt: "asc" } } },
+          },
+          participants: true,
+        },
+      });
+      if (!event) return res.status(404).json({ error: "Event not found." });
+
+      const participantByUserId = new Map(event.participants.map((participant) => [participant.userId, participant]));
+      const rows = event.participantTeams.flatMap((team) => {
+        const lead = team.members.find((member) => member.role === "lead") || team.members[0];
+        return team.members.map((member) => {
+          const participant = participantByUserId.get(member.userId);
+          return {
+            "Team ID": team.id,
+            "Team Code": team.teamCode,
+            "Team Name": team.name,
+            "Team Status": team.status || "Unconfirmed",
+            "Team College / Org": team.description || "",
+            "Team Notes": team.internalNotes || "",
+            "Team Lead Name": lead?.user?.name || "",
+            "Team Lead Email": lead?.user?.email || "",
+            "Team Lead Phone": lead?.user?.phone || "",
+            "Participant ID": participant?.id || "",
+            "Participant Code": participant?.participantCode || "",
+            "Participant Name": member.user?.name || "",
+            Email: member.user?.email || "",
+            Phone: member.user?.phone || "",
+            "College / Org": team.description || "",
+            "Participant Status": exportParticipantStatus(participant?.checkInStatus),
+            Role: member.role === "lead" ? "Team Lead" : "Member",
+            Notes: participant?.internalNotes || "",
+          };
+        });
+      });
+      const buffer = createWorkbookBuffer("Participants", PARTICIPANT_WORKBOOK_HEADERS, rows);
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", `attachment; filename="${event.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-participants.xlsx"`);
+      return res.send(buffer);
+    } catch (error) {
+      return res.status(500).json({ error: "Failed to export participants.", details: error.message });
+    }
+  },
+);
 
 // -------------------------------------------------------------
 // GET /api/events/:eventId/participants - List event participants

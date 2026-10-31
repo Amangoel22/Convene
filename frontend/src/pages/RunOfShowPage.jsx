@@ -8,7 +8,6 @@ import {
   ChevronDown,
   Clock,
   Edit,
-  FileDown,
   MapPin,
   Plus,
   Radio,
@@ -508,9 +507,6 @@ export function RunOfShowPage() {
               Add Stage
             </GlassButton>
           )}
-          <GlassButton variant="secondary" icon={<FileDown size={16} strokeWidth={2} />} className="rounded-full type-xs">
-            Export Schedule
-          </GlassButton>
         </div>
       </div>
 

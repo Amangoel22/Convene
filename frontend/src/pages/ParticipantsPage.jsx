@@ -20,6 +20,8 @@ import {
   StatusPill,
 } from "@/components/participants/ParticipantsComponents";
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+
 function useDebouncedValue(value, delay = 180) {
   const [debounced, setDebounced] = useState(value);
 
@@ -430,6 +432,22 @@ export function ParticipantsPage() {
     }
   };
 
+  // Purpose: download the current event participant directory in the import-compatible format.
+  const handleExport = async () => {
+    if (!activeEvent?.id) return;
+    const response = await fetch(`${API_BASE}/participants/${activeEvent.id}/participants/export`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("convene_token")}` },
+    });
+    if (!response.ok) return;
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${activeEvent.name || "event"}-participants.xlsx`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-8 w-full max-w-[1360px] mx-auto pb-16 pt-1">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -447,13 +465,14 @@ export function ParticipantsPage() {
               onClick={() => setImportOpen(true)}
               className="rounded-full"
             >
-              Import CSV
+              Import workbook
             </GlassButton>
           )}
           <GlassButton
             variant="secondary"
             icon={<FileDown size={16} strokeWidth={2} />}
             className="rounded-full"
+            onClick={handleExport}
           >
             Export
           </GlassButton>
@@ -614,14 +633,14 @@ export function ParticipantsPage() {
         <div className="p-10 text-center rounded-3xl border border-token surface-card-token">
           <EmptyState
             title="No matching participants found."
-            description="Create a participant or import a CSV to start building your event directory."
+            description="Create a participant or import a workbook to start building your event directory."
             actionLabel={isLead ? "Create Participant" : undefined}
             onAction={isLead ? () => setCreateModalOpen(true) : undefined}
           />
         </div>
       ) : (
         <div className="space-y-6">
-          {filteredTeams.map((team) => (
+          {filteredTeams.map((team, index) => (
             <div
               key={team.id}
               className="rounded-3xl surface-card-token border border-token overflow-hidden transition-colors hover:border-token-strong shadow-token-card"
@@ -629,7 +648,8 @@ export function ParticipantsPage() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between surface-token px-6 py-4">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="font-mono type-xs weight-bold text-token-accent accent-surface-token px-3 py-1 rounded-full shrink-0">
-                    {team.team}
+                    {/* Purpose: show a compact display number while retaining the real team identity in data. */}
+                    {String(index + 1).padStart(2, "0")}
                   </span>
                   <div className="flex flex-wrap items-baseline gap-2">
                     <h3 className="type-base weight-bold text-token-primary">
@@ -742,7 +762,12 @@ export function ParticipantsPage() {
         onSubmit={handleCreateParticipant}
         teams={teams}
       />
-      <ImportModal open={importOpen} onClose={() => setImportOpen(false)} />
+      <ImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        eventId={activeEvent?.id}
+        onImported={loadEventTeams}
+      />
     </div>
   );
 }

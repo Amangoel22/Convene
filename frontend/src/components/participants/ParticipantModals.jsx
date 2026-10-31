@@ -1,9 +1,12 @@
 // Purpose: ParticipantModals implements this source module.
 import { FileUp, Plus, Upload, X } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
 import { cn } from "@/lib/utils";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+const MAX_IMPORT_SIZE = 5 * 1024 * 1024;
 
 export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
   const [mode, setMode] = useState("newTeam"); // "newTeam" | "existingTeam" | "individual"
@@ -327,11 +330,61 @@ export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
   );
 }
 
-export function ImportModal({ open, onClose }) {
-  const previewRows = [];
+// Purpose: upload a normalized one-sheet participant workbook to the event importer.
+export function ImportModal({ open, onClose, eventId, onImported }) {
+  const inputRef = useRef(null);
+  const [file, setFile] = useState(null);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileChange = (event) => {
+    const nextFile = event.target.files?.[0] || null;
+    setError("");
+    setMessage("");
+    if (!nextFile) return;
+    if (nextFile.size > MAX_IMPORT_SIZE) {
+      setFile(null);
+      setError("The workbook must be 5 MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+    setFile(nextFile);
+  };
+
+  const handleImport = async () => {
+    if (!file || !eventId) return;
+    setUploading(true);
+    setError("");
+    setMessage("");
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const response = await fetch(`${API_BASE}/participants/${eventId}/participants/import`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${localStorage.getItem("convene_token")}` },
+        body: form,
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        setError(payload.errors?.join(" ") || payload.error || "Unable to import participants.");
+        return;
+      }
+      setMessage(`${payload.participants} participants imported across ${payload.teams} teams.`);
+      await onImported?.();
+      setFile(null);
+      if (inputRef.current) inputRef.current.value = "";
+    } catch (uploadError) {
+      setError(uploadError.message || "Unable to import participants.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <GlassModal
       open={open}
+      onClose={onClose}
       className="w-[min(720px,calc(100vw-32px))] max-w-none surface-card-token border border-token rounded-3xl p-6 text-token-primary"
     >
       <div className="flex items-start justify-between gap-4">
@@ -340,7 +393,7 @@ export function ImportModal({ open, onClose }) {
             Import participants
           </h2>
           <p className="mt-1 type-xs weight-medium text-token-secondary">
-            Upload a CSV exported from your registration platform.
+            Upload the single-sheet workbook exported by your registration platform.
           </p>
         </div>
         <button
@@ -353,27 +406,23 @@ export function ImportModal({ open, onClose }) {
       </div>
       <div className="mt-6 rounded-2xl border-2 border-dashed border-token-medium surface-token p-8 text-center">
         <Upload className="mx-auto text-token-accent" size={30} strokeWidth={2} />
-        <p className="mt-3 type-sm weight-bold text-token-primary">Drop CSV here</p>
+        <p className="mt-3 type-sm weight-bold text-token-primary">Choose one workbook</p>
         <p className="mt-1 type-xs weight-medium text-token-muted">
-          Team, leader, college, and members columns supported.
+          XLSX, XLS, or CSV · maximum 5 MB · one row per participant
         </p>
-      </div>
-      <div className="mt-5 overflow-hidden rounded-2xl surface-token border border-subtle-token">
-        {previewRows.map((row) => (
-          <div
-            key={row.id}
-            className="grid grid-cols-[1fr_1fr_0.8fr] gap-3 border-b border-subtle-token px-4 py-3 type-xs last:border-b-0"
-          >
-            <span className="truncate weight-semibold text-token-primary">
-              {row.team}: {row.teamName}
-            </span>
-            <span className="truncate text-token-secondary">{row.college}</span>
-            <span className="truncate text-token-muted">
-              {row.members.length} members
-            </span>
+        <input ref={inputRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleFileChange} className="sr-only" />
+        <button type="button" onClick={() => inputRef.current?.click()} className="mt-5 inline-flex h-10 items-center gap-2 rounded-full field-token border border-token px-4 type-xs weight-bold text-token-primary hover:hover-token">
+          <FileUp size={15} /> Choose file
+        </button>
+        {file && (
+          <div className="mx-auto mt-4 flex max-w-md items-center justify-between gap-3 rounded-xl surface-card-token px-3 py-2 text-left">
+            <span className="min-w-0 truncate type-xs weight-semibold text-token-primary">{file.name}</span>
+            <button type="button" className="shrink-0 type-11 weight-bold text-token-error" onClick={() => { setFile(null); if (inputRef.current) inputRef.current.value = ""; }}>Remove</button>
           </div>
-        ))}
+        )}
       </div>
+      {error && <p className="mt-4 type-xs weight-semibold text-token-error">{error}</p>}
+      {message && <p className="mt-4 type-xs weight-semibold text-token-success">{message}</p>}
       <div className="mt-6 flex justify-end gap-3">
         <GlassButton onClick={onClose} className="rounded-full">
           Cancel
@@ -382,8 +431,10 @@ export function ImportModal({ open, onClose }) {
           variant="primary"
           icon={<FileUp size={16} strokeWidth={2} />}
           className="rounded-full"
+          onClick={handleImport}
+          disabled={!file || uploading}
         >
-          Import CSV
+          {uploading ? "Importing..." : "Import workbook"}
         </GlassButton>
       </div>
     </GlassModal>

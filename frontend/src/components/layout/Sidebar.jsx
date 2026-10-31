@@ -3,7 +3,6 @@ import {
   Boxes,
   CalendarClock,
   ClipboardCheck,
-  Flag,
   LayoutDashboard,
   Library,
   LogOut,
@@ -16,6 +15,7 @@ import {
 import { motion } from "framer-motion";
 import { NavLink, useNavigate } from "react-router-dom";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import { ConveneMark } from "@/components/brand/ConveneMark";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -69,7 +69,7 @@ export function Sidebar() {
       {/* Brand Header */}
       <div className="flex items-center gap-3 px-2 mb-8">
         <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-token-accent text-token-inverse shadow-md">
-          <Flag size={18} strokeWidth={2.5} />
+          <ConveneMark size={20} />
         </div>
         <div>
           <h1 className="type-lg weight-extrabold tracking-tight text-token-primary leading-none">Convene</h1>

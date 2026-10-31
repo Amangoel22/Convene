@@ -14,6 +14,7 @@ import { SettingsPage } from "@/pages/SettingsPage";
 import { OnboardingPage } from "@/pages/OnboardingPage";
 import { DutiesPage } from "@/pages/DutiesPage";
 import { LoginPage } from "@/pages/LoginPage";
+import { LandingPage } from "@/pages/LandingPage";
 import { useAppStore } from "@/store/useAppStore";
 
 import { useEffect, useState } from "react";
@@ -128,7 +129,7 @@ export function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route
           path="/onboarding"

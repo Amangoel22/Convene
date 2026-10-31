@@ -27,6 +27,19 @@
   --color-text-muted: #8E99A8;
   --color-loading-base: #E8ECF1;
   --color-loading-highlight: #F7F8FA;
+  --landing-ink: #111923;
+  --landing-paper: #F7F8FA;
+  --landing-card: #FFFFFF;
+  --landing-muted: #647184;
+  --landing-accent: #3B6FD4;
+  --landing-line: rgba(20, 35, 54, 0.12);
+  --landing-glow: rgba(59, 111, 212, 0.16);
+  --landing-display-size: clamp(3.75rem, 8.2vw, 7.5rem);
+  --landing-section-size: clamp(3.4rem, 5.6vw, 6rem);
+  --landing-heading-compact: 1.25rem;
+  --landing-body-size: 1rem;
+  --landing-body-compact: 0.875rem;
+  --landing-label-size: 0.6875rem;
 }
 
 /* Purpose: semantic color classes keep component markup free of literal color values. */
@@ -334,6 +347,13 @@ select::-ms-expand {
   --color-text-primary: #F3F6FB;
   --color-text-secondary: #AEB9C9;
   --color-text-muted: #8491A5;
+  --landing-ink: #F3F6FB;
+  --landing-paper: #0E131B;
+  --landing-card: #151B25;
+  --landing-muted: #AEB9C9;
+  --landing-accent: #82AEFF;
+  --landing-line: rgba(255, 255, 255, 0.12);
+  --landing-glow: rgba(80, 130, 220, 0.20);
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
 }

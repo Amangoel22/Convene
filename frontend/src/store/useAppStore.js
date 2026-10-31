@@ -3,9 +3,12 @@ import { create } from "zustand";
 
 export const initialEvents = [];
 
+// Uses an explicit saved choice first, then follows the operating-system appearance.
 const getInitialTheme = () => {
   if (typeof window === "undefined") return "light";
-  return window.localStorage.getItem("convene_theme") === "dark" ? "dark" : "light";
+  const savedTheme = window.localStorage.getItem("convene_theme");
+  if (savedTheme === "dark" || savedTheme === "light") return savedTheme;
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 };
 
 export const useAppStore = create((set) => ({

@@ -1,0 +1,38 @@
+/* Purpose: login.css styles the branded split-screen authentication experience. */
+.login-layout { display: grid; min-height: 100svh; grid-template-columns: minmax(0, 1fr) minmax(480px, .88fr); color: var(--color-text-primary); }
+.login-story { position: relative; display: flex; min-height: 100svh; flex-direction: column; justify-content: space-between; overflow: hidden; padding: clamp(32px, 5vw, 76px); color: var(--landing-ink); background: radial-gradient(ellipse at 78% 48%, var(--landing-glow), transparent 48%), var(--landing-paper); }
+.login-story::before, .login-story::after { position: absolute; width: min(42vw, 560px); aspect-ratio: 1; border: 1px solid var(--landing-line); border-radius: 50%; content: ""; pointer-events: none; }
+.login-story::before { right: -18%; bottom: 3%; animation: landing-orbit 48s linear infinite; }
+.login-story::after { right: -8%; bottom: 13%; border-style: dashed; animation: landing-orbit 66s linear infinite reverse; }
+.login-story-brand { position: relative; z-index: 1; display: inline-flex; width: max-content; align-items: center; gap: 10px; color: var(--landing-ink); font-size: var(--landing-heading-compact); font-weight: 800; text-decoration: none; }
+.login-story-brand > span { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 13px; color: var(--landing-paper); background: var(--landing-ink); }
+.login-brand-dot { color: var(--landing-accent); }
+.login-story-copy { position: relative; z-index: 1; width: min(100%, 660px); margin: 46px auto; }
+.login-story-eyebrow { color: var(--landing-muted); font-size: var(--landing-label-size); font-weight: 800; letter-spacing: 1.8px; }
+.login-story-copy h1 { margin: 20px 0; color: var(--landing-ink); font-size: clamp(3rem, 5.4vw, 5.8rem); font-weight: 800; letter-spacing: -.075em; line-height: .98; }
+.login-story-copy h1 span { color: var(--landing-accent); }
+.login-story-copy > p:not(.login-story-eyebrow) { max-width: 500px; color: var(--landing-muted); font-size: var(--landing-body-size); line-height: 1.85; }
+.login-story-preview { position: relative; margin-top: 42px; padding: 22px; border: 1px solid var(--landing-line); border-radius: 22px; background: color-mix(in srgb, var(--landing-card) 91%, transparent); box-shadow: 0 28px 70px color-mix(in srgb, var(--landing-ink) 12%, transparent); animation: landing-card-drift 6s ease-in-out infinite; }
+.login-preview-heading { display: flex; align-items: center; gap: 10px; }
+.login-preview-mark { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 11px; color: var(--landing-accent); background: var(--landing-glow); }
+.login-preview-heading b, .login-preview-heading small { display: block; }
+.login-preview-heading b { color: var(--landing-ink); font-size: var(--landing-body-compact); }
+.login-preview-heading small { margin-top: 3px; color: var(--landing-muted); font-size: var(--landing-label-size); }
+.login-preview-heading > i { margin-left: auto; padding: 7px 10px; border: 1px solid var(--landing-line); border-radius: 99px; color: var(--landing-muted); font-size: 9px; font-style: normal; font-weight: 800; letter-spacing: 1px; }
+.login-preview-track { display: flex; align-items: center; margin: 27px 0 10px; }
+.login-preview-track > span { display: grid; width: 24px; height: 24px; flex: 0 0 24px; place-items: center; border: 1px solid var(--landing-line); border-radius: 50%; color: var(--landing-muted); background: var(--landing-card); font-size: 11px; }
+.login-preview-track > span.is-done { color: var(--landing-paper); border-color: var(--color-success); background: var(--color-success); }
+.login-preview-track > span.is-current { border-color: var(--landing-accent); animation: landing-marker-glow 1.8s ease-in-out infinite; }
+.login-preview-track > span.is-current b { width: 7px; height: 7px; border-radius: 50%; background: var(--landing-accent); }
+.login-preview-track > i { height: 1px; flex: 1; background: var(--landing-line); }
+.login-preview-track > i:first-of-type { background: var(--color-success); }
+.login-preview-labels { display: flex; justify-content: space-between; color: var(--landing-muted); font-size: var(--landing-label-size); }
+.login-preview-update { position: absolute; right: -18px; bottom: -24px; display: flex; align-items: center; gap: 9px; padding: 12px 15px; border: 1px solid var(--landing-line); border-radius: 14px; color: var(--landing-ink); background: var(--landing-card); box-shadow: 0 14px 36px var(--landing-glow); animation: landing-node-float 4s ease-in-out infinite; }
+.login-preview-update > span { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 8px; color: var(--landing-paper); background: var(--color-success); }
+.login-preview-update b { font-size: var(--landing-label-size); }
+.login-preview-update small { color: var(--landing-muted); font-size: 9px; }
+.login-story-foot { position: relative; z-index: 1; color: var(--landing-muted); font-size: var(--landing-label-size); }
+.login-form-side { display: grid; min-height: 100svh; place-items: center; padding: 40px clamp(24px, 5vw, 80px); background: var(--color-bg-primary); }
+.login-form-card { width: min(100%, 480px); }
+@media (max-width: 900px) { .login-layout { grid-template-columns: minmax(0, .92fr) minmax(420px, 1fr); }.login-story { padding: 34px; }.login-story-copy h1 { font-size: clamp(2.8rem, 5vw, 4.4rem); } }
+@media (max-width: 700px) { .login-layout { display: block; }.login-story { min-height: auto; padding: 25px 22px 35px; }.login-story-copy { margin: 48px 0 15px; }.login-story-copy h1 { font-size: clamp(2.8rem, 12vw, 4rem); }.login-story-preview { margin: 28px 8px 24px 0; padding: 16px; }.login-preview-update { right: -8px; }.login-story-foot { display: none; }.login-form-side { min-height: auto; padding: 25px 18px 40px; }.login-form-card { padding: 25px !important; } }

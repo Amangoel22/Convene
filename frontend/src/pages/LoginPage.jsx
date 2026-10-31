@@ -3,7 +3,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/store/useAppStore";
 import { GlassButton } from "@/components/glass/GlassButton";
+import { ConveneMark } from "@/components/brand/ConveneMark";
 import { LogIn, UserPlus, Sparkles, AlertCircle, ShieldCheck } from "lucide-react";
+import "@/styles/login.css";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -73,8 +75,24 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-token-page flex items-center justify-center p-4">
-      <div className="w-full max-w-md surface-card-token border border-token rounded-3xl p-8 shadow-xl">
+    <main className="login-layout min-h-screen w-full bg-token-page">
+      <section className="login-story" aria-label="About Convene">
+        <a className="login-story-brand" href="/" aria-label="Convene home"><span><ConveneMark size={20} /></span> convene</a>
+        <div className="login-story-copy">
+          <p className="login-story-eyebrow">EVENTS, IN SYNC</p>
+          <h1>Every moving part.<br/><span>One clear picture.</span></h1>
+          <p>Bring schedules, teams, tasks, and event-day decisions together—so everyone knows what happens next.</p>
+          <div className="login-story-preview" aria-hidden="true">
+            <div className="login-preview-heading"><span className="login-preview-mark"><Sparkles size={14}/></span><span><b>Event flow</b><small>Live run of show</small></span><i>IN SYNC</i></div>
+            <div className="login-preview-track"><span className="is-done">✓</span><i/><span className="is-current"><b/></span><i/><span/><i/><span/></div>
+            <div className="login-preview-labels"><span>Check-in</span><span>Opening</span><span>Sessions</span><span>Finale</span></div>
+            <div className="login-preview-update"><span>✓</span><b>Team task completed</b><small>Just now</small></div>
+          </div>
+        </div>
+        <p className="login-story-foot">One workspace for the people behind a great event.</p>
+      </section>
+      <section className="login-form-side" aria-label="Sign in or register">
+      <div className="login-form-card w-full max-w-md surface-card-token border border-token rounded-3xl p-8 shadow-xl">
         {/* Header */}
         <div className="text-center space-y-2 mb-6">
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl accent-surface-token text-token-accent mb-2">
@@ -222,10 +240,11 @@ export function LoginPage() {
         {/* Demo Credentials Footer */}
         <div className="mt-6 pt-4 border-t border-subtle-token text-center type-11 text-token-muted">
           <p className="flex items-center justify-center gap-1 weight-medium">
-            <ShieldCheck size={13} className="text-token-success" /> Direct backend integration active (`/api/auth`)
+            Let’s begin
           </p>
         </div>
       </div>
-    </div>
+      </section>
+    </main>
   );
 }

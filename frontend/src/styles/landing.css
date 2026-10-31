@@ -99,7 +99,7 @@
 .landing-why { background: color-mix(in srgb, var(--landing-card) 55%, var(--landing-paper)); }
 .landing-why-content { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 50px; }
 .landing-why-copy .landing-section-title span { color: var(--landing-accent); }
-.landing-proof-list { display: grid; gap: 13px; margin: 30px 0 0; padding: 0; list-style: none; color: var(--landing-ink); font-size: 11px; font-weight: 600; }
+.landing-proof-list { display: grid; gap: 13px; margin: 30px 0 0; padding: 0; list-style: none; color: var(--landing-ink); font-size: 13px; font-weight: 600; }
 .landing-proof-list li { display: flex; align-items: center; gap: 10px; }
 .landing-proof-list svg { color: var(--landing-accent); }
 .landing-why-visual { position: relative; display: grid; min-height: 430px; place-items: center; overflow: hidden; }
@@ -258,6 +258,21 @@ html { scroll-behavior: smooth; scroll-padding-top: 92px; }
 .landing-team-band .landing-team-copy { grid-column: 2; }
 .landing-team-band .landing-role-stack { grid-column: 3; }
 .landing-team-band .landing-team-copy h2 { font-size: var(--landing-section-size); }
+/* Tightens post-hero sections so the story flows without large unused bands. */
+.landing-section { padding-block: clamp(58px, 7vw, 104px); }
+.landing-team-band { padding-block: clamp(58px, 7vw, 104px); }
+.landing-why-visual { min-height: 390px; }
+.landing-closing { padding-block: clamp(72px, 9vw, 120px); }
+@media (max-width: 1050px) {
+  .landing-section { padding-block: 68px; }
+  .landing-team-band { padding-block: 68px; }
+  .landing-why-visual { min-height: 410px; }
+}
+@media (max-width: 700px) {
+  .landing-section { padding-block: 58px; }
+  .landing-team-band { padding-block: 58px; }
+  .landing-why-visual { min-height: 340px; }
+}
 .landing-team-copy > p:not(.landing-section-kicker) { font-size: var(--landing-body-size); }
 .landing-section-index span { font-size: var(--landing-label-size); }
 .landing-section-index::after { bottom: -110px; }

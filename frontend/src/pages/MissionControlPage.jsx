@@ -142,16 +142,20 @@ export function MissionControlPage() {
 
   // Compute continuous timeline line progress percentage across all stages
   const lineProgressPercent = useMemo(() => {
-    if (eventIsComplete) return evaluatedStages.length > 0 ? 100 : 0;
+    if (eventIsComplete || (evaluatedStages.length > 0 && completedCount === evaluatedStages.length)) return 100;
     if (evaluatedStages.length <= 1) return 0;
     const totalSegments = evaluatedStages.length - 1;
 
-    if (liveStageIndex !== -1 && evaluatedStages[liveStageIndex]?.timeWindow) {
-      const parts = evaluatedStages[liveStageIndex].timeWindow.split(/[–—-]/);
-      const startStr = parts[0]?.trim();
-      const endStr = parts[1]?.trim();
-      const startDateObj = parseTimeString(startStr, now);
-      const endDateObj = parseTimeString(endStr, now);
+    if (liveStageIndex !== -1) {
+      const curStage = evaluatedStages[liveStageIndex];
+      let startDateObj = curStage.startAt ? new Date(curStage.startAt) : null;
+      let endDateObj = curStage.endAt ? new Date(curStage.endAt) : null;
+
+      if ((!startDateObj || Number.isNaN(startDateObj.getTime())) && curStage.timeWindow) {
+        const parts = curStage.timeWindow.split(/[–—-]/);
+        startDateObj = parseTimeString(parts[0]?.trim(), now);
+        endDateObj = parseTimeString(parts[1]?.trim(), now);
+      }
 
       if (
         startDateObj &&
@@ -168,14 +172,38 @@ export function MissionControlPage() {
           (liveStageIndex + withinStageFraction) / totalSegments;
         return Math.min(100, Math.max(0, Math.round(overallFraction * 100)));
       }
-      // If no valid timeWindow duration, progress line at least reaches current node
       return Math.min(100, Math.round((liveStageIndex / totalSegments) * 100));
     }
 
-    return Math.min(100, Math.round((completedCount / totalSegments) * 100));
+    // When no stage is LIVE, line reaches the last completed stage node (not beyond it)
+    if (completedCount <= 0) return 0;
+    const lastCompletedIndex = Math.min(totalSegments, completedCount - 1);
+    return Math.min(100, Math.round((lastCompletedIndex / totalSegments) * 100));
   }, [eventIsComplete, evaluatedStages, liveStageIndex, completedCount, now]);
 
-  const progressPercent = lineProgressPercent;
+  // Overall schedule completion percentage based on total stages
+  const scheduleProgressPercent = useMemo(() => {
+    if (eventIsComplete || (rawStages.length > 0 && completedCount === rawStages.length)) return 100;
+    if (rawStages.length === 0) return 0;
+
+    if (liveStageIndex !== -1) {
+      const curStage = evaluatedStages[liveStageIndex];
+      let startDateObj = curStage.startAt ? new Date(curStage.startAt) : null;
+      let endDateObj = curStage.endAt ? new Date(curStage.endAt) : null;
+      let fraction = 0;
+      if (startDateObj && endDateObj && endDateObj.getTime() > startDateObj.getTime()) {
+        fraction = Math.max(
+          0,
+          Math.min(1, (now.getTime() - startDateObj.getTime()) / (endDateObj.getTime() - startDateObj.getTime())),
+        );
+      }
+      return Math.min(99, Math.round(((completedCount + fraction) / rawStages.length) * 100));
+    }
+
+    return Math.min(100, Math.round((completedCount / rawStages.length) * 100));
+  }, [eventIsComplete, rawStages.length, completedCount, liveStageIndex, evaluatedStages, now]);
+
+  const progressPercent = scheduleProgressPercent;
 
   // Live countdown timer in JavaScript synced with target upcoming stage / event time
   const [secondsRemaining, setSecondsRemaining] = useState(0);
@@ -391,22 +419,56 @@ export function MissionControlPage() {
                     className="flex flex-col items-center gap-2 group cursor-pointer flex-1 min-w-0"
                   >
                     {/* Node Circle */}
-                    <div
-                      className={cn(
-                        "h-4 w-4 rounded-full transition-all flex items-center justify-center border-2 shrink-0",
-                        isCurrent
-                          ? "bg-token-accent border-token-accent ring-4 ring-token-accent/20 shadow-token-accent"
-                          : isCompleted
-                            ? "bg-token-success border-token-success"
-                            : "field-token border-token-medium",
+                    <div className="relative flex items-center justify-center shrink-0 h-7 w-7">
+                      {isCurrent && (
+                        <>
+                          {/* Animated Radar Pulse Wave */}
+                          <span
+                            className="absolute inset-0 rounded-full animate-ping pointer-events-none opacity-75"
+                            style={{
+                              background: "var(--color-primary-accent, #3B6FD4)",
+                            }}
+                          />
+                          {/* Ambient Glowing Halo */}
+                          <span
+                            className="absolute -inset-1.5 rounded-full pointer-events-none animate-pulse"
+                            style={{
+                              background: "var(--color-primary-accent, #3B6FD4)",
+                              filter: "blur(6px)",
+                              opacity: 0.7,
+                            }}
+                          />
+                        </>
                       )}
-                    >
-                      {isCompleted && (
-                        <Check
-                          size={9}
-                          className="text-token-inverse stroke-[3]"
-                        />
-                      )}
+
+                      <div
+                        className={cn(
+                          "rounded-full transition-all flex items-center justify-center relative z-10",
+                          isCurrent
+                            ? "h-5 w-5 bg-token-accent border-2 border-white dark:border-zinc-900"
+                            : isCompleted
+                              ? "h-4 w-4 bg-token-success border-2 border-token-success"
+                              : "h-4 w-4 field-token border-2 border-token-medium",
+                        )}
+                        style={
+                          isCurrent
+                            ? {
+                                boxShadow:
+                                  "0 0 16px 4px var(--color-primary-accent, #3B6FD4), 0 0 32px 8px color-mix(in srgb, var(--color-primary-accent, #3B6FD4) 50%, transparent)",
+                              }
+                            : undefined
+                        }
+                      >
+                        {isCurrent && (
+                          <span className="h-1.5 w-1.5 rounded-full bg-white shadow-sm" />
+                        )}
+                        {isCompleted && (
+                          <Check
+                            size={9}
+                            className="text-token-inverse stroke-[3]"
+                          />
+                        )}
+                      </div>
                     </div>
 
                     {/* Stage Name */}
@@ -434,7 +496,11 @@ export function MissionControlPage() {
                             : "text-token-inverse-muted",
                       )}
                     >
-                      {stg.timeWindow || stg.timeDisplay || stg.time}
+                      {stg.timeWindow ||
+                        stg.timeDisplay ||
+                        (stg.startAt && stg.endAt
+                          ? `${formatDisplayTime(new Date(stg.startAt))} – ${formatDisplayTime(new Date(stg.endAt))}`
+                          : stg.time)}
                     </span>
                   </div>
                 );
@@ -444,13 +510,13 @@ export function MissionControlPage() {
             {/* Connecting Line */}
             {evaluatedStages.length > 1 && (
               <div
-                className="absolute top-[17px] h-0.5 hover-token -z-0"
+                className="absolute top-[22px] -translate-y-1/2 h-0.5 hover-token z-0"
                 style={{
                   left: `${100 / (evaluatedStages.length * 2)}%`,
                   right: `${100 / (evaluatedStages.length * 2)}%`,
                 }}
               >
-                {/* Active/Live progress line advancing forward towards next stage in blue */}
+                {/* Active/Live progress line advancing forward towards next stage */}
                 <div
                   className="absolute top-0 bottom-0 left-0 bg-token-accent transition-all duration-300"
                   style={{
@@ -459,9 +525,20 @@ export function MissionControlPage() {
                 />
                 {/* Past completed stages strictly in green */}
                 <div
-                  className="absolute top-0 bottom-0 left-0 bg-token-success transition-all duration-300"
+                  className="absolute top-0 bottom-0 left-0 bg-token-success transition-all duration-300 z-10"
                   style={{
-                    width: `${Math.min(100, Math.round((completedCount / (evaluatedStages.length - 1)) * 100))}%`,
+                    width: `${Math.min(
+                      100,
+                      Math.round(
+                        ((liveStageIndex !== -1
+                          ? liveStageIndex
+                          : completedCount === evaluatedStages.length
+                            ? evaluatedStages.length - 1
+                            : Math.max(0, completedCount - 1)) /
+                          (evaluatedStages.length - 1)) *
+                          100,
+                      ),
+                    )}%`,
                   }}
                 />
               </div>

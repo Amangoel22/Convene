@@ -44,6 +44,22 @@ router.post(
         .status(400)
         .json({ error: "A valid issue priority is required." });
     try {
+      // Guard against accidental rapid double-submission (within last 4 seconds)
+      const recentDuplicate = await prisma.issue.findFirst({
+        where: {
+          eventId: req.params.eventId,
+          title: title.trim(),
+          reporterUserId: req.user.id,
+          createdAt: {
+            gte: new Date(Date.now() - 4000),
+          },
+        },
+        include: issueInclude,
+      });
+      if (recentDuplicate) {
+        return res.status(200).json({ issue: recentDuplicate });
+      }
+
       const issue = await prisma.issue.create({
         data: {
           eventId: req.params.eventId,

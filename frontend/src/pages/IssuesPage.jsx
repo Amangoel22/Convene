@@ -30,6 +30,8 @@ export function IssuesPage() {
   const [newPriority, setNewPriority] = useState("Medium");
   const [newNotes, setNewNotes] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResolving, setIsResolving] = useState(false);
   const token = useAppStore((state) => state.token);
   const activeEvent = useAppStore((state) => state.activeEvent);
   const eventIsComplete = isEventComplete(activeEvent, new Date());
@@ -66,34 +68,46 @@ export function IssuesPage() {
 
   const handleCreateIssue = async (e) => {
     e.preventDefault();
-    if (eventIsComplete) return;
+    if (eventIsComplete || isSubmitting) return;
     if (!newTitle.trim()) return;
 
-    const response = await fetch(
-      `${API_BASE}/events/${activeEvent.id}/issues`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(
+        `${API_BASE}/events/${activeEvent.id}/issues`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: newTitle.trim(),
+            priority: newPriority,
+            description: newNotes.trim() || undefined,
+          }),
         },
-        body: JSON.stringify({
-          title: newTitle,
-          priority: newPriority,
-          description: newNotes,
-        }),
-      },
-    );
-    const payload = await response.json();
-    if (!response.ok) {
-      setError(payload.error || "Failed to report issue.");
-      return;
+      );
+      const payload = await response.json();
+      if (!response.ok) {
+        setError(payload.error || "Failed to report issue.");
+        return;
+      }
+      setIssues((previous) => {
+        if (previous.some((item) => item.id === payload.issue.id)) {
+          return previous;
+        }
+        return [payload.issue, ...previous];
+      });
+      setCreateModalOpen(false);
+      setNewTitle("");
+      setNewNotes("");
+      setError("");
+    } catch (err) {
+      setError(err.message || "Failed to report issue.");
+    } finally {
+      setIsSubmitting(false);
     }
-    setIssues((previous) => [payload.issue, ...previous]);
-    setCreateModalOpen(false);
-    setNewTitle("");
-    setNewNotes("");
-    setError("");
   };
 
   const handleOpenResolve = (iss) => {
@@ -104,33 +118,40 @@ export function IssuesPage() {
 
   const handleConfirmResolve = async (e) => {
     e.preventDefault();
-    if (eventIsComplete) return;
+    if (eventIsComplete || isResolving) return;
     if (!feedback.trim() || !targetIssue) return;
 
-    const response = await fetch(
-      `${API_BASE}/events/${activeEvent.id}/issues/${targetIssue.id}/close`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+    setIsResolving(true);
+    try {
+      const response = await fetch(
+        `${API_BASE}/events/${activeEvent.id}/issues/${targetIssue.id}/close`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ feedback: feedback.trim() }),
         },
-        body: JSON.stringify({ feedback }),
-      },
-    );
-    const payload = await response.json();
-    if (!response.ok) {
-      setError(payload.error || "Failed to close issue.");
-      return;
+      );
+      const payload = await response.json();
+      if (!response.ok) {
+        setError(payload.error || "Failed to close issue.");
+        return;
+      }
+      setIssues((prev) =>
+        prev.map((issue) =>
+          issue.id === targetIssue.id ? payload.issue : issue,
+        ),
+      );
+      setResolveModalOpen(false);
+      setTargetIssue(null);
+      setFeedback("");
+    } catch (err) {
+      setError(err.message || "Failed to close issue.");
+    } finally {
+      setIsResolving(false);
     }
-    setIssues((prev) =>
-      prev.map((issue) =>
-        issue.id === targetIssue.id ? payload.issue : issue,
-      ),
-    );
-    setResolveModalOpen(false);
-    setTargetIssue(null);
-    setFeedback("");
   };
 
   return (
@@ -318,6 +339,7 @@ export function IssuesPage() {
             <GlassButton
               type="button"
               onClick={() => setCreateModalOpen(false)}
+              disabled={isSubmitting}
               className="h-9 type-xs rounded-full"
             >
               Cancel
@@ -325,10 +347,11 @@ export function IssuesPage() {
             <GlassButton
               type="submit"
               variant="primary"
-              icon={<Plus size={15} />}
-              className="h-9 type-xs rounded-full"
+              disabled={isSubmitting || !newTitle.trim()}
+              icon={isSubmitting ? null : <Plus size={15} />}
+              className="h-9 type-xs rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit Issue
+              {isSubmitting ? "Submitting..." : "Submit Issue"}
             </GlassButton>
           </div>
         </form>
@@ -432,6 +455,7 @@ export function IssuesPage() {
             <GlassButton
               type="button"
               onClick={() => setResolveModalOpen(false)}
+              disabled={isResolving}
               className="h-9 type-xs rounded-full"
             >
               Cancel
@@ -439,10 +463,11 @@ export function IssuesPage() {
             <GlassButton
               type="submit"
               variant="success"
-              icon={<CheckCircle2 size={15} />}
-              className="h-9 type-xs rounded-full"
+              disabled={isResolving || !feedback.trim()}
+              icon={isResolving ? null : <CheckCircle2 size={15} />}
+              className="h-9 type-xs rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Resolve Issue
+              {isResolving ? "Resolving..." : "Resolve Issue"}
             </GlassButton>
           </div>
         </form>

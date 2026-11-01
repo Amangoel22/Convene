@@ -582,43 +582,55 @@ export function TasksPage() {
     ];
   }, [tasksList]);
 
-  const filteredTasks = useMemo(() => {
+  // Base visible tasks for this user/role before status filter
+  const baseVisibleTasks = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return tasksList
-      .filter((task) => {
-        // Members only see tasks assigned to their linked organization member record.
-        if (!isLead && task.assignedOrgMember?.userId !== currentUser?.id) {
-          return false;
-        }
+    return tasksList.filter((task) => {
+      // Members only see tasks assigned to their linked organization member record.
+      if (!isLead && task.assignedOrgMember?.userId !== currentUser?.id) {
+        return false;
+      }
 
-        const matchesSearch =
-          !query ||
-          task.title.toLowerCase().includes(query) ||
-          task.department.toLowerCase().includes(query) ||
-          task.assignee.name.toLowerCase().includes(query);
+      const matchesSearch =
+        !query ||
+        task.title.toLowerCase().includes(query) ||
+        task.department.toLowerCase().includes(query) ||
+        task.assignee.name.toLowerCase().includes(query);
 
-        return (
-          matchesSearch &&
-          (department === "All Teams" || task.department === department) &&
-          (status === "All Statuses" || task.status === status) &&
-          (assignee === "All Assignees" || task.assignee.name === assignee)
-        );
-      })
-      .sort((a, b) => {
-        // Completed tasks grouped at the bottom
-        if (a.status === "Completed" && b.status !== "Completed") return 1;
-        if (a.status !== "Completed" && b.status === "Completed") return -1;
-        return 0;
-      });
+      return (
+        matchesSearch &&
+        (department === "All Teams" || task.department === department) &&
+        (assignee === "All Assignees" || task.assignee.name === assignee)
+      );
+    });
   }, [
     assignee,
     currentUser?.id,
     department,
     isLead,
     search,
-    status,
     tasksList,
   ]);
+
+  const taskCounts = useMemo(() => {
+    return {
+      total: baseVisibleTasks.length,
+      inProgress: baseVisibleTasks.filter((t) => t.status === "In Progress").length,
+      todo: baseVisibleTasks.filter((t) => t.status === "Todo").length,
+      completed: baseVisibleTasks.filter((t) => t.status === "Completed").length,
+    };
+  }, [baseVisibleTasks]);
+
+  const filteredTasks = useMemo(() => {
+    return baseVisibleTasks
+      .filter((task) => status === "All Statuses" || task.status === status)
+      .sort((a, b) => {
+        // Completed tasks grouped at the bottom
+        if (a.status === "Completed" && b.status !== "Completed") return 1;
+        if (a.status !== "Completed" && b.status === "Completed") return -1;
+        return 0;
+      });
+  }, [baseVisibleTasks, status]);
 
   const handleToggleComplete = (e, taskId) => {
     e.stopPropagation();
@@ -758,54 +770,96 @@ export function TasksPage() {
       </div>
 
       {/* Onboarding-style Task Metric Overview Banner */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        <div className="rounded-3xl surface-card-token border border-token p-4 shadow-token-card">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+        <button
+          type="button"
+          onClick={() => setStatus("All Statuses")}
+          className={cn(
+            "text-left rounded-3xl surface-card-token border p-4 shadow-token-card transition-all cursor-pointer hover:border-token-accent/40",
+            status === "All Statuses"
+              ? "border-token-accent ring-2 ring-token-accent/20 bg-token-surface-light"
+              : "border-token",
+          )}
+        >
           <p className="type-10 weight-bold uppercase tracking-wider text-token-muted">
             Total Assigned
           </p>
           <p className="mt-1 type-2xl weight-extrabold text-token-primary font-mono">
-            {filteredTasks.length}
+            {taskCounts.total}
           </p>
           <span className="type-11 weight-medium text-token-secondary">
             Active operational items
           </span>
-        </div>
+        </button>
 
-        <div className="rounded-3xl surface-card-token border border-token p-4 shadow-token-card">
+        <button
+          type="button"
+          onClick={() =>
+            setStatus((prev) => (prev === "In Progress" ? "All Statuses" : "In Progress"))
+          }
+          className={cn(
+            "text-left rounded-3xl surface-card-token border p-4 shadow-token-card transition-all cursor-pointer hover:border-token-accent/40",
+            status === "In Progress"
+              ? "border-token-accent ring-2 ring-token-accent/20 bg-token-accent-light"
+              : "border-token",
+          )}
+        >
           <p className="type-10 weight-bold uppercase tracking-wider text-token-accent">
             In Progress
           </p>
           <p className="mt-1 type-2xl weight-extrabold text-token-accent font-mono">
-            {filteredTasks.filter((t) => t.status === "In Progress").length}
+            {taskCounts.inProgress}
           </p>
           <span className="type-11 weight-medium text-token-secondary">
             Currently being executed
           </span>
-        </div>
+        </button>
 
-        <div className="rounded-3xl surface-card-token border border-token p-4 shadow-token-card">
+        <button
+          type="button"
+          onClick={() =>
+            setStatus((prev) => (prev === "Todo" ? "All Statuses" : "Todo"))
+          }
+          className={cn(
+            "text-left rounded-3xl surface-card-token border p-4 shadow-token-card transition-all cursor-pointer hover:border-token-warning/40",
+            status === "Todo"
+              ? "border-token-warning ring-2 ring-token-warning/20 bg-token-warning-light"
+              : "border-token",
+          )}
+        >
           <p className="type-10 weight-bold uppercase tracking-wider text-token-muted">
             Todo
           </p>
           <p className="mt-1 type-2xl weight-extrabold text-token-secondary font-mono">
-            {filteredTasks.filter((t) => t.status === "Todo").length}
+            {taskCounts.todo}
           </p>
           <span className="type-11 weight-medium text-token-secondary">
             Awaiting execution
           </span>
-        </div>
+        </button>
 
-        <div className="rounded-3xl surface-card-token border border-token p-4 shadow-token-card">
+        <button
+          type="button"
+          onClick={() =>
+            setStatus((prev) => (prev === "Completed" ? "All Statuses" : "Completed"))
+          }
+          className={cn(
+            "text-left rounded-3xl surface-card-token border p-4 shadow-token-card transition-all cursor-pointer hover:border-token-success/40",
+            status === "Completed"
+              ? "border-token-success ring-2 ring-token-success/20 bg-token-success-light"
+              : "border-token",
+          )}
+        >
           <p className="type-10 weight-bold uppercase tracking-wider text-token-success">
             Resolved / Done
           </p>
           <p className="mt-1 type-2xl weight-extrabold text-token-success font-mono">
-            {filteredTasks.filter((t) => t.status === "Completed").length}
+            {taskCounts.completed}
           </p>
           <span className="type-11 weight-medium text-token-secondary">
             Successfully completed
           </span>
-        </div>
+        </button>
       </div>
 
       {/* Toolbar */}

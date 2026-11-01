@@ -24,6 +24,7 @@ import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
 import { PageTitle } from "@/components/ui/PageTitle";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 import { cn, isEventComplete } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 

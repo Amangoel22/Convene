@@ -11,15 +11,28 @@ const router = express.Router();
 // -------------------------------------------------------------
 // Registers a user and links an invite to the matching organization member.
 router.post("/register", async (req, res) => {
-  const { name, email, password, phone, avatarUrl, inviteKey: rawInviteKey } = req.body;
+  const {
+    name,
+    email,
+    password,
+    phone,
+    avatarUrl,
+    inviteKey: rawInviteKey,
+  } = req.body;
 
   if (!name || !email || !password || !phone) {
-    return res.status(400).json({ error: "Name, email, password, and phone number are required fields." });
+    return res
+      .status(400)
+      .json({
+        error: "Name, email, password, and phone number are required fields.",
+      });
   }
 
   const normalizedPhone = phone.replace(/\D/g, "");
   if (!/^\d{10}$/.test(normalizedPhone)) {
-    return res.status(400).json({ error: "Phone number must contain exactly 10 digits." });
+    return res
+      .status(400)
+      .json({ error: "Phone number must contain exactly 10 digits." });
   }
 
   try {
@@ -27,14 +40,27 @@ router.post("/register", async (req, res) => {
     const invitedMember = inviteKey
       ? await prisma.orgMember.findUnique({ where: { inviteKey } })
       : null;
-    if (inviteKey && !invitedMember) return res.status(400).json({ error: "Invalid event invite key." });
-    if (invitedMember?.userId) return res.status(409).json({ error: "This event invite key has already been used." });
-    if (invitedMember?.phone && invitedMember.phone.replace(/\D/g, "") !== normalizedPhone) {
-      return res.status(400).json({ error: "Phone number does not match the invited team member." });
+    if (inviteKey && !invitedMember)
+      return res.status(400).json({ error: "Invalid event invite key." });
+    if (invitedMember?.userId)
+      return res
+        .status(409)
+        .json({ error: "This event invite key has already been used." });
+    if (
+      invitedMember?.phone &&
+      invitedMember.phone.replace(/\D/g, "") !== normalizedPhone
+    ) {
+      return res
+        .status(400)
+        .json({
+          error: "Phone number does not match the invited team member.",
+        });
     }
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return res.status(409).json({ error: "User with this email already exists." });
+      return res
+        .status(409)
+        .json({ error: "User with this email already exists." });
     }
 
     const passwordHash = await hashPassword(password);
@@ -44,7 +70,7 @@ router.post("/register", async (req, res) => {
         email,
         passwordHash,
         phone: normalizedPhone,
-        avatarUrl
+        avatarUrl,
       },
       select: {
         id: true,
@@ -52,23 +78,48 @@ router.post("/register", async (req, res) => {
         email: true,
         phone: true,
         avatarUrl: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
     if (invitedMember) {
-      await prisma.orgMember.update({ where: { id: invitedMember.id }, data: { userId: user.id } });
-      await prisma.dutyAssignment.updateMany({ where: { orgMemberId: invitedMember.id }, data: { userId: user.id } });
-      const invitedAccessLevel = invitedMember.accessLevel === "lead" ? "lead" : "member";
+      await prisma.orgMember.update({
+        where: { id: invitedMember.id },
+        data: { userId: user.id },
+      });
+      await prisma.dutyAssignment.updateMany({
+        where: { orgMemberId: invitedMember.id },
+        data: { userId: user.id },
+      });
+      const invitedAccessLevel =
+        invitedMember.accessLevel === "lead" ? "lead" : "member";
       await prisma.eventMembership.upsert({
-        where: { unique_event_user: { eventId: invitedMember.eventId, userId: user.id } },
+        where: {
+          unique_event_user: {
+            eventId: invitedMember.eventId,
+            userId: user.id,
+          },
+        },
         update: {},
-        create: { eventId: invitedMember.eventId, userId: user.id, role: invitedAccessLevel === "lead" ? "organizer" : "participant" }
+        create: {
+          eventId: invitedMember.eventId,
+          userId: user.id,
+          role: invitedAccessLevel === "lead" ? "organizer" : "participant",
+        },
       });
       await prisma.orgAccess.upsert({
-        where: { unique_event_org_access: { eventId: invitedMember.eventId, userId: user.id } },
+        where: {
+          unique_event_org_access: {
+            eventId: invitedMember.eventId,
+            userId: user.id,
+          },
+        },
         update: { accessLevel: invitedAccessLevel },
-        create: { eventId: invitedMember.eventId, userId: user.id, accessLevel: invitedAccessLevel }
+        create: {
+          eventId: invitedMember.eventId,
+          userId: user.id,
+          accessLevel: invitedAccessLevel,
+        },
       });
     }
 
@@ -78,10 +129,12 @@ router.post("/register", async (req, res) => {
       message: "User registered successfully.",
       user,
       token,
-      joinedEventId: invitedMember?.eventId || null
+      joinedEventId: invitedMember?.eventId || null,
     });
   } catch (error) {
-    return res.status(500).json({ error: "Registration failed.", details: error.message });
+    return res
+      .status(500)
+      .json({ error: "Registration failed.", details: error.message });
   }
 });
 
@@ -93,7 +146,9 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ error: "Email and password are required fields." });
+    return res
+      .status(400)
+      .json({ error: "Email and password are required fields." });
   }
 
   try {
@@ -116,12 +171,14 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone,
-        avatarUrl: user.avatarUrl
+        avatarUrl: user.avatarUrl,
       },
-      token
+      token,
     });
   } catch (error) {
-    return res.status(500).json({ error: "Login failed.", details: error.message });
+    return res
+      .status(500)
+      .json({ error: "Login failed.", details: error.message });
   }
 });
 
@@ -141,23 +198,35 @@ router.patch("/password", authenticate, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
   if (!currentPassword || !newPassword) {
-    return res.status(400).json({ error: "Current password and new password are required." });
+    return res
+      .status(400)
+      .json({ error: "Current password and new password are required." });
   }
   if (typeof newPassword !== "string" || newPassword.length < 8) {
-    return res.status(400).json({ error: "New password must be at least 8 characters long." });
+    return res
+      .status(400)
+      .json({ error: "New password must be at least 8 characters long." });
   }
 
   try {
-    const user = await prisma.user.findUnique({ where: { id: req.user.id }, select: { passwordHash: true } });
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { passwordHash: true },
+    });
     if (!user || !(await comparePassword(currentPassword, user.passwordHash))) {
       return res.status(401).json({ error: "Current password is incorrect." });
     }
 
     const passwordHash = await hashPassword(newPassword);
-    await prisma.user.update({ where: { id: req.user.id }, data: { passwordHash } });
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data: { passwordHash },
+    });
     return res.status(200).json({ message: "Password changed successfully." });
   } catch (error) {
-    return res.status(500).json({ error: "Password change failed.", details: error.message });
+    return res
+      .status(500)
+      .json({ error: "Password change failed.", details: error.message });
   }
 });
 

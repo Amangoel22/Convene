@@ -3,7 +3,11 @@ import express from "express";
 import crypto from "node:crypto";
 import multer from "multer";
 import { prisma } from "../config/prisma.js";
-import { authenticate, authorizeEventMembership, authorizeOrgLead } from "../middlewares/auth.js";
+import {
+  authenticate,
+  authorizeEventMembership,
+  authorizeOrgLead,
+} from "../middlewares/auth.js";
 import { hashPassword } from "../utils/auth.js";
 import {
   createWorkbookBuffer,
@@ -13,7 +17,10 @@ import {
 } from "../utils/workbook.js";
 
 const router = express.Router();
-const workbookUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+const workbookUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 // Purpose: format database status values for the participant workbook.
 function exportParticipantStatus(status) {
@@ -27,7 +34,9 @@ function generatedParticipantEmail(phone) {
 
 // Purpose: translate workbook status labels into Prisma enum values.
 function databaseParticipantStatus(status) {
-  return normalizeParticipantStatus(status) === "Checked In" ? "Checked_In" : normalizeParticipantStatus(status);
+  return normalizeParticipantStatus(status) === "Checked In"
+    ? "Checked_In"
+    : normalizeParticipantStatus(status);
 }
 
 // -------------------------------------------------------------
@@ -57,11 +66,17 @@ router.post("/:eventId/register", authenticate, async (req, res) => {
 
     // Validate phone numbers (numeric only, max 10 digits)
     const phonesToValidate = [];
-    if (leaderPhone) phonesToValidate.push({ field: "Leader Phone", val: leaderPhone });
-    if (memberPhone) phonesToValidate.push({ field: "Member Phone", val: memberPhone });
+    if (leaderPhone)
+      phonesToValidate.push({ field: "Leader Phone", val: leaderPhone });
+    if (memberPhone)
+      phonesToValidate.push({ field: "Member Phone", val: memberPhone });
     if (Array.isArray(teamMembers)) {
       teamMembers.forEach((m, i) => {
-        if (m.phone) phonesToValidate.push({ field: `Member ${i + 1} Phone`, val: m.phone });
+        if (m.phone)
+          phonesToValidate.push({
+            field: `Member ${i + 1} Phone`,
+            val: m.phone,
+          });
       });
     }
 
@@ -84,7 +99,9 @@ router.post("/:eventId/register", authenticate, async (req, res) => {
       const cleanEmail =
         email && email.trim() ? email.trim().toLowerCase() : null;
 
-      const cleanPhone = phone ? String(phone).replace(/\D/g, "").slice(0, 10) : null;
+      const cleanPhone = phone
+        ? String(phone).replace(/\D/g, "").slice(0, 10)
+        : null;
 
       if (cleanEmail) {
         let user = await prisma.user.findUnique({
@@ -320,12 +337,21 @@ router.post(
   authorizeOrgLead(),
   workbookUpload.single("file"),
   async (req, res) => {
-    if (!req.file) return res.status(400).json({ error: "An XLSX, XLS, or CSV file is required." });
+    if (!req.file)
+      return res
+        .status(400)
+        .json({ error: "An XLSX, XLS, or CSV file is required." });
     const extension = req.file.originalname.toLowerCase().split(".").pop();
-    if (!["xlsx", "xls", "csv"].includes(extension)) return res.status(400).json({ error: "Only XLSX, XLS, and CSV files are supported." });
+    if (!["xlsx", "xls", "csv"].includes(extension))
+      return res
+        .status(400)
+        .json({ error: "Only XLSX, XLS, and CSV files are supported." });
 
     const { rows, errors } = parseParticipantWorkbook(req.file.buffer);
-    if (errors.length) return res.status(422).json({ error: "The workbook could not be imported.", errors });
+    if (errors.length)
+      return res
+        .status(422)
+        .json({ error: "The workbook could not be imported.", errors });
 
     try {
       const defaultPasswordHash = await hashPassword("password123");
@@ -337,7 +363,12 @@ router.post(
           let team = teams.get(row.teamCode);
           if (!team) {
             team = await tx.participantTeam.upsert({
-              where: { unique_event_participant_team_code: { eventId: req.params.eventId, teamCode: row.teamCode } },
+              where: {
+                unique_event_participant_team_code: {
+                  eventId: req.params.eventId,
+                  teamCode: row.teamCode,
+                },
+              },
               create: {
                 eventId: req.params.eventId,
                 teamCode: row.teamCode,
@@ -356,8 +387,11 @@ router.post(
             teams.set(row.teamCode, team);
           }
 
-          let user = row.email ? await tx.user.findUnique({ where: { email: row.email } }) : null;
-          if (!user && row.phone) user = await tx.user.findFirst({ where: { phone: row.phone } });
+          let user = row.email
+            ? await tx.user.findUnique({ where: { email: row.email } })
+            : null;
+          if (!user && row.phone)
+            user = await tx.user.findFirst({ where: { phone: row.phone } });
           if (!user) {
             user = await tx.user.create({
               data: {
@@ -370,22 +404,41 @@ router.post(
           } else {
             user = await tx.user.update({
               where: { id: user.id },
-              data: { name: row.participantName || user.name, ...(row.phone ? { phone: row.phone } : {}) },
+              data: {
+                name: row.participantName || user.name,
+                ...(row.phone ? { phone: row.phone } : {}),
+              },
             });
           }
 
           await tx.eventMembership.upsert({
-            where: { unique_event_user: { eventId: req.params.eventId, userId: user.id } },
-            create: { eventId: req.params.eventId, userId: user.id, role: "participant" },
+            where: {
+              unique_event_user: {
+                eventId: req.params.eventId,
+                userId: user.id,
+              },
+            },
+            create: {
+              eventId: req.params.eventId,
+              userId: user.id,
+              role: "participant",
+            },
             update: {},
           });
 
           await tx.eventParticipant.upsert({
-            where: { unique_event_participant: { eventId: req.params.eventId, userId: user.id } },
+            where: {
+              unique_event_participant: {
+                eventId: req.params.eventId,
+                userId: user.id,
+              },
+            },
             create: {
               eventId: req.params.eventId,
               userId: user.id,
-              participantCode: row.participantCode || `${row.teamCode}-${importedParticipants + 1}`,
+              participantCode:
+                row.participantCode ||
+                `${row.teamCode}-${importedParticipants + 1}`,
               qrToken: crypto.randomBytes(32).toString("hex"),
               checkInStatus: databaseParticipantStatus(row.participantStatus),
               internalNotes: row.notes || null,
@@ -393,13 +446,24 @@ router.post(
             update: {
               checkInStatus: databaseParticipantStatus(row.participantStatus),
               internalNotes: row.notes || null,
-              ...(row.participantCode ? { participantCode: row.participantCode } : {}),
+              ...(row.participantCode
+                ? { participantCode: row.participantCode }
+                : {}),
             },
           });
 
           await tx.participantTeamMember.upsert({
-            where: { unique_participant_team_user: { participantTeamId: team.id, userId: user.id } },
-            create: { participantTeamId: team.id, userId: user.id, role: row.role },
+            where: {
+              unique_participant_team_user: {
+                participantTeamId: team.id,
+                userId: user.id,
+              },
+            },
+            create: {
+              participantTeamId: team.id,
+              userId: user.id,
+              role: row.role,
+            },
             update: { role: row.role },
           });
           importedParticipants += 1;
@@ -407,9 +471,16 @@ router.post(
         return { teams: teams.size, participants: importedParticipants };
       });
 
-      return res.status(201).json({ message: "Participants imported successfully.", ...result });
+      return res
+        .status(201)
+        .json({ message: "Participants imported successfully.", ...result });
     } catch (error) {
-      return res.status(500).json({ error: "Failed to import participants.", details: error.message });
+      return res
+        .status(500)
+        .json({
+          error: "Failed to import participants.",
+          details: error.message,
+        });
     }
   },
 );
@@ -426,16 +497,28 @@ router.get(
         include: {
           participantTeams: {
             orderBy: { createdAt: "asc" },
-            include: { members: { include: { user: true }, orderBy: { createdAt: "asc" } } },
+            include: {
+              members: {
+                include: { user: true },
+                orderBy: { createdAt: "asc" },
+              },
+            },
           },
           participants: true,
         },
       });
       if (!event) return res.status(404).json({ error: "Event not found." });
 
-      const participantByUserId = new Map(event.participants.map((participant) => [participant.userId, participant]));
+      const participantByUserId = new Map(
+        event.participants.map((participant) => [
+          participant.userId,
+          participant,
+        ]),
+      );
       const rows = event.participantTeams.flatMap((team) => {
-        const lead = team.members.find((member) => member.role === "lead") || team.members[0];
+        const lead =
+          team.members.find((member) => member.role === "lead") ||
+          team.members[0];
         return team.members.map((member) => {
           const participant = participantByUserId.get(member.userId);
           return {
@@ -454,18 +537,35 @@ router.get(
             Email: member.user?.email || "",
             Phone: member.user?.phone || "",
             "College / Org": team.description || "",
-            "Participant Status": exportParticipantStatus(participant?.checkInStatus),
+            "Participant Status": exportParticipantStatus(
+              participant?.checkInStatus,
+            ),
             Role: member.role === "lead" ? "Team Lead" : "Member",
             Notes: participant?.internalNotes || "",
           };
         });
       });
-      const buffer = createWorkbookBuffer("Participants", PARTICIPANT_WORKBOOK_HEADERS, rows);
-      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-      res.setHeader("Content-Disposition", `attachment; filename="${event.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-participants.xlsx"`);
+      const buffer = createWorkbookBuffer(
+        "Participants",
+        PARTICIPANT_WORKBOOK_HEADERS,
+        rows,
+      );
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      );
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${event.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-participants.xlsx"`,
+      );
       return res.send(buffer);
     } catch (error) {
-      return res.status(500).json({ error: "Failed to export participants.", details: error.message });
+      return res
+        .status(500)
+        .json({
+          error: "Failed to export participants.",
+          details: error.message,
+        });
     }
   },
 );
@@ -502,12 +602,10 @@ router.get(
 
       return res.status(200).json({ participants });
     } catch (error) {
-      return res
-        .status(500)
-        .json({
-          error: "Failed to fetch participants.",
-          details: error.message,
-        });
+      return res.status(500).json({
+        error: "Failed to fetch participants.",
+        details: error.message,
+      });
     }
   },
 );

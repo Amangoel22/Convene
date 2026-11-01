@@ -7,21 +7,46 @@ import { useAppStore } from "@/store/useAppStore";
 import { getApiBase } from "@/lib/api";
 
 // Purpose: load named page exports only when their route is opened.
-const lazyPage = (loader, exportName) => lazy(() => loader().then((module) => ({ default: module[exportName] })));
+const lazyPage = (loader, exportName) =>
+  lazy(() => loader().then((module) => ({ default: module[exportName] })));
 
-const LandingPage = lazyPage(() => import("@/pages/LandingPage"), "LandingPage");
+const LandingPage = lazyPage(
+  () => import("@/pages/LandingPage"),
+  "LandingPage",
+);
 const LoginPage = lazyPage(() => import("@/pages/LoginPage"), "LoginPage");
-const OnboardingPage = lazyPage(() => import("@/pages/OnboardingPage"), "OnboardingPage");
-const MissionControlPage = lazyPage(() => import("@/pages/MissionControlPage"), "MissionControlPage");
-const ParticipantsPage = lazyPage(() => import("@/pages/ParticipantsPage"), "ParticipantsPage");
+const OnboardingPage = lazyPage(
+  () => import("@/pages/OnboardingPage"),
+  "OnboardingPage",
+);
+const MissionControlPage = lazyPage(
+  () => import("@/pages/MissionControlPage"),
+  "MissionControlPage",
+);
+const ParticipantsPage = lazyPage(
+  () => import("@/pages/ParticipantsPage"),
+  "ParticipantsPage",
+);
 const TasksPage = lazyPage(() => import("@/pages/TasksPage"), "TasksPage");
 const DutiesPage = lazyPage(() => import("@/pages/DutiesPage"), "DutiesPage");
 const TeamsPage = lazyPage(() => import("@/pages/TeamsPage"), "TeamsPage");
-const RunOfShowPage = lazyPage(() => import("@/pages/RunOfShowPage"), "RunOfShowPage");
-const InventoryPage = lazyPage(() => import("@/pages/InventoryPage"), "InventoryPage");
-const ResourcesPage = lazyPage(() => import("@/pages/ResourcesPage"), "ResourcesPage");
+const RunOfShowPage = lazyPage(
+  () => import("@/pages/RunOfShowPage"),
+  "RunOfShowPage",
+);
+const InventoryPage = lazyPage(
+  () => import("@/pages/InventoryPage"),
+  "InventoryPage",
+);
+const ResourcesPage = lazyPage(
+  () => import("@/pages/ResourcesPage"),
+  "ResourcesPage",
+);
 const IssuesPage = lazyPage(() => import("@/pages/IssuesPage"), "IssuesPage");
-const SettingsPage = lazyPage(() => import("@/pages/SettingsPage"), "SettingsPage");
+const SettingsPage = lazyPage(
+  () => import("@/pages/SettingsPage"),
+  "SettingsPage",
+);
 
 // Purpose: preserve the app layout while a route chunk is loading.
 function RouteLoader() {
@@ -36,7 +61,9 @@ function RouteLoader() {
 }
 
 function ProtectedRoute({ children }) {
-  const token = useAppStore((state) => state.token) || localStorage.getItem("convene_token");
+  const token =
+    useAppStore((state) => state.token) ||
+    localStorage.getItem("convene_token");
   const setUserSession = useAppStore((state) => state.setUserSession);
   const clearSession = useAppStore((state) => state.clearSession);
 
@@ -58,8 +85,8 @@ function ProtectedRoute({ children }) {
         const API_BASE = getApiBase();
         const res = await fetch(`${API_BASE}/auth/me`, {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (res.ok) {
@@ -71,7 +98,7 @@ function ProtectedRoute({ children }) {
             // Fetch all events for this user from backend DB
             try {
               const evRes = await fetch(`${API_BASE}/events`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
               });
               if (evRes.ok) {
                 const evData = await evRes.json();
@@ -82,16 +109,20 @@ function ProtectedRoute({ children }) {
                   location: e.primaryLocation || "Main Venue",
                   stages: (e.stages || []).map((stage) => ({
                     ...stage,
-                    location: stage.location || stage.venue?.name || ""
-                  }))
+                    location: stage.location || stage.venue?.name || "",
+                  })),
                 }));
-                const targetActive = formattedEvents.find((e) => e.id === currentActiveId) || formattedEvents[0] || null;
+                const targetActive =
+                  formattedEvents.find((e) => e.id === currentActiveId) ||
+                  formattedEvents[0] ||
+                  null;
 
                 useAppStore.setState({
                   events: formattedEvents,
                   eventsHydrated: true,
                   activeEvent: targetActive,
-                  role: targetActive?.accessLevel === "lead" ? "lead" : "member"
+                  role:
+                    targetActive?.accessLevel === "lead" ? "lead" : "member",
                 });
               } else {
                 useAppStore.setState({ eventsHydrated: true });
@@ -169,7 +200,10 @@ export function App() {
             <Route path="/tasks" element={<TasksPage />} />
             <Route path="/duties" element={<DutiesPage />} />
             <Route path="/teams" element={<TeamsPage />} />
-            <Route path="/departments" element={<Navigate to="/teams" replace />} />
+            <Route
+              path="/departments"
+              element={<Navigate to="/teams" replace />}
+            />
             <Route path="/run-of-show" element={<RunOfShowPage />} />
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/resources" element={<ResourcesPage />} />

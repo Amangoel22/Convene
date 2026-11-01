@@ -16,7 +16,7 @@ import {
   Trash2,
   UserCheck,
   Users,
-  Zap
+  Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -29,29 +29,120 @@ const eventTypes = [
   "Conference / Symposium",
   "Cultural Fest",
   "Sports Tournament",
-  "Workshop / Seminar"
+  "Workshop / Seminar",
 ];
 
 const defaultStagesForType = {
   Hackathon: [
-    { title: "Registration & Check-In", startTime: "08:00 AM", endTime: "09:30 AM", location: "Main Lobby", owner: "Registration Team", status: "Completed" },
-    { title: "Opening Ceremony", startTime: "09:30 AM", endTime: "10:15 AM", location: "Main Auditorium", owner: "Operations Team", status: "Completed" },
-    { title: "Hacking Round Launch", startTime: "10:15 AM", endTime: "03:00 PM", location: "Labs A–D", owner: "Technical Team", status: "Completed" },
-    { title: "Mentoring & Project Review", startTime: "03:00 PM", endTime: "05:30 PM", location: "Labs A–D", owner: "Technical Team", status: "LIVE" },
-    { title: "Judging & Final Demos", startTime: "05:30 PM", endTime: "07:30 PM", location: "Seminar Hall", owner: "Judging Team", status: "Upcoming" },
-    { title: "Closing Ceremony & Awards", startTime: "07:30 PM", endTime: "08:30 PM", location: "Main Auditorium", owner: "Stage Team", status: "Upcoming" }
+    {
+      title: "Registration & Check-In",
+      startTime: "08:00 AM",
+      endTime: "09:30 AM",
+      location: "Main Lobby",
+      owner: "Registration Team",
+      status: "Completed",
+    },
+    {
+      title: "Opening Ceremony",
+      startTime: "09:30 AM",
+      endTime: "10:15 AM",
+      location: "Main Auditorium",
+      owner: "Operations Team",
+      status: "Completed",
+    },
+    {
+      title: "Hacking Round Launch",
+      startTime: "10:15 AM",
+      endTime: "03:00 PM",
+      location: "Labs A–D",
+      owner: "Technical Team",
+      status: "Completed",
+    },
+    {
+      title: "Mentoring & Project Review",
+      startTime: "03:00 PM",
+      endTime: "05:30 PM",
+      location: "Labs A–D",
+      owner: "Technical Team",
+      status: "LIVE",
+    },
+    {
+      title: "Judging & Final Demos",
+      startTime: "05:30 PM",
+      endTime: "07:30 PM",
+      location: "Seminar Hall",
+      owner: "Judging Team",
+      status: "Upcoming",
+    },
+    {
+      title: "Closing Ceremony & Awards",
+      startTime: "07:30 PM",
+      endTime: "08:30 PM",
+      location: "Main Auditorium",
+      owner: "Stage Team",
+      status: "Upcoming",
+    },
   ],
   Debate: [
-    { title: "Debater Orientation & Motion Release", startTime: "09:00 AM", endTime: "10:00 AM", location: "Seminar Hall B", owner: "Debate Society Lead", status: "Completed" },
-    { title: "Preliminary Rounds", startTime: "10:15 AM", endTime: "01:00 PM", location: "Rooms 101–108", owner: "Logistics Lead", status: "LIVE" },
-    { title: "Lunch Break & Tabulation", startTime: "01:00 PM", endTime: "02:00 PM", location: "Cafeteria", owner: "Hospitality Lead", status: "Upcoming" },
-    { title: "Grand Final Debate & Awards", startTime: "02:00 PM", endTime: "05:00 PM", location: "Open Amphitheatre", owner: "Stage Lead", status: "Upcoming" }
+    {
+      title: "Debater Orientation & Motion Release",
+      startTime: "09:00 AM",
+      endTime: "10:00 AM",
+      location: "Seminar Hall B",
+      owner: "Debate Society Lead",
+      status: "Completed",
+    },
+    {
+      title: "Preliminary Rounds",
+      startTime: "10:15 AM",
+      endTime: "01:00 PM",
+      location: "Rooms 101–108",
+      owner: "Logistics Lead",
+      status: "LIVE",
+    },
+    {
+      title: "Lunch Break & Tabulation",
+      startTime: "01:00 PM",
+      endTime: "02:00 PM",
+      location: "Cafeteria",
+      owner: "Hospitality Lead",
+      status: "Upcoming",
+    },
+    {
+      title: "Grand Final Debate & Awards",
+      startTime: "02:00 PM",
+      endTime: "05:00 PM",
+      location: "Open Amphitheatre",
+      owner: "Stage Lead",
+      status: "Upcoming",
+    },
   ],
   Default: [
-    { title: "Registration & Welcome", startTime: "09:00 AM", endTime: "10:00 AM", location: "Lobby", owner: "Host Team", status: "Completed" },
-    { title: "Keynote & Main Session", startTime: "10:00 AM", endTime: "01:00 PM", location: "Main Hall", owner: "Stage Team", status: "LIVE" },
-    { title: "Networking & Valedictory", startTime: "02:00 PM", endTime: "04:30 PM", location: "Auditorium", owner: "Host Team", status: "Upcoming" }
-  ]
+    {
+      title: "Registration & Welcome",
+      startTime: "09:00 AM",
+      endTime: "10:00 AM",
+      location: "Lobby",
+      owner: "Host Team",
+      status: "Completed",
+    },
+    {
+      title: "Keynote & Main Session",
+      startTime: "10:00 AM",
+      endTime: "01:00 PM",
+      location: "Main Hall",
+      owner: "Stage Team",
+      status: "LIVE",
+    },
+    {
+      title: "Networking & Valedictory",
+      startTime: "02:00 PM",
+      endTime: "04:30 PM",
+      location: "Auditorium",
+      owner: "Host Team",
+      status: "Upcoming",
+    },
+  ],
 };
 
 import { getApiBase } from "@/lib/api";
@@ -71,12 +162,18 @@ export function OnboardingPage() {
   // Event Basic State
   const [eventName, setEventName] = useState("");
   const [eventType, setEventType] = useState("Hackathon");
-  const [eventDate, setEventDate] = useState(new Date().toISOString().split("T")[0]);
+  const [eventDate, setEventDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
 
   // Advanced Setup State (Step 4) - Supports Multi-day (e.g. 24h, 36h, 48h hackathons)
-  const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
   const [startTime, setStartTime] = useState("09:00");
-  const [endDate, setEndDate] = useState(new Date().toISOString().split("T")[0]);
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
   const [endTime, setEndTime] = useState("21:00");
   const [duration, setDuration] = useState("12 Hours");
   const [location, setLocation] = useState("");
@@ -102,9 +199,13 @@ export function OnboardingPage() {
     let parts = [];
     if (days > 0) parts.push(`${days} Day${days > 1 ? "s" : ""}`);
     if (remHours > 0) parts.push(`${remHours} Hr${remHours > 1 ? "s" : ""}`);
-    if (totalMinutes > 0) parts.push(`${totalMinutes} Min${totalMinutes > 1 ? "s" : ""}`);
+    if (totalMinutes > 0)
+      parts.push(`${totalMinutes} Min${totalMinutes > 1 ? "s" : ""}`);
 
-    const formattedDuration = parts.length > 0 ? `${parts.join(" ")} (${totalHours} Hours Total)` : `${totalHours} Hours`;
+    const formattedDuration =
+      parts.length > 0
+        ? `${parts.join(" ")} (${totalHours} Hours Total)`
+        : `${totalHours} Hours`;
     setDuration(formattedDuration);
   }, [startDate, startTime, endDate, endTime]);
 
@@ -169,7 +270,7 @@ export function OnboardingPage() {
       owner: "Organizing Team",
       status: stagesList.length === 0 ? "LIVE" : "Upcoming",
       description: `${stageTitle.trim()} at ${stageVenue.trim() || location}.`,
-      milestones: [{ label: `Start ${stageTitle.trim()}`, completed: false }]
+      milestones: [{ label: `Start ${stageTitle.trim()}`, completed: false }],
     };
     setStagesList([...stagesList, newStageObj]);
     setStageTitle("");
@@ -180,7 +281,11 @@ export function OnboardingPage() {
   };
 
   const handleRemoveStage = (id) => {
-    setStagesList(stagesList.filter((s) => s.id !== id).map((s, i) => ({ ...s, order: i + 1 })));
+    setStagesList(
+      stagesList
+        .filter((s) => s.id !== id)
+        .map((s, i) => ({ ...s, order: i + 1 })),
+    );
   };
 
   const handleFinalLaunch = async (e) => {
@@ -190,7 +295,9 @@ export function OnboardingPage() {
 
     const token = localStorage.getItem("convene_token");
     if (!token) {
-      setLaunchError("You are not logged in. Please refresh and sign in again.");
+      setLaunchError(
+        "You are not logged in. Please refresh and sign in again.",
+      );
       setIsLaunching(false);
       return;
     }
@@ -204,7 +311,7 @@ export function OnboardingPage() {
       endTime,
       durationDisplay: duration || "24 Hours",
       primaryLocation: location.trim() || undefined,
-      stages: stagesList
+      stages: stagesList,
     };
 
     try {
@@ -212,14 +319,17 @@ export function OnboardingPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        const msg = errData.error || errData.message || `Server error (${res.status}). Please try again.`;
+        const msg =
+          errData.error ||
+          errData.message ||
+          `Server error (${res.status}). Please try again.`;
         setLaunchError(msg);
         setIsLaunching(false);
         return;
@@ -231,14 +341,16 @@ export function OnboardingPage() {
         role: "Organizing Team Lead",
         duration: data.event.durationDisplay || duration || "24 Hours",
         location: data.event.primaryLocation || location.trim(),
-        stages: data.event.stages || stagesList
+        stages: data.event.stages || stagesList,
       };
       addEvent(createdDbEvent);
       setActiveEvent(createdDbEvent);
       setRole("lead");
       navigate("/dashboard");
     } catch (err) {
-      setLaunchError("Could not reach the server. Please check your connection and try again.");
+      setLaunchError(
+        "Could not reach the server. Please check your connection and try again.",
+      );
       setIsLaunching(false);
     }
   };
@@ -250,7 +362,9 @@ export function OnboardingPage() {
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-token-accent text-token-inverse shadow-md">
           <Flag size={20} strokeWidth={2.5} />
         </div>
-        <h1 className="type-2xl weight-extrabold tracking-tight text-token-primary">Convene</h1>
+        <h1 className="type-2xl weight-extrabold tracking-tight text-token-primary">
+          Convene
+        </h1>
       </div>
 
       {/* Main Container */}
@@ -263,42 +377,74 @@ export function OnboardingPage() {
                 key={s}
                 className={cn(
                   "h-2 rounded-full transition-all duration-300",
-                  step === s ? "w-8 bg-token-accent" : s < step ? "w-2 bg-token-success" : "w-2 hover-token"
+                  step === s
+                    ? "w-8 bg-token-accent"
+                    : s < step
+                      ? "w-2 bg-token-success"
+                      : "w-2 hover-token",
                 )}
               />
             ))}
           </div>
-          <span className="type-xs weight-bold text-token-muted">Step {step} of 4</span>
+          <span className="type-xs weight-bold text-token-muted">
+            Step {step} of 4
+          </span>
         </div>
 
         <AnimatePresence mode="wait">
           {/* STEP 1: Select User Role */}
           {step === 1 && (
-            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
               <div>
-                <h2 className="type-2xl weight-bold tracking-tight text-token-primary">Welcome! How are you joining Convene?</h2>
-                <p className="mt-1.5 type-sm weight-medium text-token-secondary">Select your role to customize your workspace experience.</p>
+                <h2 className="type-2xl weight-bold tracking-tight text-token-primary">
+                  Welcome! How are you joining Convene?
+                </h2>
+                <p className="mt-1.5 type-sm weight-medium text-token-secondary">
+                  Select your role to customize your workspace experience.
+                </p>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 pt-2">
-                <div onClick={() => handleSelectUserType("organizer")} className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md">
+                <div
+                  onClick={() => handleSelectUserType("organizer")}
+                  className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md"
+                >
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl accent-surface-token text-token-accent group-hover:bg-token-accent group-hover:text-token-inverse">
                     <Users size={24} strokeWidth={2} />
                   </div>
-                  <h3 className="mt-4 type-base weight-bold text-token-primary">Organizing Team</h3>
-                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">Manage event tasks, team shifts, run of show, and hardware assets.</p>
+                  <h3 className="mt-4 type-base weight-bold text-token-primary">
+                    Organizing Team
+                  </h3>
+                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">
+                    Manage event tasks, team shifts, run of show, and hardware
+                    assets.
+                  </p>
                   <div className="mt-4 flex items-center gap-1 type-xs weight-bold text-token-accent">
                     <span>Continue as Organizer</span>
                     <ArrowRight size={14} />
                   </div>
                 </div>
 
-                <div onClick={() => handleSelectUserType("participant")} className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md opacity-80">
+                <div
+                  onClick={() => handleSelectUserType("participant")}
+                  className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md opacity-80"
+                >
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl field-token text-token-secondary group-hover:bg-token-accent group-hover:text-token-inverse">
                     <UserCheck size={24} strokeWidth={2} />
                   </div>
-                  <h3 className="mt-4 type-base weight-bold text-token-primary">Participant</h3>
-                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">View team schedules, submission deadlines, and event announcements.</p>
+                  <h3 className="mt-4 type-base weight-bold text-token-primary">
+                    Participant
+                  </h3>
+                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">
+                    View team schedules, submission deadlines, and event
+                    announcements.
+                  </p>
                   <div className="mt-4 flex items-center gap-1 type-xs weight-bold text-token-muted">
                     <span>Participant Portal</span>
                     <ArrowRight size={14} />
@@ -310,36 +456,64 @@ export function OnboardingPage() {
 
           {/* STEP 2: Select Existing vs New Event */}
           {step === 2 && (
-            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
               <div className="flex items-center gap-2">
-                <button onClick={() => setStep(1)} className="flex h-8 w-8 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary">
+                <button
+                  onClick={() => setStep(1)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary"
+                >
                   <ArrowLeft size={16} />
                 </button>
                 <div>
-                  <h2 className="type-2xl weight-bold tracking-tight text-token-primary">Organizing Team Setup</h2>
-                  <p className="type-xs weight-medium text-token-secondary">Are you setting up a new event or joining an existing team?</p>
+                  <h2 className="type-2xl weight-bold tracking-tight text-token-primary">
+                    Organizing Team Setup
+                  </h2>
+                  <p className="type-xs weight-medium text-token-secondary">
+                    Are you setting up a new event or joining an existing team?
+                  </p>
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 pt-2">
-                <div onClick={() => handleSelectEventChoice("existing")} className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md">
+                <div
+                  onClick={() => handleSelectEventChoice("existing")}
+                  className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md"
+                >
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl accent-surface-token text-token-accent group-hover:bg-token-accent group-hover:text-token-inverse">
                     <Globe size={24} strokeWidth={2} />
                   </div>
-                  <h3 className="mt-4 type-base weight-bold text-token-primary">Join Existing Event</h3>
-                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">View events you have been added to by your lead organizer.</p>
+                  <h3 className="mt-4 type-base weight-bold text-token-primary">
+                    Join Existing Event
+                  </h3>
+                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">
+                    View events you have been added to by your lead organizer.
+                  </p>
                   <div className="mt-4 flex items-center gap-1 type-xs weight-bold text-token-accent">
                     <span>Select Event</span>
                     <ArrowRight size={14} />
                   </div>
                 </div>
 
-                <div onClick={() => handleSelectEventChoice("new")} className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md">
+                <div
+                  onClick={() => handleSelectEventChoice("new")}
+                  className="group cursor-pointer rounded-2xl border border-token surface-token p-6 transition-all hover:border-token-accent hover:surface-card-token hover:shadow-md"
+                >
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl accent-surface-token text-token-accent group-hover:bg-token-accent group-hover:text-token-inverse">
                     <Plus size={24} strokeWidth={2} />
                   </div>
-                  <h3 className="mt-4 type-base weight-bold text-token-primary">Create New Event</h3>
-                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">Set up a brand new event, configure timeline, timings, and location.</p>
+                  <h3 className="mt-4 type-base weight-bold text-token-primary">
+                    Create New Event
+                  </h3>
+                  <p className="mt-1 type-xs weight-medium text-token-secondary leading-relaxed">
+                    Set up a brand new event, configure timeline, timings, and
+                    location.
+                  </p>
                   <div className="mt-4 flex items-center gap-1 type-xs weight-bold text-token-accent">
                     <span>Start Event Setup</span>
                     <ArrowRight size={14} />
@@ -351,14 +525,25 @@ export function OnboardingPage() {
 
           {/* STEP 3: Basic Event Info (Name, Type, Date) OR Existing Event Selection */}
           {step === 3 && (
-            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+            <motion.div
+              key="step3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
               <div className="flex items-center gap-2">
-                <button onClick={() => setStep(2)} className="flex h-8 w-8 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary">
+                <button
+                  onClick={() => setStep(2)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary"
+                >
                   <ArrowLeft size={16} />
                 </button>
                 <div>
                   <h2 className="type-2xl weight-bold tracking-tight text-token-primary">
-                    {eventTypeChoice === "existing" ? "Select Your Assigned Event" : "Basic Event Details"}
+                    {eventTypeChoice === "existing"
+                      ? "Select Your Assigned Event"
+                      : "Basic Event Details"}
                   </h2>
                   <p className="type-xs weight-medium text-token-secondary">
                     {eventTypeChoice === "existing"
@@ -381,20 +566,33 @@ export function OnboardingPage() {
                           <Sparkles size={18} />
                         </div>
                         <div>
-                          <h4 className="type-sm weight-bold text-token-primary">{evt.name}</h4>
+                          <h4 className="type-sm weight-bold text-token-primary">
+                            {evt.name}
+                          </h4>
                           <p className="type-xs weight-medium text-token-secondary">
-                            {evt.type} • {evt.date} • <span className="text-token-accent weight-semibold">{evt.role}</span>
+                            {evt.type} • {evt.date} •{" "}
+                            <span className="text-token-accent weight-semibold">
+                              {evt.role}
+                            </span>
                           </p>
                         </div>
                       </div>
-                      <ChevronRight size={18} className="text-token-muted group-hover:text-token-accent transition-colors" />
+                      <ChevronRight
+                        size={18}
+                        className="text-token-muted group-hover:text-token-accent transition-colors"
+                      />
                     </div>
                   ))}
                 </div>
               ) : (
-                <form onSubmit={handleProceedToAdvancedSetup} className="space-y-4 pt-2">
+                <form
+                  onSubmit={handleProceedToAdvancedSetup}
+                  className="space-y-4 pt-2"
+                >
                   <div>
-                    <label className="type-xs weight-bold text-token-primary">Event Name</label>
+                    <label className="type-xs weight-bold text-token-primary">
+                      Event Name
+                    </label>
                     <input
                       type="text"
                       required
@@ -407,14 +605,20 @@ export function OnboardingPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="type-xs weight-bold text-token-primary">Event Type</label>
+                      <label className="type-xs weight-bold text-token-primary">
+                        Event Type
+                      </label>
                       <select
                         value={eventType}
                         onChange={(e) => setEventType(e.target.value)}
                         className="mt-1.5 h-11 w-full rounded-2xl field-token border border-token px-3 type-xs weight-semibold text-token-primary outline-none cursor-pointer"
                       >
                         {eventTypes.map((type) => (
-                          <option key={type} value={type} className="surface-card-token text-token-primary">
+                          <option
+                            key={type}
+                            value={type}
+                            className="surface-card-token text-token-primary"
+                          >
                             {type}
                           </option>
                         ))}
@@ -422,7 +626,9 @@ export function OnboardingPage() {
                     </div>
 
                     <div>
-                      <label className="type-xs weight-bold text-token-primary">Date of Event</label>
+                      <label className="type-xs weight-bold text-token-primary">
+                        Date of Event
+                      </label>
                       <input
                         type="date"
                         required
@@ -449,14 +655,28 @@ export function OnboardingPage() {
 
           {/* STEP 4: Timings, Duration, Location & Event Timeline Stages Configuration */}
           {step === 4 && (
-            <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+            <motion.div
+              key="step4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
               <div className="flex items-center gap-2">
-                <button onClick={() => setStep(3)} className="flex h-8 w-8 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary">
+                <button
+                  onClick={() => setStep(3)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary"
+                >
                   <ArrowLeft size={16} />
                 </button>
                 <div>
-                  <h2 className="type-2xl weight-bold tracking-tight text-token-primary">Dashboard & Timeline Setup</h2>
-                  <p className="type-xs weight-medium text-token-secondary">Configure start/end timings, location, and run of show stages for {eventName}.</p>
+                  <h2 className="type-2xl weight-bold tracking-tight text-token-primary">
+                    Dashboard & Timeline Setup
+                  </h2>
+                  <p className="type-xs weight-medium text-token-secondary">
+                    Configure start/end timings, location, and run of show
+                    stages for {eventName}.
+                  </p>
                 </div>
               </div>
 
@@ -465,10 +685,14 @@ export function OnboardingPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Start Date & Time */}
                   <div className="space-y-2 rounded-2xl surface-token border border-subtle-token p-3.5">
-                    <span className="type-11 weight-bold uppercase tracking-wider text-token-accent">Start Date & Time</span>
+                    <span className="type-11 weight-bold uppercase tracking-wider text-token-accent">
+                      Start Date & Time
+                    </span>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="type-10 weight-bold text-token-muted">Start Date</label>
+                        <label className="type-10 weight-bold text-token-muted">
+                          Start Date
+                        </label>
                         <input
                           type="date"
                           required
@@ -478,7 +702,9 @@ export function OnboardingPage() {
                         />
                       </div>
                       <div>
-                        <label className="type-10 weight-bold text-token-muted">Start Time</label>
+                        <label className="type-10 weight-bold text-token-muted">
+                          Start Time
+                        </label>
                         <input
                           type="time"
                           required
@@ -492,10 +718,14 @@ export function OnboardingPage() {
 
                   {/* End Date & Time */}
                   <div className="space-y-2 rounded-2xl surface-token border border-subtle-token p-3.5">
-                    <span className="type-11 weight-bold uppercase tracking-wider text-token-warning">End Date & Time</span>
+                    <span className="type-11 weight-bold uppercase tracking-wider text-token-warning">
+                      End Date & Time
+                    </span>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="type-10 weight-bold text-token-muted">End Date</label>
+                        <label className="type-10 weight-bold text-token-muted">
+                          End Date
+                        </label>
                         <input
                           type="date"
                           required
@@ -505,7 +735,9 @@ export function OnboardingPage() {
                         />
                       </div>
                       <div>
-                        <label className="type-10 weight-bold text-token-muted">End Time</label>
+                        <label className="type-10 weight-bold text-token-muted">
+                          End Time
+                        </label>
                         <input
                           type="time"
                           required
@@ -522,7 +754,9 @@ export function OnboardingPage() {
                 <div className="flex items-center justify-between rounded-2xl accent-surface-token border border-token-accent/20 px-4 py-2.5">
                   <div className="flex items-center gap-2">
                     <Clock size={16} className="text-token-accent" />
-                    <span className="type-xs weight-bold text-token-primary">Total Calculated Event Duration:</span>
+                    <span className="type-xs weight-bold text-token-primary">
+                      Total Calculated Event Duration:
+                    </span>
                   </div>
                   <span className="type-xs weight-extrabold text-token-accent font-mono surface-card-token px-3 py-1 rounded-full shadow-sm">
                     {duration}
@@ -532,22 +766,34 @@ export function OnboardingPage() {
                 {/* Event Timeline Stages Builder */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="type-xs weight-bold text-token-primary">Run of Show Stages & Locations ({stagesList.length})</label>
-                    <span className="type-11 weight-medium text-token-muted">Appears on Dashboard & Run of Show</span>
+                    <label className="type-xs weight-bold text-token-primary">
+                      Run of Show Stages & Locations ({stagesList.length})
+                    </label>
+                    <span className="type-11 weight-medium text-token-muted">
+                      Appears on Dashboard & Run of Show
+                    </span>
                   </div>
 
                   {/* Configured Stages List */}
                   <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                     {stagesList.map((stg) => (
-                      <div key={stg.id} className="flex items-center justify-between rounded-2xl surface-token border border-subtle-token px-3.5 py-2.5 type-xs">
+                      <div
+                        key={stg.id}
+                        className="flex items-center justify-between rounded-2xl surface-token border border-subtle-token px-3.5 py-2.5 type-xs"
+                      >
                         <div className="flex items-center gap-3 min-w-0">
                           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full accent-surface-token font-mono type-11 weight-bold text-token-accent">
                             {stg.order}
                           </span>
                           <div className="min-w-0">
-                            <p className="weight-bold text-token-primary truncate">{stg.title}</p>
+                            <p className="weight-bold text-token-primary truncate">
+                              {stg.title}
+                            </p>
                             <p className="type-11 weight-medium text-token-secondary truncate">
-                              {stg.timeWindow} • <span className="text-token-accent weight-semibold">{stg.location}</span>
+                              {stg.timeWindow} •{" "}
+                              <span className="text-token-accent weight-semibold">
+                                {stg.location}
+                              </span>
                             </p>
                           </div>
                         </div>
@@ -606,8 +852,13 @@ export function OnboardingPage() {
                 <div className="pt-3 space-y-3">
                   {launchError && (
                     <div className="flex items-start gap-3 rounded-2xl error-surface-token border border-token-error-light px-4 py-3">
-                      <Zap size={16} className="text-token-error mt-0.5 shrink-0" />
-                      <p className="type-xs weight-semibold text-token-error leading-relaxed">{launchError}</p>
+                      <Zap
+                        size={16}
+                        className="text-token-error mt-0.5 shrink-0"
+                      />
+                      <p className="type-xs weight-semibold text-token-error leading-relaxed">
+                        {launchError}
+                      </p>
                     </div>
                   )}
                   <button

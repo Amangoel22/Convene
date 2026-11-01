@@ -1,6 +1,14 @@
 // Purpose: InventoryPage implements this source module.
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, Boxes, Edit2, PackageCheck, Plus, X, Wrench } from "lucide-react";
+import {
+  AlertTriangle,
+  Boxes,
+  Edit2,
+  PackageCheck,
+  Plus,
+  X,
+  Wrench,
+} from "lucide-react";
 import { useState } from "react";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
@@ -21,7 +29,7 @@ function EditItemModal({ open, item, onClose, onSave }) {
     name: "",
     totalNeeded: 0,
     available: 0,
-    defective: 0
+    defective: 0,
   });
   const [editingName, setEditingName] = useState(false);
 
@@ -31,7 +39,7 @@ function EditItemModal({ open, item, onClose, onSave }) {
         name: item.name || "",
         totalNeeded: item.totalNeeded || 0,
         available: item.available || 0,
-        defective: item.defective || 0
+        defective: item.defective || 0,
       });
       setEditingName(!item.id);
     }
@@ -48,17 +56,24 @@ function EditItemModal({ open, item, onClose, onSave }) {
       name: formData.name.trim(),
       totalNeeded: Number(formData.totalNeeded),
       available: Number(formData.available),
-      defective: Number(formData.defective)
+      defective: Number(formData.defective),
     });
     onClose();
   };
 
   return (
-    <GlassModal open={open} className="w-[min(480px,calc(100vw-32px))] max-w-none surface-card-token border border-token rounded-3xl p-6 text-token-primary">
+    <GlassModal
+      open={open}
+      className="w-[min(480px,calc(100vw-32px))] max-w-none surface-card-token border border-token rounded-3xl p-6 text-token-primary"
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="type-xl weight-bold text-token-primary">{item?.id ? `Edit: ${item.name}` : "Add Inventory Item"}</h2>
-          <p className="mt-1 type-xs weight-medium text-token-secondary">Manage required quantities, available stock, and defective units.</p>
+          <h2 className="type-xl weight-bold text-token-primary">
+            {item?.id ? `Edit: ${item.name}` : "Add Inventory Item"}
+          </h2>
+          <p className="mt-1 type-xs weight-medium text-token-secondary">
+            Manage required quantities, available stock, and defective units.
+          </p>
         </div>
         <button
           className="flex h-8 w-8 min-h-0 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary"
@@ -72,21 +87,29 @@ function EditItemModal({ open, item, onClose, onSave }) {
       <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         {editingName || !item?.id ? (
           <div>
-            <label className="type-xs weight-semibold text-token-muted">Equipment / Item Name</label>
+            <label className="type-xs weight-semibold text-token-muted">
+              Equipment / Item Name
+            </label>
             <input
               type="text"
               required
               placeholder="e.g. HDMI 2.0 Cables"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               className="mt-1 h-10 w-full rounded-full field-token border border-token px-4 type-xs weight-semibold text-token-primary outline-none placeholder:text-token-muted"
             />
           </div>
         ) : (
           <div className="flex items-center justify-between rounded-2xl surface-token border border-subtle-token px-4 py-2.5">
             <div>
-              <span className="type-10 weight-semibold text-token-muted block">Equipment Name</span>
-              <span className="type-xs weight-bold text-token-primary">{formData.name}</span>
+              <span className="type-10 weight-semibold text-token-muted block">
+                Equipment Name
+              </span>
+              <span className="type-xs weight-bold text-token-primary">
+                {formData.name}
+              </span>
             </div>
             <button
               type="button"
@@ -100,44 +123,65 @@ function EditItemModal({ open, item, onClose, onSave }) {
 
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="type-xs weight-semibold text-token-muted">Total Needed</label>
+            <label className="type-xs weight-semibold text-token-muted">
+              Total Needed
+            </label>
             <input
               type="number"
               min={0}
               value={formData.totalNeeded}
-              onChange={(e) => setFormData({ ...formData, totalNeeded: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, totalNeeded: e.target.value })
+              }
               className="mt-1 h-10 w-full rounded-full field-token border border-token px-4 type-xs weight-semibold text-token-primary outline-none"
             />
           </div>
 
           <div>
-            <label className="type-xs weight-semibold text-token-muted">Available</label>
+            <label className="type-xs weight-semibold text-token-muted">
+              Available
+            </label>
             <input
               type="number"
               min={0}
               value={formData.available}
-              onChange={(e) => setFormData({ ...formData, available: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, available: e.target.value })
+              }
               className="mt-1 h-10 w-full rounded-full field-token border border-token px-4 type-xs weight-semibold text-token-primary outline-none"
             />
           </div>
 
           <div>
-            <label className="type-xs weight-semibold text-token-muted">Defective</label>
+            <label className="type-xs weight-semibold text-token-muted">
+              Defective
+            </label>
             <input
               type="number"
               min={0}
               value={formData.defective}
-              onChange={(e) => setFormData({ ...formData, defective: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, defective: e.target.value })
+              }
               className="mt-1 h-10 w-full rounded-full field-token border border-token px-4 type-xs weight-semibold text-token-primary outline-none"
             />
           </div>
         </div>
 
         <div className="mt-6 flex justify-end gap-3 pt-2">
-          <GlassButton type="button" onClick={onClose} className="h-9 type-xs rounded-full">
+          <GlassButton
+            type="button"
+            onClick={onClose}
+            className="h-9 type-xs rounded-full"
+          >
             Cancel
           </GlassButton>
-          <GlassButton type="submit" variant="primary" icon={<Edit2 size={15} />} className="h-9 type-xs rounded-full">
+          <GlassButton
+            type="submit"
+            variant="primary"
+            icon={<Edit2 size={15} />}
+            className="h-9 type-xs rounded-full"
+          >
             Save Item
           </GlassButton>
         </div>
@@ -168,9 +212,14 @@ export function InventoryPage() {
     }
     setLoading(true);
     setError("");
-    fetch(`${API_BASE}/events/${activeEvent.id}/inventory`, { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API_BASE}/events/${activeEvent.id}/inventory`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then(async (response) => {
-        if (!response.ok) throw new Error((await response.json()).error || "Failed to load inventory.");
+        if (!response.ok)
+          throw new Error(
+            (await response.json()).error || "Failed to load inventory.",
+          );
         return response.json();
       })
       .then((payload) => setInventory(payload.inventory || []))
@@ -200,15 +249,24 @@ export function InventoryPage() {
       : `${API_BASE}/events/${activeEvent.id}/inventory`;
     const response = await fetch(endpoint, {
       method: isExisting ? "PATCH" : "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(savedItem)
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(savedItem),
     });
     const payload = await response.json();
     if (!response.ok) {
       setError(payload.error || "Unable to save inventory item.");
       throw new Error(payload.error || "Unable to save inventory item.");
     }
-    setInventory((prev) => isExisting ? prev.map((item) => item.id === payload.item.id ? payload.item : item) : [...prev, payload.item]);
+    setInventory((prev) =>
+      isExisting
+        ? prev.map((item) =>
+            item.id === payload.item.id ? payload.item : item,
+          )
+        : [...prev, payload.item],
+    );
   };
 
   return (
@@ -217,21 +275,36 @@ export function InventoryPage() {
         <div>
           <PageTitle>Hardware &amp; Asset Inventory</PageTitle>
           <p className="mt-1 type-sm text-token-secondary weight-medium">
-            Track physical equipment total requirements, available stock, and defective items.
+            Track physical equipment total requirements, available stock, and
+            defective items.
           </p>
         </div>
         {isLead && !eventIsComplete && (
-          <GlassButton variant="primary" icon={<Plus size={16} strokeWidth={2} />} onClick={handleOpenAdd} className="rounded-full">
+          <GlassButton
+            variant="primary"
+            icon={<Plus size={16} strokeWidth={2} />}
+            onClick={handleOpenAdd}
+            className="rounded-full"
+          >
             Add Equipment
           </GlassButton>
         )}
       </div>
 
-      {error && <div role="alert" className="rounded-2xl border border-token-error/20 bg-token-error/10 px-4 py-3 type-xs weight-semibold text-token-error">{error}</div>}
+      {error && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-token-error/20 bg-token-error/10 px-4 py-3 type-xs weight-semibold text-token-error"
+        >
+          {error}
+        </div>
+      )}
 
       {loading ? (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, index) => <LoadingSkeleton key={index} className="h-44 rounded-3xl" />)}
+          {Array.from({ length: 6 }).map((_, index) => (
+            <LoadingSkeleton key={index} className="h-44 rounded-3xl" />
+          ))}
         </div>
       ) : inventory.length === 0 ? (
         <EmptyState
@@ -244,10 +317,15 @@ export function InventoryPage() {
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {inventory.map((item) => (
-            <div key={item.id} className="rounded-3xl surface-card-token border border-token p-6 shadow-token-card flex flex-col justify-between">
+            <div
+              key={item.id}
+              className="rounded-3xl surface-card-token border border-token p-6 shadow-token-card flex flex-col justify-between"
+            >
               <div>
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="type-base weight-bold text-token-primary leading-snug">{item.name}</h3>
+                  <h3 className="type-base weight-bold text-token-primary leading-snug">
+                    {item.name}
+                  </h3>
                   {isLead && !eventIsComplete && (
                     <button
                       onClick={() => handleOpenEdit(item)}
@@ -261,16 +339,28 @@ export function InventoryPage() {
 
                 <div className="mt-5 grid grid-cols-3 gap-2 rounded-2xl surface-token border border-subtle-token p-3 text-center">
                   <div>
-                    <span className="type-10 weight-bold uppercase tracking-wider text-token-muted block">Needed</span>
-                    <span className="type-sm weight-extrabold text-token-primary block mt-0.5 font-mono">{item.totalNeeded}</span>
+                    <span className="type-10 weight-bold uppercase tracking-wider text-token-muted block">
+                      Needed
+                    </span>
+                    <span className="type-sm weight-extrabold text-token-primary block mt-0.5 font-mono">
+                      {item.totalNeeded}
+                    </span>
                   </div>
                   <div>
-                    <span className="type-10 weight-bold uppercase tracking-wider text-token-success block">Available</span>
-                    <span className="type-sm weight-extrabold text-token-success block mt-0.5 font-mono">{item.available}</span>
+                    <span className="type-10 weight-bold uppercase tracking-wider text-token-success block">
+                      Available
+                    </span>
+                    <span className="type-sm weight-extrabold text-token-success block mt-0.5 font-mono">
+                      {item.available}
+                    </span>
                   </div>
                   <div>
-                    <span className="type-10 weight-bold uppercase tracking-wider text-token-error block">Defective</span>
-                    <span className="type-sm weight-extrabold text-token-error block mt-0.5 font-mono">{item.defective}</span>
+                    <span className="type-10 weight-bold uppercase tracking-wider text-token-error block">
+                      Defective
+                    </span>
+                    <span className="type-sm weight-extrabold text-token-error block mt-0.5 font-mono">
+                      {item.defective}
+                    </span>
                   </div>
                 </div>
               </div>

@@ -252,11 +252,25 @@ export function ResourcesPage() {
               />
               {file ? (
                 <div className="flex min-w-0 items-center gap-2 rounded-full field-token border border-token px-4 py-2">
-                  <span className="min-w-0 truncate type-xs weight-semibold text-token-primary">{file.name}</span>
-                  <button type="button" className="shrink-0 type-11 weight-bold text-token-error hover:underline" onClick={() => { setFile(null); fileInputRef.current.value = ""; }}>Remove</button>
+                  <span className="min-w-0 truncate type-xs weight-semibold text-token-primary">
+                    {file.name}
+                  </span>
+                  <button
+                    type="button"
+                    className="shrink-0 type-11 weight-bold text-token-error hover:underline"
+                    onClick={() => {
+                      setFile(null);
+                      fileInputRef.current.value = "";
+                    }}
+                  >
+                    Remove
+                  </button>
                 </div>
               ) : (
-                <label htmlFor="resource-file" className="inline-flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-full field-token border border-token px-4 type-xs weight-bold text-token-primary transition-colors hover:hover-token">
+                <label
+                  htmlFor="resource-file"
+                  className="inline-flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-full field-token border border-token px-4 type-xs weight-bold text-token-primary transition-colors hover:hover-token"
+                >
                   <Upload size={15} />
                   Choose file
                 </label>

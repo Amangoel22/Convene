@@ -27,12 +27,7 @@ import { PageTitle } from "@/components/ui/PageTitle";
 import { cn, isEventComplete } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 
-const statuses = [
-  "All Statuses",
-  "Todo",
-  "In Progress",
-  "Completed",
-];
+const statuses = ["All Statuses", "Todo", "In Progress", "Completed"];
 import { getApiBase } from "@/lib/api";
 const API_BASE = getApiBase();
 
@@ -313,33 +308,35 @@ function TaskDrawer({
         </div>
 
         {/* Save changes footer */}
-        {!readOnly && <div className="shrink-0 border-t border-subtle-token pt-4 flex items-center gap-3">
-          <GlassButton
-            variant="primary"
-            className="flex-1 h-9 type-xs justify-center rounded-full"
-            icon={
-              task.status === "Completed" ? (
-                <RotateCcw size={15} />
-              ) : (
-                <Save size={15} />
-              )
-            }
-            onClick={async () => {
-              if (task.status === "Completed") {
-                setDraftTask({
-                  ...task,
-                  status: "Todo",
-                  completedToday: false,
-                });
-                return;
+        {!readOnly && (
+          <div className="shrink-0 border-t border-subtle-token pt-4 flex items-center gap-3">
+            <GlassButton
+              variant="primary"
+              className="flex-1 h-9 type-xs justify-center rounded-full"
+              icon={
+                task.status === "Completed" ? (
+                  <RotateCcw size={15} />
+                ) : (
+                  <Save size={15} />
+                )
               }
-              await onUpdateTask(task);
-              onClose();
-            }}
-          >
-            {task.status === "Completed" ? "Reopen Task" : "Save Changes"}
-          </GlassButton>
-        </div>}
+              onClick={async () => {
+                if (task.status === "Completed") {
+                  setDraftTask({
+                    ...task,
+                    status: "Todo",
+                    completedToday: false,
+                  });
+                  return;
+                }
+                await onUpdateTask(task);
+                onClose();
+              }}
+            >
+              {task.status === "Completed" ? "Reopen Task" : "Save Changes"}
+            </GlassButton>
+          </div>
+        )}
       </motion.aside>
     </AnimatePresence>
   );
@@ -709,9 +706,14 @@ export function TasksPage() {
   // Purpose: download the current event task register for reporting and handoff.
   const handleExport = async () => {
     if (!activeEvent?.id) return;
-    const response = await fetch(`${API_BASE}/events/${activeEvent.id}/tasks/export`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("convene_token")}` },
-    });
+    const response = await fetch(
+      `${API_BASE}/events/${activeEvent.id}/tasks/export`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("convene_token")}`,
+        },
+      },
+    );
     if (!response.ok) return;
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
@@ -976,63 +978,61 @@ export function TasksPage() {
         ) : (
           /* Kanban Board View */
           <div className="p-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4 overflow-x-auto">
-            {["Todo", "In Progress", "Completed"].map(
-              (columnStatus) => {
-                const columnTasks = filteredTasks.filter(
-                  (t) => t.status === columnStatus,
-                );
-                return (
-                  <div
-                    key={columnStatus}
-                    className="rounded-2xl surface-token border border-subtle-token p-3.5 flex flex-col min-h-[480px]"
-                  >
-                    {/* Column Header */}
-                    <div className="mb-3 flex items-center justify-between border-b border-subtle-token pb-2.5 px-1">
-                      <span className="type-xs weight-bold uppercase tracking-wider text-token-primary">
-                        {columnStatus}
-                      </span>
-                      <span className="inline-flex h-5 px-2 items-center justify-center rounded-full hover-token type-11 weight-bold text-token-primary">
-                        {columnTasks.length}
-                      </span>
-                    </div>
-
-                    {/* Column Task Cards */}
-                    <div className="flex-1 space-y-2 overflow-y-auto pr-0.5">
-                      {columnTasks.map((task) => (
-                        <div
-                          key={task.id}
-                          className="group cursor-pointer rounded-2xl surface-card-token border border-token p-3.5 transition-all hover:border-token-strong shadow-token-small"
-                          onClick={() => setSelectedTask(task)}
-                        >
-                          <span className="type-10 weight-extrabold uppercase tracking-wider text-token-accent accent-surface-token px-2 py-0.5 rounded-full">
-                            {task.department}
-                          </span>
-                          <p className="mt-2 type-xs weight-bold text-token-primary line-clamp-2">
-                            {task.title}
-                          </p>
-                          <div className="mt-3 flex items-center justify-between border-t border-subtle-token pt-2 type-11">
-                            <span className="weight-semibold text-token-secondary truncate max-w-[120px]">
-                              {task.assignee.name}
-                            </span>
-                            <button
-                              className={cn(
-                                "flex h-5 w-5 min-h-0 items-center justify-center rounded-full transition-colors",
-                                task.status === "Completed"
-                                  ? "bg-token-success text-token-inverse"
-                                  : "field-token text-token-success hover:hover-token",
-                              )}
-                              onClick={(e) => handleToggleComplete(e, task.id)}
-                            >
-                              <Check size={11} strokeWidth={2.5} />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+            {["Todo", "In Progress", "Completed"].map((columnStatus) => {
+              const columnTasks = filteredTasks.filter(
+                (t) => t.status === columnStatus,
+              );
+              return (
+                <div
+                  key={columnStatus}
+                  className="rounded-2xl surface-token border border-subtle-token p-3.5 flex flex-col min-h-[480px]"
+                >
+                  {/* Column Header */}
+                  <div className="mb-3 flex items-center justify-between border-b border-subtle-token pb-2.5 px-1">
+                    <span className="type-xs weight-bold uppercase tracking-wider text-token-primary">
+                      {columnStatus}
+                    </span>
+                    <span className="inline-flex h-5 px-2 items-center justify-center rounded-full hover-token type-11 weight-bold text-token-primary">
+                      {columnTasks.length}
+                    </span>
                   </div>
-                );
-              },
-            )}
+
+                  {/* Column Task Cards */}
+                  <div className="flex-1 space-y-2 overflow-y-auto pr-0.5">
+                    {columnTasks.map((task) => (
+                      <div
+                        key={task.id}
+                        className="group cursor-pointer rounded-2xl surface-card-token border border-token p-3.5 transition-all hover:border-token-strong shadow-token-small"
+                        onClick={() => setSelectedTask(task)}
+                      >
+                        <span className="type-10 weight-extrabold uppercase tracking-wider text-token-accent accent-surface-token px-2 py-0.5 rounded-full">
+                          {task.department}
+                        </span>
+                        <p className="mt-2 type-xs weight-bold text-token-primary line-clamp-2">
+                          {task.title}
+                        </p>
+                        <div className="mt-3 flex items-center justify-between border-t border-subtle-token pt-2 type-11">
+                          <span className="weight-semibold text-token-secondary truncate max-w-[120px]">
+                            {task.assignee.name}
+                          </span>
+                          <button
+                            className={cn(
+                              "flex h-5 w-5 min-h-0 items-center justify-center rounded-full transition-colors",
+                              task.status === "Completed"
+                                ? "bg-token-success text-token-inverse"
+                                : "field-token text-token-success hover:hover-token",
+                            )}
+                            onClick={(e) => handleToggleComplete(e, task.id)}
+                          >
+                            <Check size={11} strokeWidth={2.5} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

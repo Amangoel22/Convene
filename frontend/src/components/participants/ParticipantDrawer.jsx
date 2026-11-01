@@ -10,9 +10,15 @@ import { COLORS } from "@/constants/colors";
 
 function Info({ label, value }) {
   return (
-    <div className={`rounded-2xl bg-[${COLORS.cardBg}] border border-subtle-token p-3`}>
-      <p className={`type-11 weight-semibold text-[${COLORS.grayMuted}]`}>{label}</p>
-      <p className={`mt-0.5 truncate type-sm weight-bold text-[${COLORS.dark}]`}>
+    <div
+      className={`rounded-2xl bg-[${COLORS.cardBg}] border border-subtle-token p-3`}
+    >
+      <p className={`type-11 weight-semibold text-[${COLORS.grayMuted}]`}>
+        {label}
+      </p>
+      <p
+        className={`mt-0.5 truncate type-sm weight-bold text-[${COLORS.dark}]`}
+      >
         {value || "N/A"}
       </p>
     </div>
@@ -108,7 +114,9 @@ export function ParticipantDrawer({
         {isLead && (
           <div className="mt-5 flex items-center justify-between rounded-2xl accent-surface-token border border-token-accent/20 p-3.5">
             <span className="type-xs weight-bold text-token-accent">
-              {isIndividual ? "Update Participant Status" : "Update Team Status"}
+              {isIndividual
+                ? "Update Participant Status"
+                : "Update Team Status"}
             </span>
             <div className="relative inline-flex items-center">
               <select

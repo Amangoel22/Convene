@@ -57,15 +57,26 @@ export function StatusText({ status }) {
   };
 
   return (
-    <span className={cn("type-xs weight-bold", statusColors[status] || "text-token-secondary")}>
+    <span
+      className={cn(
+        "type-xs weight-bold",
+        statusColors[status] || "text-token-secondary",
+      )}
+    >
       {status || "Confirmed"}
     </span>
   );
 }
 
-export function ParticipantStatusSelect({ status, onChange, isLead = true, disabled = false }) {
+export function ParticipantStatusSelect({
+  status,
+  onChange,
+  isLead = true,
+  disabled = false,
+}) {
   const statusColors = {
-    Unconfirmed: "text-token-warning bg-token-warning/10 border-token-warning/30",
+    Unconfirmed:
+      "text-token-warning bg-token-warning/10 border-token-warning/30",
     Confirmed: "text-token-success bg-token-success/10 border-token-success/30",
     "Checked In": "text-token-accent bg-token-accent/10 border-token-accent/30",
     Absent: "text-token-secondary bg-token-field border-token-subtle",
@@ -78,7 +89,8 @@ export function ParticipantStatusSelect({ status, onChange, isLead = true, disab
       <span
         className={cn(
           "inline-flex h-7 items-center rounded-full px-2.5 type-10 weight-black uppercase tracking-wider border",
-          statusColors[status] || "bg-token-field text-token-secondary border-token-subtle",
+          statusColors[status] ||
+            "bg-token-field text-token-secondary border-token-subtle",
         )}
       >
         {status || "Confirmed"}
@@ -97,15 +109,46 @@ export function ParticipantStatusSelect({ status, onChange, isLead = true, disab
         disabled={disabled}
         className={cn(
           "h-7 cursor-pointer appearance-none rounded-full pl-2.5 pr-6 type-10 weight-black uppercase tracking-wider border outline-none transition-all shadow-sm",
-          statusColors[status] || "bg-token-field text-token-secondary border-token-subtle",
+          statusColors[status] ||
+            "bg-token-field text-token-secondary border-token-subtle",
         )}
       >
-        <option value="Checked In" className="surface-card-token text-token-primary font-sans weight-semibold capitalize">Checked In</option>
-        <option value="Confirmed" className="surface-card-token text-token-primary font-sans weight-semibold capitalize">Confirmed</option>
-        <option value="Unconfirmed" className="surface-card-token text-token-primary font-sans weight-semibold capitalize">Unconfirmed</option>
-        <option value="Absent" className="surface-card-token text-token-primary font-sans weight-semibold capitalize">Absent</option>
-        <option value="Withdrawn" className="surface-card-token text-token-primary font-sans weight-semibold capitalize">Withdrawn</option>
-        <option value="Rejected" className="surface-card-token text-token-primary font-sans weight-semibold capitalize">Rejected</option>
+        <option
+          value="Checked In"
+          className="surface-card-token text-token-primary font-sans weight-semibold capitalize"
+        >
+          Checked In
+        </option>
+        <option
+          value="Confirmed"
+          className="surface-card-token text-token-primary font-sans weight-semibold capitalize"
+        >
+          Confirmed
+        </option>
+        <option
+          value="Unconfirmed"
+          className="surface-card-token text-token-primary font-sans weight-semibold capitalize"
+        >
+          Unconfirmed
+        </option>
+        <option
+          value="Absent"
+          className="surface-card-token text-token-primary font-sans weight-semibold capitalize"
+        >
+          Absent
+        </option>
+        <option
+          value="Withdrawn"
+          className="surface-card-token text-token-primary font-sans weight-semibold capitalize"
+        >
+          Withdrawn
+        </option>
+        <option
+          value="Rejected"
+          className="surface-card-token text-token-primary font-sans weight-semibold capitalize"
+        >
+          Rejected
+        </option>
       </select>
     </div>
   );
@@ -121,7 +164,11 @@ export function SelectFilter({ value, onChange, options, label }) {
         className="h-9 cursor-pointer appearance-none rounded-full field-token border border-token pl-3.5 pr-8 type-xs weight-semibold text-token-primary outline-none hover:hover-token transition-colors"
       >
         {options.map((option) => (
-          <option key={option} value={option} className="surface-card-token text-token-primary">
+          <option
+            key={option}
+            value={option}
+            className="surface-card-token text-token-primary"
+          >
             {option}
           </option>
         ))}

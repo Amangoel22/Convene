@@ -4,23 +4,23 @@ export const colors = {
     primary: "#F5F1EA",
     secondary: "#FFFDF8",
     glass: "rgba(255,253,248,0.62)",
-    glassStrong: "rgba(255,253,248,0.86)"
+    glassStrong: "rgba(255,253,248,0.86)",
   },
   accent: {
     gold: "#A9792F",
-    goldHover: "#8E6424"
+    goldHover: "#8E6424",
   },
   state: {
     success: "#4F7A62",
     warning: "#A9792F",
     error: "#B04A3A",
-    info: "#8B6F5A"
+    info: "#8B6F5A",
   },
   text: {
     primary: "#2A2622",
     secondary: "#6E665C",
-    muted: "#9A9084"
-  }
+    muted: "#9A9084",
+  },
 };
 
 export const spacing = {
@@ -30,7 +30,7 @@ export const spacing = {
   lg: 24,
   xl: 32,
   "2xl": 48,
-  "3xl": 64
+  "3xl": 64,
 };
 
 export const radius = {
@@ -40,14 +40,14 @@ export const radius = {
   navbar: 26,
   sidebar: 28,
   modal: 32,
-  pill: 999
+  pill: 999,
 };
 
 export const blur = {
   card: 22,
   navbar: 24,
   sidebar: 30,
-  modal: 28
+  modal: 28,
 };
 
 export const shadows = {
@@ -55,7 +55,7 @@ export const shadows = {
   cardHover: "0 14px 42px rgba(83,60,42,.12)",
   hero: "0 18px 48px rgba(83,60,42,.1)",
   sidebar: "0 18px 48px rgba(83,60,42,.105)",
-  gold: "0 0 0 1px rgba(169,121,47,.45), 0 14px 34px rgba(169,121,47,.16)"
+  gold: "0 0 0 1px rgba(169,121,47,.45), 0 14px 34px rgba(169,121,47,.16)",
 };
 
 export const animations = {
@@ -64,6 +64,6 @@ export const animations = {
   slow: 0.35,
   spring: {
     stiffness: 320,
-    damping: 26
-  }
+    damping: 26,
+  },
 };

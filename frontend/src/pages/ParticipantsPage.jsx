@@ -102,19 +102,19 @@ export function ParticipantsPage() {
             t.members?.find((m) => m.role === "lead") || t.members?.[0];
           const leader = leadMember?.user
             ? {
-              name: leadMember.user.name,
-              email: leadMember.user.email,
-              phone: leadMember.user.phone || "N/A",
-              initials: leadMember.user.name
-                ? leadMember.user.name.substring(0, 2).toUpperCase()
-                : "U",
-            }
+                name: leadMember.user.name,
+                email: leadMember.user.email,
+                phone: leadMember.user.phone || "N/A",
+                initials: leadMember.user.name
+                  ? leadMember.user.name.substring(0, 2).toUpperCase()
+                  : "U",
+              }
             : {
-              name: "Team Lead",
-              email: "lead@convene.test",
-              phone: "N/A",
-              initials: "TL",
-            };
+                name: "Team Lead",
+                email: "lead@convene.test",
+                phone: "N/A",
+                initials: "TL",
+              };
 
           const members = (t.members || []).map((m) => {
             const userId = m.user?.id || m.userId || m.id;
@@ -220,7 +220,8 @@ export function ParticipantsPage() {
       total: teams.length,
       checkedIn: teams.filter((t) => teamMatchesStatus(t, "Checked In")).length,
       confirmed: teams.filter((t) => teamMatchesStatus(t, "Confirmed")).length,
-      unconfirmed: teams.filter((t) => teamMatchesStatus(t, "Unconfirmed")).length,
+      unconfirmed: teams.filter((t) => teamMatchesStatus(t, "Unconfirmed"))
+        .length,
       rejected: teams.filter((t) => teamMatchesStatus(t, "Rejected")).length,
     };
   }, [teams, teamMatchesStatus]);
@@ -267,17 +268,14 @@ export function ParticipantsPage() {
 
     const token = localStorage.getItem("convene_token");
     try {
-      await fetch(
-        `${API_BASE}/participants/teams/${teamId}/status`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({ status: newStatus }),
+      await fetch(`${API_BASE}/participants/teams/${teamId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-      );
+        body: JSON.stringify({ status: newStatus }),
+      });
     } catch (err) {
       console.warn("Failed to update team status on backend:", err.message);
     }
@@ -390,20 +388,17 @@ export function ParticipantsPage() {
       );
 
       try {
-        await fetch(
-          `${API_BASE}/participants/${memberId}/status`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            body: JSON.stringify({
-              checkInStatus: selectedMember?.status || "Confirmed",
-              internalNotes: noteText,
-            }),
+        await fetch(`${API_BASE}/participants/${memberId}/status`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-        );
+          body: JSON.stringify({
+            checkInStatus: selectedMember?.status || "Confirmed",
+            internalNotes: noteText,
+          }),
+        });
       } catch (err) {
         console.warn("Failed to update participant notes:", err.message);
       }
@@ -416,17 +411,14 @@ export function ParticipantsPage() {
       );
 
       try {
-        await fetch(
-          `${API_BASE}/participants/teams/${teamId}/notes`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            body: JSON.stringify({ internalNotes: noteText }),
+        await fetch(`${API_BASE}/participants/teams/${teamId}/notes`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-        );
+          body: JSON.stringify({ internalNotes: noteText }),
+        });
       } catch (err) {
         console.warn("Failed to update team notes:", err.message);
       }
@@ -436,9 +428,14 @@ export function ParticipantsPage() {
   // Purpose: download the current event participant directory in the import-compatible format.
   const handleExport = async () => {
     if (!activeEvent?.id) return;
-    const response = await fetch(`${API_BASE}/participants/${activeEvent.id}/participants/export`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("convene_token")}` },
-    });
+    const response = await fetch(
+      `${API_BASE}/participants/${activeEvent.id}/participants/export`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("convene_token")}`,
+        },
+      },
+    );
     if (!response.ok) return;
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);

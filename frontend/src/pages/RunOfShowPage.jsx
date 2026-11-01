@@ -14,7 +14,7 @@ import {
   Search,
   Sparkles,
   Users,
-  X
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -23,12 +23,20 @@ import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
 import { PageTitle } from "@/components/ui/PageTitle";
-import { cn, formatDisplayTime, formatTimeString, getStageStatus, isEventComplete, parseTimeString, addHoursToTimeString } from "@/lib/utils";
+import {
+  cn,
+  formatDisplayTime,
+  formatTimeString,
+  getStageStatus,
+  isEventComplete,
+  parseTimeString,
+  addHoursToTimeString,
+} from "@/lib/utils";
 
 const statusStyles = {
   LIVE: "bg-token-success/10 text-token-success",
   Completed: "bg-token-success/10 text-token-success",
-  Upcoming: "accent-surface-token text-token-accent"
+  Upcoming: "accent-surface-token text-token-accent",
 };
 
 function StatusBadge({ status = "Upcoming" }) {
@@ -36,7 +44,7 @@ function StatusBadge({ status = "Upcoming" }) {
     <span
       className={cn(
         "inline-flex whitespace-nowrap items-center gap-1.5 rounded-full px-2.5 py-0.5 type-xs weight-bold tracking-wide",
-        statusStyles[status] ?? statusStyles.Upcoming
+        statusStyles[status] ?? statusStyles.Upcoming,
       )}
     >
       {status === "LIVE" ? (
@@ -57,14 +65,22 @@ function StatusBadge({ status = "Upcoming" }) {
 function formatStageSchedule(stage) {
   const start = stage.startAt ? new Date(stage.startAt) : null;
   const end = stage.endAt ? new Date(stage.endAt) : null;
-  if (!start || Number.isNaN(start.getTime())) return stage.timeWindow || "Schedule not set";
+  if (!start || Number.isNaN(start.getTime()))
+    return stage.timeWindow || "Schedule not set";
 
   const dateOptions = { day: "numeric", month: "short", year: "numeric" };
   const startDate = start.toLocaleDateString("en-IN", dateOptions);
-  const endDate = end && !Number.isNaN(end.getTime()) ? end.toLocaleDateString("en-IN", dateOptions) : startDate;
-  const dateRange = end && start.toDateString() !== end.toDateString() ? `${startDate} – ${endDate}` : startDate;
+  const endDate =
+    end && !Number.isNaN(end.getTime())
+      ? end.toLocaleDateString("en-IN", dateOptions)
+      : startDate;
+  const dateRange =
+    end && start.toDateString() !== end.toDateString()
+      ? `${startDate} – ${endDate}`
+      : startDate;
   const startTime = formatDisplayTime(start);
-  const endTime = end && !Number.isNaN(end.getTime()) ? formatDisplayTime(end) : "—";
+  const endTime =
+    end && !Number.isNaN(end.getTime()) ? formatDisplayTime(end) : "—";
   return `${dateRange} | ${startTime} – ${endTime}`;
 }
 
@@ -78,7 +94,11 @@ function SelectFilter({ value, onChange, options, label }) {
         className="cursor-pointer bg-transparent type-xs weight-semibold text-token-primary outline-none pr-1"
       >
         {options.map((option) => (
-          <option key={option} value={option} className="surface-card-token text-token-primary">
+          <option
+            key={option}
+            value={option}
+            className="surface-card-token text-token-primary"
+          >
             {option}
           </option>
         ))}
@@ -122,9 +142,13 @@ function StageDrawer({ stage, onClose, onUpdateStatus }) {
           <div>
             <div className="flex items-center gap-2.5">
               <StatusBadge status={stage.status} />
-              <span className="type-xs weight-bold text-token-muted">Stage {stage.order} of 6</span>
+              <span className="type-xs weight-bold text-token-muted">
+                Stage {stage.order} of 6
+              </span>
             </div>
-            <h2 className="mt-2 type-2xl weight-bold text-token-primary">{stage.title}</h2>
+            <h2 className="mt-2 type-2xl weight-bold text-token-primary">
+              {stage.title}
+            </h2>
           </div>
           <button
             className="flex h-9 w-9 min-h-0 items-center justify-center rounded-full field-token text-token-secondary hover:hover-token hover:text-token-primary"
@@ -140,32 +164,64 @@ function StageDrawer({ stage, onClose, onUpdateStatus }) {
           {/* Metadata Grid */}
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-2xl surface-token border border-subtle-token p-3.5">
-              <span className="type-11 weight-semibold text-token-muted block">Time Window</span>
-              <span className="type-xs weight-bold text-token-primary block mt-1">{stage.timeWindow}</span>
+              <span className="type-11 weight-semibold text-token-muted block">
+                Time Window
+              </span>
+              <span className="type-xs weight-bold text-token-primary block mt-1">
+                {stage.timeWindow}
+              </span>
             </div>
             <div className="rounded-2xl surface-token border border-subtle-token p-3.5">
-              <span className="type-11 weight-semibold text-token-muted block">Location</span>
-              <span className="type-xs weight-bold text-token-primary block mt-1">{stage.location}</span>
+              <span className="type-11 weight-semibold text-token-muted block">
+                Location
+              </span>
+              <span className="type-xs weight-bold text-token-primary block mt-1">
+                {stage.location}
+              </span>
             </div>
             <div className="rounded-2xl surface-token border border-subtle-token p-3.5">
-              <span className="type-11 weight-semibold text-token-muted block">Lead Owner</span>
-              <span className="type-xs weight-bold text-token-primary block mt-1">{stage.owner}</span>
+              <span className="type-11 weight-semibold text-token-muted block">
+                Lead Owner
+              </span>
+              <span className="type-xs weight-bold text-token-primary block mt-1">
+                {stage.owner}
+              </span>
             </div>
             <div className="rounded-2xl surface-token border border-subtle-token p-3.5">
-              <span className="type-11 weight-semibold text-token-muted block">Department</span>
-              <span className="type-xs weight-bold text-token-primary block mt-1">{stage.department}</span>
+              <span className="type-11 weight-semibold text-token-muted block">
+                Department
+              </span>
+              <span className="type-xs weight-bold text-token-primary block mt-1">
+                {stage.department}
+              </span>
             </div>
           </div>
 
           {/* Key Checklist Milestones */}
           {stage.milestones && stage.milestones.length > 0 && (
             <div>
-              <h3 className="type-xs weight-bold uppercase tracking-wider text-token-muted">Stage Milestones</h3>
+              <h3 className="type-xs weight-bold uppercase tracking-wider text-token-muted">
+                Stage Milestones
+              </h3>
               <div className="mt-3 space-y-2">
                 {stage.milestones.map((m, idx) => (
-                  <div key={idx} className="flex items-center gap-3 rounded-2xl surface-token border border-subtle-token p-3 type-xs weight-medium text-token-primary">
-                    <CheckCircle2 size={16} className={cn(m.completed ? "text-token-success" : "text-token-muted")} />
-                    <span className={cn(m.completed && "line-through text-token-muted")}>{m.label}</span>
+                  <div
+                    key={idx}
+                    className="flex items-center gap-3 rounded-2xl surface-token border border-subtle-token p-3 type-xs weight-medium text-token-primary"
+                  >
+                    <CheckCircle2
+                      size={16}
+                      className={cn(
+                        m.completed ? "text-token-success" : "text-token-muted",
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        m.completed && "line-through text-token-muted",
+                      )}
+                    >
+                      {m.label}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -266,16 +322,22 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
       title: title.trim(),
       timeWindow: formattedWindow,
       location: location.trim() || "",
-      status: stage ? stage.status : "Upcoming"
+      status: stage ? stage.status : "Upcoming",
     });
     onClose();
   };
 
   return (
-    <GlassModal open={open} onClose={onClose} title={stage ? "Edit Timeline Stage" : "Add Timeline Stage"}>
+    <GlassModal
+      open={open}
+      onClose={onClose}
+      title={stage ? "Edit Timeline Stage" : "Add Timeline Stage"}
+    >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="type-xs weight-semibold text-token-muted">Stage Title</label>
+          <label className="type-xs weight-semibold text-token-muted">
+            Stage Title
+          </label>
           <input
             type="text"
             required
@@ -289,7 +351,9 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
         {/* Time Selector Inputs */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="type-xs weight-semibold text-token-muted">Start Time</label>
+            <label className="type-xs weight-semibold text-token-muted">
+              Start Time
+            </label>
             <input
               type="time"
               required
@@ -300,7 +364,9 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
           </div>
 
           <div>
-            <label className="type-xs weight-semibold text-token-muted">End Time</label>
+            <label className="type-xs weight-semibold text-token-muted">
+              End Time
+            </label>
             <input
               type="time"
               required
@@ -313,7 +379,9 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="type-xs weight-semibold text-token-muted">Venue</label>
+            <label className="type-xs weight-semibold text-token-muted">
+              Venue
+            </label>
             <input
               type="text"
               placeholder="e.g. Main Auditorium"
@@ -325,10 +393,19 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
         </div>
 
         <div className="mt-6 flex justify-end gap-3 pt-2">
-          <GlassButton type="button" onClick={onClose} className="h-9 type-xs rounded-full">
+          <GlassButton
+            type="button"
+            onClick={onClose}
+            className="h-9 type-xs rounded-full"
+          >
             Cancel
           </GlassButton>
-          <GlassButton type="submit" variant="primary" icon={<Check size={15} />} className="h-9 type-xs rounded-full">
+          <GlassButton
+            type="submit"
+            variant="primary"
+            icon={<Check size={15} />}
+            className="h-9 type-xs rounded-full"
+          >
             {stage ? "Save Changes" : "Create Stage"}
           </GlassButton>
         </div>
@@ -340,9 +417,13 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
 export function RunOfShowPage() {
   const eventsHydrated = useAppStore((state) => state.eventsHydrated);
   const activeEvent = useAppStore((state) => state.activeEvent);
-  const updateActiveEventStages = useAppStore((state) => state.updateActiveEventStages);
+  const updateActiveEventStages = useAppStore(
+    (state) => state.updateActiveEventStages,
+  );
   const updateStageDetails = useAppStore((state) => state.updateStageDetails);
-  const addStageToActiveEvent = useAppStore((state) => state.addStageToActiveEvent);
+  const addStageToActiveEvent = useAppStore(
+    (state) => state.addStageToActiveEvent,
+  );
   const role = useAppStore((state) => state.role);
   const isLead = role === "lead";
 
@@ -367,7 +448,10 @@ export function RunOfShowPage() {
 
   // Evaluate stages dynamically based on current time window, preserving manual overrides
   const stages = useMemo(() => {
-    return rawStages.map((s) => ({ ...s, status: eventIsComplete ? "Completed" : getStageStatus(s, now) }));
+    return rawStages.map((s) => ({
+      ...s,
+      status: eventIsComplete ? "Completed" : getStageStatus(s, now),
+    }));
   }, [eventIsComplete, rawStages, now]);
 
   const filteredStages = useMemo(() => {
@@ -378,7 +462,8 @@ export function RunOfShowPage() {
         stage.title.toLowerCase().includes(query) ||
         (stage.location && stage.location.toLowerCase().includes(query));
 
-      const matchesStatus = statusFilter === "All Statuses" || stage.status === statusFilter;
+      const matchesStatus =
+        statusFilter === "All Statuses" || stage.status === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
@@ -395,9 +480,9 @@ export function RunOfShowPage() {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ status: newStatus })
+          body: JSON.stringify({ status: newStatus }),
         });
       } catch (err) {
         console.warn("Backend status sync warning:", err.message);
@@ -416,13 +501,13 @@ export function RunOfShowPage() {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
               title: stageData.title,
               timeWindow: stageData.timeWindow,
-              location: stageData.location
-            })
+              location: stageData.location,
+            }),
           });
         } catch (err) {
           console.warn("Backend stage update warning:", err.message);
@@ -431,31 +516,34 @@ export function RunOfShowPage() {
     } else {
       let createdStage = {
         ...stageData,
-        order: stages.length + 1
+        order: stages.length + 1,
       };
 
       if (token && activeEvent?.id) {
         try {
-          const res = await fetch(`${API_BASE}/events/${activeEvent.id}/stages`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`
+          const res = await fetch(
+            `${API_BASE}/events/${activeEvent.id}/stages`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                title: stageData.title,
+                timeWindow: stageData.timeWindow,
+                location: stageData.location,
+                stageOrder: stages.length + 1,
+              }),
             },
-            body: JSON.stringify({
-              title: stageData.title,
-              timeWindow: stageData.timeWindow,
-              location: stageData.location,
-              stageOrder: stages.length + 1
-            })
-          });
+          );
           if (res.ok) {
             const data = await res.json();
             if (data.stage) {
               createdStage = {
                 ...createdStage,
                 id: data.stage.id,
-                order: data.stage.stageOrder
+                order: data.stage.stageOrder,
               };
             }
           }
@@ -477,23 +565,43 @@ export function RunOfShowPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <PageTitle>Run of Show</PageTitle>
-          <p className="mt-2 type-sm weight-bold text-token-primary">{activeEvent?.name || "Event"}</p>
+          <p className="mt-2 type-sm weight-bold text-token-primary">
+            {activeEvent?.name || "Event"}
+          </p>
           <p className="mt-1 type-xs weight-semibold text-token-muted">
             {(() => {
-              const startDate = activeEvent?.startDate ? new Date(activeEvent.startDate) : null;
-              const endDate = activeEvent?.endDate ? new Date(activeEvent.endDate) : null;
-              const dateOptions = { day: "numeric", month: "short", year: "numeric" };
-              const startLabel = startDate ? startDate.toLocaleDateString("en-IN", dateOptions) : "Date not set";
-              const endLabel = endDate ? endDate.toLocaleDateString("en-IN", dateOptions) : startLabel;
-              const dateRange = startDate && endDate && startDate.toDateString() !== endDate.toDateString()
-                ? `${startLabel} – ${endLabel}`
+              const startDate = activeEvent?.startDate
+                ? new Date(activeEvent.startDate)
+                : null;
+              const endDate = activeEvent?.endDate
+                ? new Date(activeEvent.endDate)
+                : null;
+              const dateOptions = {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              };
+              const startLabel = startDate
+                ? startDate.toLocaleDateString("en-IN", dateOptions)
+                : "Date not set";
+              const endLabel = endDate
+                ? endDate.toLocaleDateString("en-IN", dateOptions)
                 : startLabel;
+              const dateRange =
+                startDate &&
+                endDate &&
+                startDate.toDateString() !== endDate.toDateString()
+                  ? `${startLabel} – ${endLabel}`
+                  : startLabel;
               return dateRange;
             })()}
             <span className="mx-2 text-token-inverse-muted">|</span>
-            {activeEvent?.startTime || "Start time not set"} – {activeEvent?.endTime || "End time not set"}
+            {activeEvent?.startTime || "Start time not set"} –{" "}
+            {activeEvent?.endTime || "End time not set"}
           </p>
-          <p className="mt-1 type-sm text-token-secondary weight-medium">Master timeline, stage handovers, and live event progression.</p>
+          <p className="mt-1 type-sm text-token-secondary weight-medium">
+            Master timeline, stage handovers, and live event progression.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           {isLead && !eventIsComplete && (
@@ -515,7 +623,11 @@ export function RunOfShowPage() {
       {/* Filter controls */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex h-9 min-w-[240px] flex-1 items-center gap-2 rounded-full field-token border border-token px-3.5 type-xs weight-medium text-token-primary focus-within:ring-1 focus-within:ring-token-accent">
-          <Search size={15} strokeWidth={2} className="text-token-muted shrink-0" />
+          <Search
+            size={15}
+            strokeWidth={2}
+            className="text-token-muted shrink-0"
+          />
           <input
             type="text"
             placeholder="Search timeline stages, locations, leads..."
@@ -540,8 +652,12 @@ export function RunOfShowPage() {
             <CheckCircle2 size={20} strokeWidth={2.5} />
           </div>
           <div>
-            <p className="type-sm weight-extrabold text-token-primary">Event completed</p>
-            <p className="mt-0.5 type-xs weight-medium text-token-secondary">All timeline stages are complete. This schedule is now read-only.</p>
+            <p className="type-sm weight-extrabold text-token-primary">
+              Event completed
+            </p>
+            <p className="mt-0.5 type-xs weight-medium text-token-secondary">
+              All timeline stages are complete. This schedule is now read-only.
+            </p>
           </div>
         </div>
       )}
@@ -556,8 +672,17 @@ export function RunOfShowPage() {
           icon={CalendarClock}
           title="No timeline stages configured"
           description="Create timeline stages to track live event progression, venues, and stage leads."
-          actionLabel={isLead && activeEvent && !eventIsComplete ? "Add Stage" : undefined}
-          onAction={isLead && activeEvent && !eventIsComplete ? () => { setEditingStage(null); setEditModalOpen(true); } : undefined}
+          actionLabel={
+            isLead && activeEvent && !eventIsComplete ? "Add Stage" : undefined
+          }
+          onAction={
+            isLead && activeEvent && !eventIsComplete
+              ? () => {
+                  setEditingStage(null);
+                  setEditModalOpen(true);
+                }
+              : undefined
+          }
         />
       ) : (
         <div className="relative space-y-4 md:before:absolute md:before:bottom-8 md:before:left-[2.75rem] md:before:top-8 md:before:w-px md:before:bg-token-success/20">
@@ -574,31 +699,43 @@ export function RunOfShowPage() {
                     ? "surface-card-token border-token-accent/40 ring-1 ring-token-accent/20"
                     : stg.status === "Completed"
                       ? "bg-gradient-to-r from-token-success-light to-token-inverse border-token-success/20"
-                    : "surface-card-token border-token"
+                      : "surface-card-token border-token",
                 )}
               >
                 <div className="flex items-start gap-4 min-w-0 flex-1">
                   <div
                     className={cn(
                       "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl font-mono type-sm weight-bold",
-                      isLive ? "accent-surface-token text-token-accent" : stg.status === "Completed" ? "bg-token-success text-token-inverse" : "field-token text-token-secondary"
+                      isLive
+                        ? "accent-surface-token text-token-accent"
+                        : stg.status === "Completed"
+                          ? "bg-token-success text-token-inverse"
+                          : "field-token text-token-secondary",
                     )}
                   >
-                    {stg.status === "Completed" ? <Check size={18} strokeWidth={3} /> : displayIndex}
+                    {stg.status === "Completed" ? (
+                      <Check size={18} strokeWidth={3} />
+                    ) : (
+                      displayIndex
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-3">
-                      <h3 className="type-base weight-bold text-token-primary truncate">{stg.title}</h3>
+                      <h3 className="type-base weight-bold text-token-primary truncate">
+                        {stg.title}
+                      </h3>
                       <StatusBadge status={stg.status} />
                     </div>
                     <div className="mt-2.5 space-y-1.5 type-xs weight-medium text-token-muted">
                       {stg.location && (
                         <span className="inline-flex items-center gap-1.5 font-mono weight-semibold text-token-secondary">
-                          <MapPin size={13} className="text-token-muted" /> {stg.location}
+                          <MapPin size={13} className="text-token-muted" />{" "}
+                          {stg.location}
                         </span>
                       )}
                       <span className="flex items-center gap-1.5 font-mono weight-semibold text-token-secondary">
-                        <Clock size={13} className="text-token-muted" /> {formatStageSchedule(stg)}
+                        <Clock size={13} className="text-token-muted" />{" "}
+                        {formatStageSchedule(stg)}
                       </span>
                     </div>
                   </div>

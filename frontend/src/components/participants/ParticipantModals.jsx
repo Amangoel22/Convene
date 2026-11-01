@@ -361,17 +361,28 @@ export function ImportModal({ open, onClose, eventId, onImported }) {
     try {
       const form = new FormData();
       form.append("file", file);
-      const response = await fetch(`${API_BASE}/participants/${eventId}/participants/import`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${localStorage.getItem("convene_token")}` },
-        body: form,
-      });
+      const response = await fetch(
+        `${API_BASE}/participants/${eventId}/participants/import`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("convene_token")}`,
+          },
+          body: form,
+        },
+      );
       const payload = await response.json();
       if (!response.ok) {
-        setError(payload.errors?.join(" ") || payload.error || "Unable to import participants.");
+        setError(
+          payload.errors?.join(" ") ||
+            payload.error ||
+            "Unable to import participants.",
+        );
         return;
       }
-      setMessage(`${payload.participants} participants imported across ${payload.teams} teams.`);
+      setMessage(
+        `${payload.participants} participants imported across ${payload.teams} teams.`,
+      );
       await onImported?.();
       setFile(null);
       if (inputRef.current) inputRef.current.value = "";
@@ -394,7 +405,8 @@ export function ImportModal({ open, onClose, eventId, onImported }) {
             Import participants
           </h2>
           <p className="mt-1 type-xs weight-medium text-token-secondary">
-            Upload the single-sheet workbook exported by your registration platform.
+            Upload the single-sheet workbook exported by your registration
+            platform.
           </p>
         </div>
         <button
@@ -406,24 +418,57 @@ export function ImportModal({ open, onClose, eventId, onImported }) {
         </button>
       </div>
       <div className="mt-6 rounded-2xl border-2 border-dashed border-token-medium surface-token p-8 text-center">
-        <Upload className="mx-auto text-token-accent" size={30} strokeWidth={2} />
-        <p className="mt-3 type-sm weight-bold text-token-primary">Choose one workbook</p>
+        <Upload
+          className="mx-auto text-token-accent"
+          size={30}
+          strokeWidth={2}
+        />
+        <p className="mt-3 type-sm weight-bold text-token-primary">
+          Choose one workbook
+        </p>
         <p className="mt-1 type-xs weight-medium text-token-muted">
           XLSX, XLS, or CSV · maximum 5 MB · one row per participant
         </p>
-        <input ref={inputRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleFileChange} className="sr-only" />
-        <button type="button" onClick={() => inputRef.current?.click()} className="mt-5 inline-flex h-10 items-center gap-2 rounded-full field-token border border-token px-4 type-xs weight-bold text-token-primary hover:hover-token">
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          onChange={handleFileChange}
+          className="sr-only"
+        />
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="mt-5 inline-flex h-10 items-center gap-2 rounded-full field-token border border-token px-4 type-xs weight-bold text-token-primary hover:hover-token"
+        >
           <FileUp size={15} /> Choose file
         </button>
         {file && (
           <div className="mx-auto mt-4 flex max-w-md items-center justify-between gap-3 rounded-xl surface-card-token px-3 py-2 text-left">
-            <span className="min-w-0 truncate type-xs weight-semibold text-token-primary">{file.name}</span>
-            <button type="button" className="shrink-0 type-11 weight-bold text-token-error" onClick={() => { setFile(null); if (inputRef.current) inputRef.current.value = ""; }}>Remove</button>
+            <span className="min-w-0 truncate type-xs weight-semibold text-token-primary">
+              {file.name}
+            </span>
+            <button
+              type="button"
+              className="shrink-0 type-11 weight-bold text-token-error"
+              onClick={() => {
+                setFile(null);
+                if (inputRef.current) inputRef.current.value = "";
+              }}
+            >
+              Remove
+            </button>
           </div>
         )}
       </div>
-      {error && <p className="mt-4 type-xs weight-semibold text-token-error">{error}</p>}
-      {message && <p className="mt-4 type-xs weight-semibold text-token-success">{message}</p>}
+      {error && (
+        <p className="mt-4 type-xs weight-semibold text-token-error">{error}</p>
+      )}
+      {message && (
+        <p className="mt-4 type-xs weight-semibold text-token-success">
+          {message}
+        </p>
+      )}
       <div className="mt-6 flex justify-end gap-3">
         <GlassButton onClick={onClose} className="rounded-full">
           Cancel

@@ -24,29 +24,40 @@ app.use(
         scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
         imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "https://unpkg.com"]
-      }
-    }
-  })
+        connectSrc: ["'self'", "https://unpkg.com"],
+      },
+    },
+  }),
 );
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow local development ports 5000 and 5173 or CLIENT_URL
-      if (!origin || origin.includes("localhost:5000") || origin.includes("localhost:5173") || origin === process.env.CLIENT_URL) {
+      if (
+        !origin ||
+        origin.includes("localhost:5000") ||
+        origin.includes("localhost:5173") ||
+        origin === process.env.CLIENT_URL
+      ) {
         callback(null, true);
       } else {
         callback(null, true);
       }
     },
-    credentials: true
-  })
+    credentials: true,
+  }),
 );
 app.use(express.json());
 
 // Root Welcome Endpoint
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Convene Backend API is running.", version: "0.1.0", docs: "/docs" });
+  res
+    .status(200)
+    .json({
+      message: "Convene Backend API is running.",
+      version: "0.1.0",
+      docs: "/docs",
+    });
 });
 
 // Health Check Endpoint
@@ -206,7 +217,9 @@ app.use((req, res) => {
 // Global Error Handler
 app.use((err, req, res, _next) => {
   console.error("Unhandled Error:", err);
-  res.status(500).json({ error: "Internal Server Error", details: err.message });
+  res
+    .status(500)
+    .json({ error: "Internal Server Error", details: err.message });
 });
 
 export default app;

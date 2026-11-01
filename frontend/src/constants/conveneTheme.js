@@ -27,12 +27,42 @@ export const CONVENE_THEME = {
 
 // Purpose: define the selectable visual presets exposed to public and authenticated users.
 export const CONVENE_THEME_OPTIONS = [
-  { id: "warm-copper", label: "Warm Copper", description: "The current Convene palette", swatch: "#B85C38" },
-  { id: "forest-authority", label: "Forest Authority", description: "Sage, pine, and mint", swatch: "#0F766E" },
-  { id: "obsidian-copper", label: "Obsidian Copper", description: "Industrial charcoal and rust", swatch: "#D94E1F" },
-  { id: "plum-prestige", label: "Plum Prestige", description: "Violet, aubergine, and lilac", swatch: "#8B5CF6" },
-  { id: "nordic-marigold", label: "Nordic Marigold", description: "Birch, charcoal, and ochre", swatch: "#D97706" },
-  { id: "blue-daylight", label: "Blue Daylight", description: "The original light workspace", swatch: "#3B6FD4" },
+  {
+    id: "warm-copper",
+    label: "Warm Copper",
+    description: "The current Convene palette",
+    swatch: "#B85C38",
+  },
+  {
+    id: "forest-authority",
+    label: "Forest Authority",
+    description: "Sage, pine, and mint",
+    swatch: "#0F766E",
+  },
+  {
+    id: "obsidian-copper",
+    label: "Obsidian Copper",
+    description: "Industrial charcoal and rust",
+    swatch: "#D94E1F",
+  },
+  {
+    id: "plum-prestige",
+    label: "Plum Prestige",
+    description: "Violet, aubergine, and lilac",
+    swatch: "#8B5CF6",
+  },
+  {
+    id: "nordic-marigold",
+    label: "Nordic Marigold",
+    description: "Birch, charcoal, and ochre",
+    swatch: "#D97706",
+  },
+  {
+    id: "blue-daylight",
+    label: "Blue Daylight",
+    description: "The original light workspace",
+    swatch: "#3B6FD4",
+  },
 ];
 
 // Purpose: provide one safe default for first-time visitors and invalid saved values.

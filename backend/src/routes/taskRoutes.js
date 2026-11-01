@@ -1,114 +1,276 @@
 // Purpose: taskRoutes implements this source module.
 import express from "express";
 import { prisma } from "../config/prisma.js";
-import { authenticate, authorizeEventMembership, authorizeOrgLead } from "../middlewares/auth.js";
+import {
+  authenticate,
+  authorizeEventMembership,
+  authorizeOrgLead,
+} from "../middlewares/auth.js";
 import { createWorkbookBuffer } from "../utils/workbook.js";
 
 const router = express.Router();
-const memberInclude = { user: { select: { id: true, name: true, email: true, phone: true, avatarUrl: true } }, orgTeam: { select: { id: true, name: true } } };
+const memberInclude = {
+  user: {
+    select: { id: true, name: true, email: true, phone: true, avatarUrl: true },
+  },
+  orgTeam: { select: { id: true, name: true } },
+};
 
-const TASK_WORKBOOK_HEADERS = ["Task ID", "Task Title", "Description", "Team", "Assigned To", "Assigned Phone", "Status", "Priority", "Due Date", "Created At", "Updated At"];
+const TASK_WORKBOOK_HEADERS = [
+  "Task ID",
+  "Task Title",
+  "Description",
+  "Team",
+  "Assigned To",
+  "Assigned Phone",
+  "Status",
+  "Priority",
+  "Due Date",
+  "Created At",
+  "Updated At",
+];
 
 // Links an explicitly self-assigned pending member to the authenticated account.
 async function linkMatchingSelf(member, userId, userPhone) {
-  if (member?.userId || !userPhone || member.phone?.replace(/\D/g, "") !== userPhone.replace(/\D/g, "")) return member;
-  const existingLink = await prisma.orgMember.findFirst({ where: { eventId: member.eventId, userId, NOT: { id: member.id } }, select: { id: true } });
+  if (
+    member?.userId ||
+    !userPhone ||
+    member.phone?.replace(/\D/g, "") !== userPhone.replace(/\D/g, "")
+  )
+    return member;
+  const existingLink = await prisma.orgMember.findFirst({
+    where: { eventId: member.eventId, userId, NOT: { id: member.id } },
+    select: { id: true },
+  });
   if (existingLink) return member;
-  return prisma.orgMember.update({ where: { id: member.id }, data: { userId } });
+  return prisma.orgMember.update({
+    where: { id: member.id },
+    data: { userId },
+  });
 }
 
 // Handles router.get.
-router.get("/:eventId/tasks", authenticate, authorizeEventMembership(), async (req, res) => {
-  const { orgTeamId, status, priority } = req.query;
-  try {
-    const tasks = await prisma.task.findMany({ where: { eventId: req.params.eventId, ...(orgTeamId && { orgTeamId }), ...(status && { status }), ...(priority && { priority }) }, include: { orgTeam: true, assignedOrgMember: { include: memberInclude } }, orderBy: { createdAt: "desc" } });
-    return res.json({ tasks });
-  } catch (error) { return res.status(500).json({ error: "Failed to fetch tasks.", details: error.message }); }
-});
+router.get(
+  "/:eventId/tasks",
+  authenticate,
+  authorizeEventMembership(),
+  async (req, res) => {
+    const { orgTeamId, status, priority } = req.query;
+    try {
+      const tasks = await prisma.task.findMany({
+        where: {
+          eventId: req.params.eventId,
+          ...(orgTeamId && { orgTeamId }),
+          ...(status && { status }),
+          ...(priority && { priority }),
+        },
+        include: {
+          orgTeam: true,
+          assignedOrgMember: { include: memberInclude },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+      return res.json({ tasks });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: "Failed to fetch tasks.", details: error.message });
+    }
+  },
+);
 
 // Purpose: export event tasks into a readable workbook for operational reporting.
-router.get("/:eventId/tasks/export", authenticate, authorizeEventMembership(), async (req, res) => {
-  try {
-    const event = await prisma.event.findUnique({ where: { id: req.params.eventId }, select: { name: true } });
-    if (!event) return res.status(404).json({ error: "Event not found." });
-    const tasks = await prisma.task.findMany({
-      where: { eventId: req.params.eventId },
-      include: { orgTeam: true, assignedOrgMember: { include: { user: true } } },
-      orderBy: { createdAt: "asc" },
-    });
-    const rows = tasks.map((task) => ({
-      "Task ID": task.id,
-      "Task Title": task.title,
-      Description: task.description || "",
-      Team: task.orgTeam?.name || "",
-      "Assigned To": task.assignedOrgMember?.user?.name || task.assignedOrgMember?.name || "",
-      "Assigned Phone": task.assignedOrgMember?.user?.phone || task.assignedOrgMember?.phone || "",
-      Status: task.status === "In_Progress" ? "In Progress" : task.status,
-      Priority: task.priority,
-      "Due Date": task.dueAt ? task.dueAt.toISOString() : "",
-      "Created At": task.createdAt.toISOString(),
-      "Updated At": task.updatedAt.toISOString(),
-    }));
-    const buffer = createWorkbookBuffer("Tasks", TASK_WORKBOOK_HEADERS, rows);
-    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    res.setHeader("Content-Disposition", `attachment; filename="${event.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-tasks.xlsx"`);
-    return res.send(buffer);
-  } catch (error) {
-    return res.status(500).json({ error: "Failed to export tasks.", details: error.message });
-  }
-});
+router.get(
+  "/:eventId/tasks/export",
+  authenticate,
+  authorizeEventMembership(),
+  async (req, res) => {
+    try {
+      const event = await prisma.event.findUnique({
+        where: { id: req.params.eventId },
+        select: { name: true },
+      });
+      if (!event) return res.status(404).json({ error: "Event not found." });
+      const tasks = await prisma.task.findMany({
+        where: { eventId: req.params.eventId },
+        include: {
+          orgTeam: true,
+          assignedOrgMember: { include: { user: true } },
+        },
+        orderBy: { createdAt: "asc" },
+      });
+      const rows = tasks.map((task) => ({
+        "Task ID": task.id,
+        "Task Title": task.title,
+        Description: task.description || "",
+        Team: task.orgTeam?.name || "",
+        "Assigned To":
+          task.assignedOrgMember?.user?.name ||
+          task.assignedOrgMember?.name ||
+          "",
+        "Assigned Phone":
+          task.assignedOrgMember?.user?.phone ||
+          task.assignedOrgMember?.phone ||
+          "",
+        Status: task.status === "In_Progress" ? "In Progress" : task.status,
+        Priority: task.priority,
+        "Due Date": task.dueAt ? task.dueAt.toISOString() : "",
+        "Created At": task.createdAt.toISOString(),
+        "Updated At": task.updatedAt.toISOString(),
+      }));
+      const buffer = createWorkbookBuffer("Tasks", TASK_WORKBOOK_HEADERS, rows);
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      );
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${event.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-tasks.xlsx"`,
+      );
+      return res.send(buffer);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: "Failed to export tasks.", details: error.message });
+    }
+  },
+);
 
 // Handles router.post.
-router.post("/:eventId/tasks", authenticate, authorizeEventMembership(["organizer"]), authorizeOrgLead(), async (req, res) => {
-  const { title, description, orgTeamId, assignedOrgMemberId, priority, dueAt } = req.body;
-  if (!title) return res.status(400).json({ error: "Task title is required." });
-  try {
-    let resolvedOrgTeamId = null;
-    if (assignedOrgMemberId) {
-      let member = await prisma.orgMember.findFirst({ where: { id: assignedOrgMemberId, eventId: req.params.eventId } });
-      if (!member) return res.status(400).json({ error: "Assigned member does not belong to this event." });
-      member = await linkMatchingSelf(member, req.user.id, req.user.phone);
-      resolvedOrgTeamId = member.orgTeamId;
+router.post(
+  "/:eventId/tasks",
+  authenticate,
+  authorizeEventMembership(["organizer"]),
+  authorizeOrgLead(),
+  async (req, res) => {
+    const {
+      title,
+      description,
+      orgTeamId,
+      assignedOrgMemberId,
+      priority,
+      dueAt,
+    } = req.body;
+    if (!title)
+      return res.status(400).json({ error: "Task title is required." });
+    try {
+      let resolvedOrgTeamId = null;
+      if (assignedOrgMemberId) {
+        let member = await prisma.orgMember.findFirst({
+          where: { id: assignedOrgMemberId, eventId: req.params.eventId },
+        });
+        if (!member)
+          return res
+            .status(400)
+            .json({ error: "Assigned member does not belong to this event." });
+        member = await linkMatchingSelf(member, req.user.id, req.user.phone);
+        resolvedOrgTeamId = member.orgTeamId;
+      }
+      if (!assignedOrgMemberId && orgTeamId) {
+        const team = await prisma.orgTeam.findFirst({
+          where: { id: orgTeamId, eventId: req.params.eventId },
+        });
+        if (!team)
+          return res
+            .status(400)
+            .json({ error: "Team does not belong to this event." });
+        resolvedOrgTeamId = team.id;
+      }
+      const task = await prisma.task.create({
+        data: {
+          eventId: req.params.eventId,
+          title,
+          description,
+          orgTeamId: resolvedOrgTeamId,
+          assignedOrgMemberId: assignedOrgMemberId || null,
+          assignedAt: assignedOrgMemberId ? new Date() : null,
+          priority: priority || "Medium",
+          dueAt: dueAt ? new Date(dueAt) : null,
+          lastUpdatedByName: req.user.name,
+        },
+        include: {
+          orgTeam: true,
+          assignedOrgMember: { include: memberInclude },
+        },
+      });
+      return res
+        .status(201)
+        .json({ message: "Task created successfully.", task });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: "Failed to create task.", details: error.message });
     }
-    if (!assignedOrgMemberId && orgTeamId) {
-      const team = await prisma.orgTeam.findFirst({ where: { id: orgTeamId, eventId: req.params.eventId } });
-      if (!team) return res.status(400).json({ error: "Team does not belong to this event." });
-      resolvedOrgTeamId = team.id;
-    }
-    const task = await prisma.task.create({ data: { eventId: req.params.eventId, title, description, orgTeamId: resolvedOrgTeamId, assignedOrgMemberId: assignedOrgMemberId || null, assignedAt: assignedOrgMemberId ? new Date() : null, priority: priority || "Medium", dueAt: dueAt ? new Date(dueAt) : null, lastUpdatedByName: req.user.name }, include: { orgTeam: true, assignedOrgMember: { include: memberInclude } } });
-    return res.status(201).json({ message: "Task created successfully.", task });
-  } catch (error) { return res.status(500).json({ error: "Failed to create task.", details: error.message }); }
-});
+  },
+);
 
 // Handles router.patch.
 router.patch("/:taskId/status", authenticate, async (req, res) => {
   const { status } = req.body;
   if (!status) return res.status(400).json({ error: "Status is required." });
   try {
-    const task = await prisma.task.findUnique({ where: { id: req.params.taskId }, include: { assignedOrgMember: { select: { userId: true } } } });
+    const task = await prisma.task.findUnique({
+      where: { id: req.params.taskId },
+      include: { assignedOrgMember: { select: { userId: true } } },
+    });
     if (!task) return res.status(404).json({ error: "Task not found." });
-    const membership = await prisma.eventMembership.findUnique({ where: { unique_event_user: { eventId: task.eventId, userId: req.user.id } } });
+    const membership = await prisma.eventMembership.findUnique({
+      where: {
+        unique_event_user: { eventId: task.eventId, userId: req.user.id },
+      },
+    });
     const isAssignedMember = task.assignedOrgMember?.userId === req.user.id;
-    if (!membership || (membership.role !== "organizer" && !isAssignedMember)) return res.status(403).json({ error: "Only the assigned member or an organizer can update task status." });
-    const prismaStatus = status === "In Progress" ? "In_Progress" : status === "Todo" ? "Todo" : status;
-    const updated = await prisma.task.update({ where: { id: task.id }, data: { status: prismaStatus, lastUpdatedByName: req.user.name }, include: { orgTeam: true, assignedOrgMember: { include: memberInclude } } });
+    if (!membership || (membership.role !== "organizer" && !isAssignedMember))
+      return res
+        .status(403)
+        .json({
+          error:
+            "Only the assigned member or an organizer can update task status.",
+        });
+    const prismaStatus =
+      status === "In Progress"
+        ? "In_Progress"
+        : status === "Todo"
+          ? "Todo"
+          : status;
+    const updated = await prisma.task.update({
+      where: { id: task.id },
+      data: { status: prismaStatus, lastUpdatedByName: req.user.name },
+      include: { orgTeam: true, assignedOrgMember: { include: memberInclude } },
+    });
     return res.json({ message: "Task status updated.", task: updated });
-  } catch (error) { return res.status(500).json({ error: "Failed to update task status.", details: error.message }); }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "Failed to update task status.", details: error.message });
+  }
 });
 
 // Handles router.patch.
 router.patch("/:taskId", authenticate, async (req, res) => {
   const { assignedOrgMemberId, priority, dueAt } = req.body;
   try {
-    const task = await prisma.task.findUnique({ where: { id: req.params.taskId } });
+    const task = await prisma.task.findUnique({
+      where: { id: req.params.taskId },
+    });
     if (!task) return res.status(404).json({ error: "Task not found." });
-    const membership = await prisma.eventMembership.findUnique({ where: { unique_event_user: { eventId: task.eventId, userId: req.user.id } } });
-    if (!membership || membership.role !== "organizer") return res.status(403).json({ error: "Organizer access required." });
+    const membership = await prisma.eventMembership.findUnique({
+      where: {
+        unique_event_user: { eventId: task.eventId, userId: req.user.id },
+      },
+    });
+    if (!membership || membership.role !== "organizer")
+      return res.status(403).json({ error: "Organizer access required." });
     let resolvedTeamId = task.orgTeamId;
     let resolvedMemberId = task.assignedOrgMemberId;
     if (assignedOrgMemberId !== undefined && assignedOrgMemberId) {
-      let member = await prisma.orgMember.findFirst({ where: { id: assignedOrgMemberId, eventId: task.eventId } });
-      if (!member) return res.status(400).json({ error: "Assigned member does not belong to this event." });
+      let member = await prisma.orgMember.findFirst({
+        where: { id: assignedOrgMemberId, eventId: task.eventId },
+      });
+      if (!member)
+        return res
+          .status(400)
+          .json({ error: "Assigned member does not belong to this event." });
       member = await linkMatchingSelf(member, req.user.id, req.user.phone);
       resolvedTeamId = member.orgTeamId;
       resolvedMemberId = member.id;
@@ -117,9 +279,34 @@ router.patch("/:taskId", authenticate, async (req, res) => {
       resolvedMemberId = null;
     }
     const validPriorities = ["Critical", "High", "Medium", "Low"];
-    if (priority !== undefined && !validPriorities.includes(priority)) return res.status(400).json({ error: "Invalid task priority." });
-    const updated = await prisma.task.update({ where: { id: task.id }, data: { assignedOrgMemberId: resolvedMemberId, orgTeamId: resolvedTeamId, assignedAt: resolvedMemberId ? (task.assignedOrgMemberId === resolvedMemberId ? task.assignedAt : new Date()) : null, ...(priority !== undefined ? { priority } : {}), ...(dueAt !== undefined ? { dueAt: dueAt ? new Date(dueAt) : null } : {}), lastUpdatedByName: req.user.name }, include: { orgTeam: true, assignedOrgMember: { include: memberInclude } } });
+    if (priority !== undefined && !validPriorities.includes(priority))
+      return res.status(400).json({ error: "Invalid task priority." });
+    const updated = await prisma.task.update({
+      where: { id: task.id },
+      data: {
+        assignedOrgMemberId: resolvedMemberId,
+        orgTeamId: resolvedTeamId,
+        assignedAt: resolvedMemberId
+          ? task.assignedOrgMemberId === resolvedMemberId
+            ? task.assignedAt
+            : new Date()
+          : null,
+        ...(priority !== undefined ? { priority } : {}),
+        ...(dueAt !== undefined
+          ? { dueAt: dueAt ? new Date(dueAt) : null }
+          : {}),
+        lastUpdatedByName: req.user.name,
+      },
+      include: { orgTeam: true, assignedOrgMember: { include: memberInclude } },
+    });
     return res.json({ message: "Task assignment updated.", task: updated });
-  } catch (error) { return res.status(500).json({ error: "Failed to update task assignment.", details: error.message }); }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({
+        error: "Failed to update task assignment.",
+        details: error.message,
+      });
+  }
 });
 export default router;

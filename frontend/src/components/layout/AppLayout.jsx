@@ -18,9 +18,16 @@ export function AppLayout() {
   }, [themePalette]);
 
   return (
-    <div className="app-background min-h-screen" data-theme="convene" data-convene-palette={themePalette}>
+    <div
+      className="app-background min-h-screen"
+      data-theme="convene"
+      data-convene-palette={themePalette}
+    >
       <div className="flex min-h-screen w-full px-4 py-4 md:px-6 lg:px-8">
-        <Sidebar mobileOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
+        <Sidebar
+          mobileOpen={mobileNavOpen}
+          onClose={() => setMobileNavOpen(false)}
+        />
         <div className="flex min-w-0 flex-1 flex-col gap-6 pl-0 lg:pl-64">
           <Navbar onMenuOpen={() => setMobileNavOpen(true)} />
           <AnimatePresence mode="wait">

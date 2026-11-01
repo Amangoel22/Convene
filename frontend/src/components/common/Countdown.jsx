@@ -9,8 +9,12 @@ export function Countdown({ label, value, description }) {
       transition={{ type: "spring", stiffness: 320, damping: 25 }}
     >
       <p className="type-xs weight-semibold text-token-secondary">{label}</p>
-      <p className="mt-1 type-2xl weight-bold tabular-nums text-token-primary">{value}</p>
-      <p className="mt-0.5 type-xs weight-medium text-token-muted">{description}</p>
+      <p className="mt-1 type-2xl weight-bold tabular-nums text-token-primary">
+        {value}
+      </p>
+      <p className="mt-0.5 type-xs weight-medium text-token-muted">
+        {description}
+      </p>
     </motion.div>
   );
 }

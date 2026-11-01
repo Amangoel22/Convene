@@ -1,13 +1,19 @@
 // Purpose: stageRoutes implements this source module.
 import express from "express";
 import { prisma } from "../config/prisma.js";
-import { authenticate, authorizeEventMembership, authorizeOrgLead } from "../middlewares/auth.js";
+import {
+  authenticate,
+  authorizeEventMembership,
+  authorizeOrgLead,
+} from "../middlewares/auth.js";
 
 const router = express.Router();
 
 // Handles parseTimeWindow.
 function parseTimeWindow(eventDate, timeWindow) {
-  const [start, end] = String(timeWindow || "09:00 AM – 10:00 AM").split(/[–—-]/).map((v) => v.trim());
+  const [start, end] = String(timeWindow || "09:00 AM – 10:00 AM")
+    .split(/[–—-]/)
+    .map((v) => v.trim());
   const parse = (value) => {
     const match = value.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
     if (!match) return new Date(eventDate);
@@ -23,13 +29,19 @@ function parseTimeWindow(eventDate, timeWindow) {
 
 // Handles serializeStage.
 function serializeStage(stage) {
-  return { ...stage, timeWindow: `${stage.startAt.toISOString()} – ${stage.endAt.toISOString()}`, location: stage.venue?.name || "" };
+  return {
+    ...stage,
+    timeWindow: `${stage.startAt.toISOString()} – ${stage.endAt.toISOString()}`,
+    location: stage.venue?.name || "",
+  };
 }
 
 // Handles resolveVenue.
 async function resolveVenue(eventId, venueId, location) {
   if (venueId) {
-    const venue = await prisma.venue.findFirst({ where: { id: venueId, eventId } });
+    const venue = await prisma.venue.findFirst({
+      where: { id: venueId, eventId },
+    });
     if (!venue) {
       const error = new Error("Venue does not belong to this event.");
       error.statusCode = 400;
@@ -38,45 +50,173 @@ async function resolveVenue(eventId, venueId, location) {
     return { connect: { id: venue.id } };
   }
   if (!location) return undefined;
-  const venue = await prisma.venue.upsert({ where: { unique_event_venue_name: { eventId, name: location } }, create: { eventId, name: location }, update: {} });
+  const venue = await prisma.venue.upsert({
+    where: { unique_event_venue_name: { eventId, name: location } },
+    create: { eventId, name: location },
+    update: {},
+  });
   return { connect: { id: venue.id } };
 }
 
 // Handles router.get.
-router.get("/:eventId/stages", authenticate, authorizeEventMembership(), async (req, res) => {
-  try {
-    const stages = await prisma.stage.findMany({ where: { eventId: req.params.eventId }, include: { venue: { include: { images: { orderBy: { sortOrder: "asc" } } } }, orgTeam: { select: { id: true, name: true } } }, orderBy: { stageOrder: "asc" } });
-    return res.json({ stages: stages.map(serializeStage) });
-  } catch (error) { return res.status(500).json({ error: "Failed to fetch stages.", details: error.message }); }
-});
+router.get(
+  "/:eventId/stages",
+  authenticate,
+  authorizeEventMembership(),
+  async (req, res) => {
+    try {
+      const stages = await prisma.stage.findMany({
+        where: { eventId: req.params.eventId },
+        include: {
+          venue: { include: { images: { orderBy: { sortOrder: "asc" } } } },
+          orgTeam: { select: { id: true, name: true } },
+        },
+        orderBy: { stageOrder: "asc" },
+      });
+      return res.json({ stages: stages.map(serializeStage) });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: "Failed to fetch stages.", details: error.message });
+    }
+  },
+);
 
 // Handles router.post.
-router.post("/:eventId/stages", authenticate, authorizeEventMembership(["organizer"]), authorizeOrgLead(), async (req, res) => {
-  const { title, timeWindow, startAt, endAt, venueId, location, orgTeamId, stageOrder } = req.body;
-  if (!title || (!timeWindow && (!startAt || !endAt))) return res.status(400).json({ error: "Title and schedule are required." });
-  try {
-    const event = await prisma.event.findUnique({ where: { id: req.params.eventId }, select: { startDate: true } });
-    const parsed = timeWindow ? parseTimeWindow(event.startDate, timeWindow) : { startAt: new Date(startAt), endAt: new Date(endAt) };
-    const venue = await resolveVenue(req.params.eventId, venueId, location);
-    const stage = await prisma.stage.create({ data: { eventId: req.params.eventId, stageOrder: stageOrder || await prisma.stage.count({ where: { eventId: req.params.eventId } }) + 1, title, startAt: parsed.startAt, endAt: parsed.endAt, ...(venue && { venue }), ...(orgTeamId && { orgTeam: { connect: { id: orgTeamId } } }) }, include: { venue: true } });
-    return res.status(201).json({ message: "Stage created successfully.", stage: serializeStage(stage) });
-  } catch (error) { return res.status(500).json({ error: "Failed to create stage.", details: error.message }); }
-});
+router.post(
+  "/:eventId/stages",
+  authenticate,
+  authorizeEventMembership(["organizer"]),
+  authorizeOrgLead(),
+  async (req, res) => {
+    const {
+      title,
+      timeWindow,
+      startAt,
+      endAt,
+      venueId,
+      location,
+      orgTeamId,
+      stageOrder,
+    } = req.body;
+    if (!title || (!timeWindow && (!startAt || !endAt)))
+      return res
+        .status(400)
+        .json({ error: "Title and schedule are required." });
+    try {
+      const event = await prisma.event.findUnique({
+        where: { id: req.params.eventId },
+        select: { startDate: true },
+      });
+      const parsed = timeWindow
+        ? parseTimeWindow(event.startDate, timeWindow)
+        : { startAt: new Date(startAt), endAt: new Date(endAt) };
+      const venue = await resolveVenue(req.params.eventId, venueId, location);
+      const stage = await prisma.stage.create({
+        data: {
+          eventId: req.params.eventId,
+          stageOrder:
+            stageOrder ||
+            (await prisma.stage.count({
+              where: { eventId: req.params.eventId },
+            })) + 1,
+          title,
+          startAt: parsed.startAt,
+          endAt: parsed.endAt,
+          ...(venue && { venue }),
+          ...(orgTeamId && { orgTeam: { connect: { id: orgTeamId } } }),
+        },
+        include: { venue: true },
+      });
+      return res
+        .status(201)
+        .json({
+          message: "Stage created successfully.",
+          stage: serializeStage(stage),
+        });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: "Failed to create stage.", details: error.message });
+    }
+  },
+);
 
 // Handles router.patch.
 router.patch("/:stageId", authenticate, async (req, res) => {
   try {
-    const existing = await prisma.stage.findUnique({ where: { id: req.params.stageId } });
+    const existing = await prisma.stage.findUnique({
+      where: { id: req.params.stageId },
+    });
     if (!existing) return res.status(404).json({ error: "Stage not found." });
-    const membership = await prisma.eventMembership.findUnique({ where: { unique_event_user: { eventId: existing.eventId, userId: req.user.id } } });
-    const access = await prisma.orgAccess.findUnique({ where: { unique_event_org_access: { eventId: existing.eventId, userId: req.user.id } } });
-    if (!membership || membership.role !== "organizer" || !access || access.accessLevel !== "lead") return res.status(403).json({ error: "Lead organizer access is required for this event." });
-    const { title, startAt, endAt, timeWindow, venueId, location, orgTeamId, status } = req.body;
-    const event = await prisma.event.findUnique({ where: { id: existing.eventId }, select: { startDate: true } });
-    const schedule = timeWindow ? parseTimeWindow(event.startDate, timeWindow) : {};
-    const venue = venueId || location ? await resolveVenue(existing.eventId, venueId, location) : undefined;
-    const stage = await prisma.stage.update({ where: { id: existing.id }, data: { ...(title && { title }), ...(startAt && { startAt: new Date(startAt) }), ...(endAt && { endAt: new Date(endAt) }), ...schedule, ...(venue && { venue }), ...(orgTeamId !== undefined && { orgTeam: orgTeamId ? { connect: { id: orgTeamId } } : { disconnect: true } }), ...(status && { status }) }, include: { venue: true } });
-    return res.json({ message: "Stage updated successfully.", stage: serializeStage(stage) });
-  } catch (error) { return res.status(error.statusCode || 500).json({ error: error.message || "Failed to update stage." }); }
+    const membership = await prisma.eventMembership.findUnique({
+      where: {
+        unique_event_user: { eventId: existing.eventId, userId: req.user.id },
+      },
+    });
+    const access = await prisma.orgAccess.findUnique({
+      where: {
+        unique_event_org_access: {
+          eventId: existing.eventId,
+          userId: req.user.id,
+        },
+      },
+    });
+    if (
+      !membership ||
+      membership.role !== "organizer" ||
+      !access ||
+      access.accessLevel !== "lead"
+    )
+      return res
+        .status(403)
+        .json({ error: "Lead organizer access is required for this event." });
+    const {
+      title,
+      startAt,
+      endAt,
+      timeWindow,
+      venueId,
+      location,
+      orgTeamId,
+      status,
+    } = req.body;
+    const event = await prisma.event.findUnique({
+      where: { id: existing.eventId },
+      select: { startDate: true },
+    });
+    const schedule = timeWindow
+      ? parseTimeWindow(event.startDate, timeWindow)
+      : {};
+    const venue =
+      venueId || location
+        ? await resolveVenue(existing.eventId, venueId, location)
+        : undefined;
+    const stage = await prisma.stage.update({
+      where: { id: existing.id },
+      data: {
+        ...(title && { title }),
+        ...(startAt && { startAt: new Date(startAt) }),
+        ...(endAt && { endAt: new Date(endAt) }),
+        ...schedule,
+        ...(venue && { venue }),
+        ...(orgTeamId !== undefined && {
+          orgTeam: orgTeamId
+            ? { connect: { id: orgTeamId } }
+            : { disconnect: true },
+        }),
+        ...(status && { status }),
+      },
+      include: { venue: true },
+    });
+    return res.json({
+      message: "Stage updated successfully.",
+      stage: serializeStage(stage),
+    });
+  } catch (error) {
+    return res
+      .status(error.statusCode || 500)
+      .json({ error: error.message || "Failed to update stage." });
+  }
 });
 export default router;

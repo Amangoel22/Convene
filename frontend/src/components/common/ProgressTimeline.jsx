@@ -5,8 +5,12 @@ export function ProgressTimeline({ progress, stages }) {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between gap-4">
-        <p className="type-sm weight-semibold text-token-primary">Run of Show Progress</p>
-        <p className="type-sm weight-semibold text-token-secondary">{progress}% complete</p>
+        <p className="type-sm weight-semibold text-token-primary">
+          Run of Show Progress
+        </p>
+        <p className="type-sm weight-semibold text-token-secondary">
+          {progress}% complete
+        </p>
       </div>
       <div className="relative h-2 rounded-full surface-card-token/55">
         <motion.div
@@ -26,8 +30,12 @@ export function ProgressTimeline({ progress, stages }) {
                   : "rounded-xl border border-token-inverse/45 surface-card-token/30 px-2.5 py-1.5"
               }
             >
-              <p className="truncate type-xs weight-semibold text-token-primary">{stage.label}</p>
-              <p className="mt-0.5 type-11 weight-medium capitalize text-token-secondary">{stage.status}</p>
+              <p className="truncate type-xs weight-semibold text-token-primary">
+                {stage.label}
+              </p>
+              <p className="mt-0.5 type-11 weight-medium capitalize text-token-secondary">
+                {stage.status}
+              </p>
             </div>
           </div>
         ))}

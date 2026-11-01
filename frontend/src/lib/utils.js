@@ -38,7 +38,9 @@ export function formatTimeString(inputStr) {
 // Formats a Date using the user's saved 12-hour or 24-hour clock preference.
 export function formatDisplayTime(date) {
   if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
-  const use24Hour = typeof window !== "undefined" && window.localStorage.getItem("convene_time_format") === "24h";
+  const use24Hour =
+    typeof window !== "undefined" &&
+    window.localStorage.getItem("convene_time_format") === "24h";
   return date.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -120,11 +122,14 @@ export function getStageStatus(stage, now = new Date()) {
 
   // Legacy/local stages may only have a timeWindow.
   if (stage?.timeWindow) {
-    const [startText, endText] = stage.timeWindow.split(/[–—-]/).map((part) => part?.trim());
+    const [startText, endText] = stage.timeWindow
+      .split(/[–—-]/)
+      .map((part) => part?.trim());
     const windowStart = parseTimeString(startText, now);
     const windowEnd = parseTimeString(endText, now);
     if (windowEnd && now >= windowEnd) return "Completed";
-    if (windowStart && now >= windowStart && (!windowEnd || now < windowEnd)) return "LIVE";
+    if (windowStart && now >= windowStart && (!windowEnd || now < windowEnd))
+      return "LIVE";
     return "Upcoming";
   }
 
@@ -134,7 +139,8 @@ export function getStageStatus(stage, now = new Date()) {
 export function isEventComplete(event, now = new Date()) {
   if (!event) return false;
   const stages = event.stages || [];
-  if (stages.length > 0) return stages.every((stage) => getStageStatus(stage, now) === "Completed");
+  if (stages.length > 0)
+    return stages.every((stage) => getStageStatus(stage, now) === "Completed");
   const eventEnd = eventDateTime(event, "endDate", "endTime");
   return Boolean(eventEnd && now >= eventEnd);
 }

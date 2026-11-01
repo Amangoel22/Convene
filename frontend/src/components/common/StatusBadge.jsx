@@ -8,7 +8,7 @@ export function StatusBadge({ status, children, className }) {
       className={cn(
         "type-xs weight-semibold whitespace-nowrap inline-block",
         STATUS_TEXT_CLASSES[status] ?? STATUS_TEXT_CLASSES.upcoming,
-        className
+        className,
       )}
     >
       {children ?? status}

@@ -169,7 +169,9 @@ export function IssuesPage() {
           title="No operational issues reported"
           description="Log equipment glitches, power drops, or floor incidents. Anyone can report an incident."
           actionLabel="Report Issue"
-          onAction={eventIsComplete ? undefined : () => setCreateModalOpen(true)}
+          onAction={
+            eventIsComplete ? undefined : () => setCreateModalOpen(true)
+          }
         />
       ) : (
         <div className="space-y-3">
@@ -341,28 +343,34 @@ export function IssuesPage() {
       >
         <div className="space-y-5 pt-2">
           <div className="border-b border-token pb-4">
-            <p className="type-xl weight-bold text-token-primary">Issue details</p>
-            <p className="mt-1 type-xs text-token-muted">Read-only information for this resolved issue.</p>
+            <p className="type-xl weight-bold text-token-primary">
+              Issue details
+            </p>
+            <p className="mt-1 type-xs text-token-muted">
+              Read-only information for this resolved issue.
+            </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl field-token p-4">
-            <p className="type-11 weight-medium text-token-muted">Title</p>
-            <p className="mt-1 type-sm weight-bold text-token-primary">
-              {targetIssue?.title}
-            </p>
-          </div>
-          <div className="rounded-2xl field-token p-4">
-            <p className="type-11 weight-medium text-token-muted">Priority</p>
-            <p className="mt-1 type-sm weight-bold text-token-primary">
-              {targetIssue?.priority}
-            </p>
-          </div>
-          <div className="rounded-2xl field-token p-4">
-            <p className="type-11 weight-medium text-token-muted">Reported by</p>
-            <p className="mt-1 type-sm weight-bold text-token-primary">
-              {targetIssue?.reporterUser?.name || "Unknown user"}
-            </p>
-          </div>
+            <div className="rounded-2xl field-token p-4">
+              <p className="type-11 weight-medium text-token-muted">Title</p>
+              <p className="mt-1 type-sm weight-bold text-token-primary">
+                {targetIssue?.title}
+              </p>
+            </div>
+            <div className="rounded-2xl field-token p-4">
+              <p className="type-11 weight-medium text-token-muted">Priority</p>
+              <p className="mt-1 type-sm weight-bold text-token-primary">
+                {targetIssue?.priority}
+              </p>
+            </div>
+            <div className="rounded-2xl field-token p-4">
+              <p className="type-11 weight-medium text-token-muted">
+                Reported by
+              </p>
+              <p className="mt-1 type-sm weight-bold text-token-primary">
+                {targetIssue?.reporterUser?.name || "Unknown user"}
+              </p>
+            </div>
           </div>
           <div className="rounded-2xl field-token p-4">
             <p className="type-11 weight-medium text-token-muted">Notes</p>

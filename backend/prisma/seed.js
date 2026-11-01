@@ -13,7 +13,7 @@ const TEAM_NAMES = [
   "CloudX Engineers",
   "ByteCraft Developers",
   "ApexCoders",
-  "ZenithLabs"
+  "ZenithLabs",
 ];
 
 const MEMBER_NAMES = [
@@ -26,7 +26,7 @@ const MEMBER_NAMES = [
   ["Zoya Khan", "Aditya Bose", "Ananya Paul", "Bharat D'Souza"],
   ["Chaggan Lal", "Deepa Pillai", "Girish Hegde", "Indu Saxena"],
   ["Jatin Solanki", "Kavita Rao", "Lokesh Chandra", "Meera Nambiar"],
-  ["Nitin Agarwal", "Prerna Pandey", "Rohan Vaswani", "Siddharth Kaul"]
+  ["Nitin Agarwal", "Prerna Pandey", "Rohan Vaswani", "Siddharth Kaul"],
 ];
 
 async function main() {
@@ -61,11 +61,14 @@ async function main() {
       email: "aman@gmail.com",
       passwordHash,
       phone: "9999999999",
-      avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
-    }
+      avatarUrl:
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+    },
   });
 
-  console.log(`👤 Created Main Organizer User: ${userAman.name} (${userAman.email})`);
+  console.log(
+    `👤 Created Main Organizer User: ${userAman.name} (${userAman.email})`,
+  );
 
   // 3. Create Event
   const event1 = await prisma.event.create({
@@ -77,8 +80,8 @@ async function main() {
       startTime: "09:00 AM",
       endTime: "06:00 PM",
       durationDisplay: "3 Days",
-      primaryLocation: "Grand Auditorium & Hall B, Tech Park"
-    }
+      primaryLocation: "Grand Auditorium & Hall B, Tech Park",
+    },
   });
 
   console.log(`📅 Created Event: "${event1.name}" (${event1.id})`);
@@ -88,19 +91,31 @@ async function main() {
     data: {
       eventId: event1.id,
       userId: userAman.id,
-      role: "organizer"
-    }
+      role: "organizer",
+    },
   });
 
   // 4. Organising Teams & Members
   const designOrgTeam = await prisma.orgTeam.create({
-    data: { eventId: event1.id, name: "Design & Content", description: "Branding, stage backdrops, social assets" }
+    data: {
+      eventId: event1.id,
+      name: "Design & Content",
+      description: "Branding, stage backdrops, social assets",
+    },
   });
   const techOrgTeam = await prisma.orgTeam.create({
-    data: { eventId: event1.id, name: "Tech & Stage", description: "AV system, lighting, livestreaming" }
+    data: {
+      eventId: event1.id,
+      name: "Tech & Stage",
+      description: "AV system, lighting, livestreaming",
+    },
   });
   const opsOrgTeam = await prisma.orgTeam.create({
-    data: { eventId: event1.id, name: "Logistics & Operations", description: "Venue, check-in, catering, badges" }
+    data: {
+      eventId: event1.id,
+      name: "Logistics & Operations",
+      description: "Venue, check-in, catering, badges",
+    },
   });
 
   // Aman as Org Member Lead in Logistics & Ops
@@ -110,8 +125,8 @@ async function main() {
       orgTeamId: opsOrgTeam.id,
       userId: userAman.id,
       name: userAman.name,
-      phone: userAman.phone
-    }
+      phone: userAman.phone,
+    },
   });
 
   // Assign Lead access level to Aman
@@ -119,8 +134,8 @@ async function main() {
     data: {
       eventId: event1.id,
       userId: userAman.id,
-      accessLevel: "lead"
-    }
+      accessLevel: "lead",
+    },
   });
 
   console.log("🏢 Created Organising Teams & assigned Lead access to Aman.");
@@ -138,8 +153,8 @@ async function main() {
         eventId: event1.id,
         name: teamName,
         teamCode,
-        description: `IIT Bombay / Convene Campus Team ${tIdx + 1}`
-      }
+        description: `IIT Bombay / Convene Campus Team ${tIdx + 1}`,
+      },
     });
 
     const membersForThisTeam = MEMBER_NAMES[tIdx];
@@ -157,8 +172,8 @@ async function main() {
           email,
           passwordHash,
           phone,
-          avatarUrl: `https://images.unsplash.com/photo-${1500000000000 + (tIdx * 4 + mIdx) * 1000}?w=150`
-        }
+          avatarUrl: `https://images.unsplash.com/photo-${1500000000000 + (tIdx * 4 + mIdx) * 1000}?w=150`,
+        },
       });
 
       // Join Event Membership as Participant
@@ -166,8 +181,8 @@ async function main() {
         data: {
           eventId: event1.id,
           userId: user.id,
-          role: "participant"
-        }
+          role: "participant",
+        },
       });
 
       // Add to ParticipantTeamMember (lead vs member)
@@ -175,8 +190,8 @@ async function main() {
         data: {
           participantTeamId: partTeam.id,
           userId: user.id,
-          role: isLead ? "lead" : "member"
-        }
+          role: isLead ? "lead" : "member",
+        },
       });
 
       // Create EventParticipant QR entry
@@ -188,15 +203,17 @@ async function main() {
           participantCode: `PART-${tIdx + 1}-${mIdx + 1}`,
           qrToken: `QR_TOKEN_T${tIdx + 1}_M${mIdx + 1}_${Date.now()}`,
           checkInStatus,
-          internalNotes: isLead ? "Team Lead Contact" : undefined
-        }
+          internalNotes: isLead ? "Team Lead Contact" : undefined,
+        },
       });
 
       totalParticipantsCreated++;
     }
   }
 
-  console.log(`🏆 Created 10 Participant Teams with 4 members each (${totalParticipantsCreated} total participants).`);
+  console.log(
+    `🏆 Created 10 Participant Teams with 4 members each (${totalParticipantsCreated} total participants).`,
+  );
 
   // 6. Stages
   await prisma.stage.createMany({
@@ -208,7 +225,7 @@ async function main() {
         startAt: new Date("2026-10-15T09:30:00Z"),
         endAt: new Date("2026-10-15T10:45:00Z"),
         orgTeamId: techOrgTeam.id,
-        status: "Completed"
+        status: "Completed",
       },
       {
         eventId: event1.id,
@@ -217,7 +234,7 @@ async function main() {
         startAt: new Date("2026-10-15T11:00:00Z"),
         endAt: new Date("2026-10-15T13:00:00Z"),
         orgTeamId: designOrgTeam.id,
-        status: "LIVE"
+        status: "LIVE",
       },
       {
         eventId: event1.id,
@@ -226,9 +243,9 @@ async function main() {
         startAt: new Date("2026-10-15T14:30:00Z"),
         endAt: new Date("2026-10-15T17:00:00Z"),
         orgTeamId: opsOrgTeam.id,
-        status: "Upcoming"
-      }
-    ]
+        status: "Upcoming",
+      },
+    ],
   });
 
   // 7. Tasks
@@ -242,7 +259,7 @@ async function main() {
         assignedOrgMemberId: orgMemberAman.id,
         status: "In_Progress",
         priority: "High",
-        dueAt: new Date("2026-10-15T08:30:00Z")
+        dueAt: new Date("2026-10-15T08:30:00Z"),
       },
       {
         eventId: event1.id,
@@ -252,9 +269,9 @@ async function main() {
         assignedOrgMemberId: orgMemberAman.id,
         status: "Completed",
         priority: "Critical",
-        dueAt: new Date("2026-10-15T08:00:00Z")
-      }
-    ]
+        dueAt: new Date("2026-10-15T08:00:00Z"),
+      },
+    ],
   });
 
   // 8. Duties
@@ -264,12 +281,12 @@ async function main() {
       title: "North Gate QR Badge Scanner Duty",
       startAt: new Date("2026-10-15T08:00:00Z"),
       endAt: new Date("2026-10-15T11:30:00Z"),
-      notes: "Verify participant QR codes on the Convene App."
-    }
+      notes: "Verify participant QR codes on the Convene App.",
+    },
   });
 
   await prisma.dutyAssignment.create({
-    data: { eventId: event1.id, dutyId: duty1.id, userId: userAman.id }
+    data: { eventId: event1.id, dutyId: duty1.id, userId: userAman.id },
   });
 
   console.log("\n✅ Database Seeding Complete!");

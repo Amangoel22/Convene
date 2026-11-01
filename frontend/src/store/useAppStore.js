@@ -1,6 +1,9 @@
 // Purpose: useAppStore implements this source module.
 import { create } from "zustand";
-import { getInitialConveneTheme, isConveneTheme } from "@/constants/conveneTheme";
+import {
+  getInitialConveneTheme,
+  isConveneTheme,
+} from "@/constants/conveneTheme";
 
 export const initialEvents = [];
 
@@ -22,7 +25,13 @@ export const useAppStore = create((set) => ({
   setUserSession: (user, token) => set({ currentUser: user, token }),
   clearSession: () => {
     localStorage.removeItem("convene_token");
-    set({ currentUser: null, token: null, events: [], eventsHydrated: false, activeEvent: null });
+    set({
+      currentUser: null,
+      token: null,
+      events: [],
+      eventsHydrated: false,
+      activeEvent: null,
+    });
   },
   setRole: (role) => set({ role }),
   setThemePalette: (themePalette) => {
@@ -33,27 +42,38 @@ export const useAppStore = create((set) => ({
     }
     set({ themePalette });
   },
-  setActiveEvent: (event) => set({ activeEvent: event, role: event?.accessLevel === "lead" ? "lead" : "member" }),
+  setActiveEvent: (event) =>
+    set({
+      activeEvent: event,
+      role: event?.accessLevel === "lead" ? "lead" : "member",
+    }),
   addEvent: (newEvent) =>
     set((state) => {
-      const event = { ...newEvent, userRole: newEvent.userRole || "organizer", accessLevel: newEvent.accessLevel || "lead" };
+      const event = {
+        ...newEvent,
+        userRole: newEvent.userRole || "organizer",
+        accessLevel: newEvent.accessLevel || "lead",
+      };
       return {
-      events: [event, ...state.events],
-      eventsHydrated: true,
-      activeEvent: event,
-      role: event.accessLevel === "lead" ? "lead" : "member",
-      hasOnboarded: true
+        events: [event, ...state.events],
+        eventsHydrated: true,
+        activeEvent: event,
+        role: event.accessLevel === "lead" ? "lead" : "member",
+        hasOnboarded: true,
       };
     }),
   updateActiveEventStages: (stageId, newStatus) =>
     set((state) => {
       if (!state.activeEvent) return state;
       const updatedStages = state.activeEvent.stages.map((s) =>
-        s.id === stageId ? { ...s, status: newStatus } : s
+        s.id === stageId ? { ...s, status: newStatus } : s,
       );
-      const updatedActiveEvent = { ...state.activeEvent, stages: updatedStages };
+      const updatedActiveEvent = {
+        ...state.activeEvent,
+        stages: updatedStages,
+      };
       const updatedEvents = state.events.map((e) =>
-        e.id === state.activeEvent.id ? updatedActiveEvent : e
+        e.id === state.activeEvent.id ? updatedActiveEvent : e,
       );
       return { activeEvent: updatedActiveEvent, events: updatedEvents };
     }),
@@ -61,11 +81,14 @@ export const useAppStore = create((set) => ({
     set((state) => {
       if (!state.activeEvent) return state;
       const updatedStages = state.activeEvent.stages.map((s) =>
-        s.id === stageId ? { ...s, ...updatedData } : s
+        s.id === stageId ? { ...s, ...updatedData } : s,
       );
-      const updatedActiveEvent = { ...state.activeEvent, stages: updatedStages };
+      const updatedActiveEvent = {
+        ...state.activeEvent,
+        stages: updatedStages,
+      };
       const updatedEvents = state.events.map((e) =>
-        e.id === state.activeEvent.id ? updatedActiveEvent : e
+        e.id === state.activeEvent.id ? updatedActiveEvent : e,
       );
       return { activeEvent: updatedActiveEvent, events: updatedEvents };
     }),
@@ -73,19 +96,27 @@ export const useAppStore = create((set) => ({
     set((state) => {
       if (!state.activeEvent) return state;
       const updatedStages = [...state.activeEvent.stages, newStage];
-      const updatedActiveEvent = { ...state.activeEvent, stages: updatedStages };
+      const updatedActiveEvent = {
+        ...state.activeEvent,
+        stages: updatedStages,
+      };
       const updatedEvents = state.events.map((e) =>
-        e.id === state.activeEvent.id ? updatedActiveEvent : e
+        e.id === state.activeEvent.id ? updatedActiveEvent : e,
       );
       return { activeEvent: updatedActiveEvent, events: updatedEvents };
     }),
   deleteStageFromActiveEvent: (stageId) =>
     set((state) => {
       if (!state.activeEvent) return state;
-      const updatedStages = state.activeEvent.stages.filter((s) => s.id !== stageId);
-      const updatedActiveEvent = { ...state.activeEvent, stages: updatedStages };
+      const updatedStages = state.activeEvent.stages.filter(
+        (s) => s.id !== stageId,
+      );
+      const updatedActiveEvent = {
+        ...state.activeEvent,
+        stages: updatedStages,
+      };
       const updatedEvents = state.events.map((e) =>
-        e.id === state.activeEvent.id ? updatedActiveEvent : e
+        e.id === state.activeEvent.id ? updatedActiveEvent : e,
       );
       return { activeEvent: updatedActiveEvent, events: updatedEvents };
     }),
@@ -93,5 +124,5 @@ export const useAppStore = create((set) => ({
   resetOnboarding: () => set({ hasOnboarded: false }),
   setSidebarExpanded: (expanded) => set({ sidebarExpanded: expanded }),
   // Keeps old callers safe without allowing a second visual mode to return.
-  toggleTheme: () => set({ theme: "convene" })
+  toggleTheme: () => set({ theme: "convene" }),
 }));

@@ -10,19 +10,29 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 export function TaskList() {
   return (
     <GlassCard elevation="main" className="h-full">
-      <SectionHeader title="Today's Tasks" description="Items needing organizer attention" actionLabel="View all" />
+      <SectionHeader
+        title="Today's Tasks"
+        description="Items needing organizer attention"
+        actionLabel="View all"
+      />
       <div className="space-y-2">
         {todayTasks.map((task) => (
           <motion.div
             key={task.id}
             className="rounded-xl border border-token-inverse/45 surface-card-token/35 px-3 py-2 transition-colors hover:border-token-inverse/70 hover:surface-card-token/55"
-            whileHover={{ y: -1, scale: 1.005, boxShadow: "0 6px 20px rgba(31,41,55,0.06)" }}
+            whileHover={{
+              y: -1,
+              scale: 1.005,
+              boxShadow: "0 6px 20px rgba(31,41,55,0.06)",
+            }}
             transition={{ type: "spring", stiffness: 360, damping: 28 }}
           >
             <div className="flex items-center justify-between gap-2.5">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="truncate type-xs weight-semibold text-token-primary">{task.title}</p>
+                  <p className="truncate type-xs weight-semibold text-token-primary">
+                    {task.title}
+                  </p>
                 </div>
                 <div className="mt-1 flex items-center gap-2 type-11 weight-medium text-token-secondary">
                   <span className="truncate">{task.department}</span>
@@ -34,7 +44,10 @@ export function TaskList() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <UserAvatar initials={task.assignee} className="h-6 w-6 type-10" />
+                <UserAvatar
+                  initials={task.assignee}
+                  className="h-6 w-6 type-10"
+                />
                 <motion.button
                   className="flex h-6 w-6 min-h-0 shrink-0 items-center justify-center rounded-full surface-card-token/60 text-token-success hover:surface-card-token"
                   aria-label={`Complete ${task.title}`}

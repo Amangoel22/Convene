@@ -11,7 +11,11 @@ export function Leaderboard() {
   return (
     <GlassCard elevation="main" className="h-full">
       <div className="mb-5 flex items-center justify-between gap-4">
-        <SectionHeader title="Top Organizers" description="Maximum five shown" className="mb-0" />
+        <SectionHeader
+          title="Top Organizers"
+          description="Maximum five shown"
+          className="mb-0"
+        />
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-token-gold/20 text-token-warning-dark">
           <Trophy size={21} strokeWidth={1.75} />
         </div>
@@ -23,20 +27,44 @@ export function Leaderboard() {
             className="flex items-center gap-3 rounded-[20px] border border-token-inverse/45 surface-card-token/35 p-3 transition-colors hover:border-token-inverse/70 hover:surface-card-token/55"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            whileHover={{ y: -2, scale: 1.005, boxShadow: "0 10px 28px rgba(31,41,55,0.06)" }}
-            transition={{ delay: index * 0.04, type: "spring", stiffness: 260, damping: 24 }}
+            whileHover={{
+              y: -2,
+              scale: 1.005,
+              boxShadow: "0 10px 28px rgba(31,41,55,0.06)",
+            }}
+            transition={{
+              delay: index * 0.04,
+              type: "spring",
+              stiffness: 260,
+              damping: 24,
+            }}
           >
-            <span className="w-5 text-center type-sm weight-bold text-token-muted">{index + 1}</span>
-            <UserAvatar initials={member.initials} image={member.avatar} className="h-10 w-10 type-xs" />
+            <span className="w-5 text-center type-sm weight-bold text-token-muted">
+              {index + 1}
+            </span>
+            <UserAvatar
+              initials={member.initials}
+              image={member.avatar}
+              className="h-10 w-10 type-xs"
+            />
             <div className="min-w-0 flex-1">
-              <p className="truncate type-sm weight-semibold text-token-primary">{member.name}</p>
-              <p className="truncate type-xs weight-medium text-token-muted">{member.reliability} reliability</p>
+              <p className="truncate type-sm weight-semibold text-token-primary">
+                {member.name}
+              </p>
+              <p className="truncate type-xs weight-medium text-token-muted">
+                {member.reliability} reliability
+              </p>
             </div>
             <div className="hidden text-right sm:block">
-              <p className="type-sm weight-bold tabular-nums text-token-primary">{member.xp}</p>
+              <p className="type-sm weight-bold tabular-nums text-token-primary">
+                {member.xp}
+              </p>
               <p className="type-xs weight-medium text-token-muted">XP</p>
             </div>
-            <Badge tone={index === 0 ? "gold" : "neutral"} className="hidden xl:inline-flex">
+            <Badge
+              tone={index === 0 ? "gold" : "neutral"}
+              className="hidden xl:inline-flex"
+            >
               {member.badge}
             </Badge>
           </motion.div>

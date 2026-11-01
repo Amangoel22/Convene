@@ -127,12 +127,10 @@ router.post(
     } catch (error) {
       await storage.from(bucket).remove([path]);
       const details = error?.message || "Storage upload failed.";
-      return res
-        .status(500)
-        .json({
-          error: `Failed to upload resource to bucket "${bucket}".`,
-          details,
-        });
+      return res.status(500).json({
+        error: `Failed to upload resource to bucket "${bucket}".`,
+        details,
+      });
     }
   },
 );
@@ -157,11 +155,9 @@ router.patch(
         const fileError = validateFile(req.file);
         if (fileError) return res.status(400).json({ error: fileError });
         if (!storage)
-          return res
-            .status(500)
-            .json({
-              error: "Supabase Storage is not configured on the backend.",
-            });
+          return res.status(500).json({
+            error: "Supabase Storage is not configured on the backend.",
+          });
         newPath = filePath(req.params.eventId, req.file);
         const { error } = await storage
           .from(bucket)

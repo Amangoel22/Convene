@@ -192,8 +192,12 @@ export function LandingPage() {
         );
         const nextActivityPosition = Math.floor(Math.random() * 4);
         setActivityPosition(nextActivityPosition);
-        const teamOptions = [0, 1, 2, 3].filter((position) => position !== nextActivityPosition);
-        setTeamPosition(teamOptions[Math.floor(Math.random() * teamOptions.length)]);
+        const teamOptions = [0, 1, 2, 3].filter(
+          (position) => position !== nextActivityPosition,
+        );
+        setTeamPosition(
+          teamOptions[Math.floor(Math.random() * teamOptions.length)],
+        );
       },
       2500 + Math.floor(Math.random() * 1800),
     );
@@ -204,10 +208,13 @@ export function LandingPage() {
   useEffect(() => {
     const section = stepsSectionRef.current;
     if (!section) return undefined;
-    const observer = new IntersectionObserver(([entry]) => {
-      setStepsVisible(entry.isIntersecting);
-      if (entry.isIntersecting) setActiveStep(0);
-    }, { threshold: 0.2 });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setStepsVisible(entry.isIntersecting);
+        if (entry.isIntersecting) setActiveStep(0);
+      },
+      { threshold: 0.2 },
+    );
     observer.observe(section);
     return () => observer.disconnect();
   }, []);
@@ -225,14 +232,14 @@ export function LandingPage() {
   return (
     <main className="landing-page">
       {/* Landing navigation. */}
-      <header className={`landing-nav ${navVisible ? "is-visible" : "is-hidden"}`}>
+      <header
+        className={`landing-nav ${navVisible ? "is-visible" : "is-hidden"}`}
+      >
         <a className="landing-brand" href="#top" aria-label="Convene home">
           <span className="landing-brand-mark">
             <ConveneMark />
           </span>
-          <span>
-            convene
-          </span>
+          <span>convene</span>
         </a>
         <nav className="landing-nav-links" aria-label="Main navigation">
           <a href="#platform">Platform</a>
@@ -619,7 +626,11 @@ export function LandingPage() {
       </section>
 
       {/* Section 03: animated path from setup through event day. */}
-      <section ref={stepsSectionRef} className="landing-section landing-how" id="how-it-works">
+      <section
+        ref={stepsSectionRef}
+        className="landing-section landing-how"
+        id="how-it-works"
+      >
         <div className="landing-section-index">
           <b>03</b>
           <span>HOW IT WORKS</span>
@@ -786,7 +797,9 @@ export function LandingPage() {
               {orbitFeatures.map(({ icon: Icon, label, position }) => (
                 <div className={`landing-orbit-item ${position}`} key={label}>
                   <div className="landing-orbit-item-inner">
-                    <span className="landing-orbit-node"><Icon size={17} /></span>
+                    <span className="landing-orbit-node">
+                      <Icon size={17} />
+                    </span>
                     <span className="landing-orbit-label">{label}</span>
                   </div>
                 </div>
@@ -823,9 +836,7 @@ export function LandingPage() {
           <span className="landing-brand-mark">
             <ConveneMark size={17} />
           </span>
-          <span>
-            convene
-          </span>
+          <span>convene</span>
         </a>
         <span>Thoughtfully coordinated events.</span>
         <a href="#top">Back to top ↑</a>

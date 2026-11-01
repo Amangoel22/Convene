@@ -7,7 +7,10 @@ export function PageTitle({ children, className = "", size = "page" }) {
     <h1
       className={`workspace-page-title ${className}`.trim()}
       style={{
-        fontSize: size === "hero" ? TYPOGRAPHY.fontSize.pageTitleHero : TYPOGRAPHY.fontSize.pageTitle,
+        fontSize:
+          size === "hero"
+            ? TYPOGRAPHY.fontSize.pageTitleHero
+            : TYPOGRAPHY.fontSize.pageTitle,
         fontWeight: TYPOGRAPHY.fontWeight.pageTitle,
         letterSpacing: TYPOGRAPHY.letterSpacing.pageTitle,
         lineHeight: TYPOGRAPHY.lineHeight.pageTitle,

@@ -227,17 +227,14 @@ export function MissionControlPage() {
       task.status === "Completed" ? "In Progress" : "Completed";
     const token = localStorage.getItem("convene_token");
     try {
-      const response = await fetch(
-        `${getApiBase()}/tasks/${taskId}/status`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: nextStatus }),
+      const response = await fetch(`${getApiBase()}/tasks/${taskId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({ status: nextStatus }),
+      });
       const data = await response.json();
       if (!response.ok)
         throw new Error(data.error || "Failed to update task status.");
@@ -405,7 +402,10 @@ export function MissionControlPage() {
                       )}
                     >
                       {isCompleted && (
-                        <Check size={9} className="text-token-inverse stroke-[3]" />
+                        <Check
+                          size={9}
+                          className="text-token-inverse stroke-[3]"
+                        />
                       )}
                     </div>
 
@@ -542,7 +542,9 @@ export function MissionControlPage() {
           aria-label="Personal organizer tasks"
         >
           <div className="flex items-center justify-between">
-            <h3 className="type-20 weight-bold text-token-primary">Your Tasks</h3>
+            <h3 className="type-20 weight-bold text-token-primary">
+              Your Tasks
+            </h3>
             <Link
               to="/tasks"
               className="type-xs weight-semibold text-token-accent hover:text-token-accent-dark transition-colors inline-flex items-center gap-1"
@@ -578,9 +580,7 @@ export function MissionControlPage() {
                     onClick={() => toggleTask(task.id)}
                     className={cn(
                       "group flex items-start gap-3 py-3.5 px-3 rounded-xl cursor-pointer transition-colors duration-150",
-                      task.completed
-                        ? "opacity-75"
-                        : "hover-surface-token ",
+                      task.completed ? "opacity-75" : "hover-surface-token ",
                     )}
                   >
                     <button

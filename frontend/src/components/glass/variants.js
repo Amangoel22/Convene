@@ -6,24 +6,24 @@ export const glassCardVariants = cva("glass-surface rounded-[20px]", {
     elevation: {
       hero: "glass-elevation-hero",
       main: "glass-elevation-main",
-      metric: "glass-elevation-metric"
+      metric: "glass-elevation-metric",
     },
     padding: {
       none: "p-0",
       sm: "p-5",
       md: "p-6",
-      lg: "p-8"
+      lg: "p-8",
     },
     interactive: {
       true: "cursor-pointer",
-      false: ""
-    }
+      false: "",
+    },
   },
   defaultVariants: {
     elevation: "main",
     padding: "md",
-    interactive: false
-  }
+    interactive: false,
+  },
 });
 
 export const glassButtonVariants = cva(
@@ -31,15 +31,19 @@ export const glassButtonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-token-accent text-token-inverse hover:bg-token-accent-dark border border-token-accent shadow-sm",
-        secondary: "field-token text-token-secondary hover:hover-token hover:text-token-primary border border-token",
+        primary:
+          "bg-token-accent text-token-inverse hover:bg-token-accent-dark border border-token-accent shadow-sm",
+        secondary:
+          "field-token text-token-secondary hover:hover-token hover:text-token-primary border border-token",
         info: "bg-token-accent text-token-inverse hover:bg-token-accent-dark",
-        success: "bg-token-success text-token-inverse hover:bg-token-success-dark weight-bold",
-        ghost: "bg-transparent text-token-secondary hover:field-token hover:text-token-primary"
-      }
+        success:
+          "bg-token-success text-token-inverse hover:bg-token-success-dark weight-bold",
+        ghost:
+          "bg-transparent text-token-secondary hover:field-token hover:text-token-primary",
+      },
     },
     defaultVariants: {
-      variant: "secondary"
-    }
-  }
+      variant: "secondary",
+    },
+  },
 );

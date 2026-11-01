@@ -264,21 +264,24 @@ export function DutiesPage() {
       return setError("Duty end time must be after its start time.");
     setSaving(true);
     try {
-      const response = await fetch(`${API_BASE}/events/${activeEvent.id}/duties/${viewingDuty.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("convene_token")}`,
+      const response = await fetch(
+        `${API_BASE}/events/${activeEvent.id}/duties/${viewingDuty.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("convene_token")}`,
+          },
+          body: JSON.stringify({
+            title: newTitle.trim(),
+            startAt: startAt.toISOString(),
+            endAt: endAt.toISOString(),
+            venueId: newVenueId || null,
+            orgMemberIds: selectedAssignees,
+            notes: newNotes.trim() || null,
+          }),
         },
-        body: JSON.stringify({
-          title: newTitle.trim(),
-          startAt: startAt.toISOString(),
-          endAt: endAt.toISOString(),
-          venueId: newVenueId || null,
-          orgMemberIds: selectedAssignees,
-          notes: newNotes.trim() || null,
-        }),
-      });
+      );
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Failed to update duty.");
       const formatted = formatDuty(data.duty);
@@ -415,7 +418,14 @@ export function DutiesPage() {
           (editingDuty ? (
             <form onSubmit={handleUpdateDuty} className="space-y-4 pt-1">
               <h2 className="type-xl weight-bold">Edit Duty</h2>
-              {error && <div role="alert" className="rounded-2xl border border-token-error/30 bg-token-error/10 px-3 py-2 type-xs weight-semibold text-token-error">{error}</div>}
+              {error && (
+                <div
+                  role="alert"
+                  className="rounded-2xl border border-token-error/30 bg-token-error/10 px-3 py-2 type-xs weight-semibold text-token-error"
+                >
+                  {error}
+                </div>
+              )}
               <input
                 required
                 value={newTitle}

@@ -44,7 +44,9 @@ function formatTeam(team) {
     members[0];
   const leadUser = leadMember?.user;
   const leadName = leadUser?.name || leadMember?.name || "Unassigned";
-  const leadRole = (leadMember?.role || "member").replace("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const leadRole = (leadMember?.role || "member")
+    .replace("-", " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
   return {
     ...team,
     iconName: "Users",
@@ -163,7 +165,9 @@ function TeamDrawer({
               <TeamIcon size={24} strokeWidth={2} />
             </div>
             <div>
-              <h2 className="type-2xl weight-bold text-token-primary">{team.name}</h2>
+              <h2 className="type-2xl weight-bold text-token-primary">
+                {team.name}
+              </h2>
               <p className="mt-0.5 type-xs weight-semibold text-token-muted">
                 {team.members.length} Team Members
               </p>
@@ -242,7 +246,10 @@ function TeamDrawer({
                         {member.name}
                       </p>
                       <p className="type-xs weight-medium text-token-muted truncate">
-                        {member.role} · {member.accessLevel === "lead" ? "Lead Organizer" : "Member"}
+                        {member.role} ·{" "}
+                        {member.accessLevel === "lead"
+                          ? "Lead Organizer"
+                          : "Member"}
                       </p>
                     </div>
                   </div>
@@ -391,7 +398,9 @@ function CreateTeamModal({ open, onClose, onCreateTeam }) {
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="type-xl weight-bold text-token-primary">Create Team</h2>
+          <h2 className="type-xl weight-bold text-token-primary">
+            Create Team
+          </h2>
           <p className="mt-1 type-xs weight-medium text-token-secondary">
             Add a new organizing team to the directory.
           </p>
@@ -537,16 +546,41 @@ function CreateTeamModal({ open, onClose, onCreateTeam }) {
 function InviteKeyModal({ member, onClose, onRegenerate }) {
   if (!member) return null;
   return (
-    <GlassModal open={Boolean(member)} onClose={onClose} title="Event Invite Key">
+    <GlassModal
+      open={Boolean(member)}
+      onClose={onClose}
+      title="Event Invite Key"
+    >
       <div className="space-y-5">
-        <p className="type-sm text-token-secondary">Share this key with {member.name}. They must enter it during registration to join this event.</p>
+        <p className="type-sm text-token-secondary">
+          Share this key with {member.name}. They must enter it during
+          registration to join this event.
+        </p>
         <div className="rounded-2xl border border-token-accent/20 accent-surface-token px-5 py-6 text-center">
-          <p className="type-10 weight-bold uppercase tracking-widest text-token-secondary">Invite key</p>
-          <p className="mt-2 font-mono type-2xl weight-extrabold tracking-[0.2em] text-token-accent-dark">{member.inviteKey || "Unavailable"}</p>
+          <p className="type-10 weight-bold uppercase tracking-widest text-token-secondary">
+            Invite key
+          </p>
+          <p className="mt-2 font-mono type-2xl weight-extrabold tracking-[0.2em] text-token-accent-dark">
+            {member.inviteKey || "Unavailable"}
+          </p>
         </div>
         <div className="flex justify-end gap-3">
-          <GlassButton type="button" onClick={onClose} className="h-9 rounded-full type-xs">Close</GlassButton>
-          <GlassButton type="button" variant="primary" icon={<RefreshCw size={14} />} onClick={() => onRegenerate(member)} className="h-9 rounded-full type-xs">Regenerate</GlassButton>
+          <GlassButton
+            type="button"
+            onClick={onClose}
+            className="h-9 rounded-full type-xs"
+          >
+            Close
+          </GlassButton>
+          <GlassButton
+            type="button"
+            variant="primary"
+            icon={<RefreshCw size={14} />}
+            onClick={() => onRegenerate(member)}
+            className="h-9 rounded-full type-xs"
+          >
+            Regenerate
+          </GlassButton>
         </div>
       </div>
     </GlassModal>
@@ -557,7 +591,9 @@ function EditMemberModal({ member, teams, onClose, onSave }) {
   const [name, setName] = useState(member?.name || "");
   const [phone, setPhone] = useState(member?.phone || "");
   const [role, setRole] = useState(member?.role || "member");
-  const [accessLevel, setAccessLevel] = useState(member?.accessLevel || "member");
+  const [accessLevel, setAccessLevel] = useState(
+    member?.accessLevel || "member",
+  );
   const [teamId, setTeamId] = useState(member?.orgTeamId || "");
   const [errors, setErrors] = useState({});
   useEffect(() => {
@@ -599,7 +635,9 @@ function EditMemberModal({ member, teams, onClose, onSave }) {
               ? {}
               : { phone: "Phone number is 10 digits." }),
             ...(role ? {} : { role: "Role is required." }),
-            ...(accessLevel ? {} : { accessLevel: "Organizer access is required." }),
+            ...(accessLevel
+              ? {}
+              : { accessLevel: "Organizer access is required." }),
             ...(teamId ? {} : { team: "Team is required." }),
           };
           setErrors(nextErrors);
@@ -610,7 +648,10 @@ function EditMemberModal({ member, teams, onClose, onSave }) {
         <div>
           <input
             value={name}
-            onChange={(event) => { setName(event.target.value); setErrors((current) => ({ ...current, name: "" })); }}
+            onChange={(event) => {
+              setName(event.target.value);
+              setErrors((current) => ({ ...current, name: "" }));
+            }}
             placeholder="Name"
             className="h-10 w-full rounded-full field-token px-4 type-xs outline-none"
           />
@@ -624,7 +665,10 @@ function EditMemberModal({ member, teams, onClose, onSave }) {
             maxLength={10}
             inputMode="numeric"
             value={phone}
-            onChange={(event) => { setPhone(event.target.value.replace(/\D/g, "").slice(0, 10)); setErrors((current) => ({ ...current, phone: "" })); }}
+            onChange={(event) => {
+              setPhone(event.target.value.replace(/\D/g, "").slice(0, 10));
+              setErrors((current) => ({ ...current, phone: "" }));
+            }}
             placeholder="10-digit phone number"
             className="h-10 w-full rounded-full field-token px-4 type-xs outline-none"
           />
@@ -634,50 +678,73 @@ function EditMemberModal({ member, teams, onClose, onSave }) {
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div>
-            <label className="mb-1 block type-10 weight-bold uppercase tracking-wide text-token-muted">Team role</label>
-            <div className="relative"><select
-              value={role}
-              onChange={(event) => { setRole(event.target.value); setErrors((current) => ({ ...current, role: "" })); }}
-              className="h-10 w-full appearance-none rounded-full field-token pl-3 pr-8 type-xs outline-none"
-            >
-              <option value="">Select role</option>
-              <option value="leader">Leader</option>
-              <option value="co-leader">Co-leader</option>
-              <option value="member">Member</option>
-            </select></div>
+            <label className="mb-1 block type-10 weight-bold uppercase tracking-wide text-token-muted">
+              Team role
+            </label>
+            <div className="relative">
+              <select
+                value={role}
+                onChange={(event) => {
+                  setRole(event.target.value);
+                  setErrors((current) => ({ ...current, role: "" }));
+                }}
+                className="h-10 w-full appearance-none rounded-full field-token pl-3 pr-8 type-xs outline-none"
+              >
+                <option value="">Select role</option>
+                <option value="leader">Leader</option>
+                <option value="co-leader">Co-leader</option>
+                <option value="member">Member</option>
+              </select>
+            </div>
             {errors.role && (
               <p className="mt-1 type-11 text-token-error">{errors.role}</p>
             )}
           </div>
           <div>
-            <label className="mb-1 block type-10 weight-bold uppercase tracking-wide text-token-muted">Event access</label>
-            <div className="relative"><select
-              value={accessLevel}
-              onChange={(event) => { setAccessLevel(event.target.value); setErrors((current) => ({ ...current, accessLevel: "" })); }}
-              className="h-10 w-full appearance-none rounded-full field-token pl-3 pr-8 type-xs outline-none"
-            >
-              <option value="">Select access</option>
-              <option value="lead">Lead Organizer</option>
-              <option value="member">Member</option>
-            </select></div>
+            <label className="mb-1 block type-10 weight-bold uppercase tracking-wide text-token-muted">
+              Event access
+            </label>
+            <div className="relative">
+              <select
+                value={accessLevel}
+                onChange={(event) => {
+                  setAccessLevel(event.target.value);
+                  setErrors((current) => ({ ...current, accessLevel: "" }));
+                }}
+                className="h-10 w-full appearance-none rounded-full field-token pl-3 pr-8 type-xs outline-none"
+              >
+                <option value="">Select access</option>
+                <option value="lead">Lead Organizer</option>
+                <option value="member">Member</option>
+              </select>
+            </div>
             {errors.accessLevel && (
-              <p className="mt-1 type-11 text-token-error">{errors.accessLevel}</p>
+              <p className="mt-1 type-11 text-token-error">
+                {errors.accessLevel}
+              </p>
             )}
           </div>
           <div>
-            <label className="mb-1 block type-10 weight-bold uppercase tracking-wide text-token-muted">Team</label>
-            <div className="relative"><select
-              value={teamId}
-              onChange={(event) => { setTeamId(event.target.value); setErrors((current) => ({ ...current, team: "" })); }}
-              className="h-10 w-full appearance-none rounded-full field-token pl-3 pr-8 type-xs outline-none"
-            >
-              <option value="">Select team</option>
-              {teams.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name}
-                </option>
-              ))}
-            </select></div>
+            <label className="mb-1 block type-10 weight-bold uppercase tracking-wide text-token-muted">
+              Team
+            </label>
+            <div className="relative">
+              <select
+                value={teamId}
+                onChange={(event) => {
+                  setTeamId(event.target.value);
+                  setErrors((current) => ({ ...current, team: "" }));
+                }}
+                className="h-10 w-full appearance-none rounded-full field-token pl-3 pr-8 type-xs outline-none"
+              >
+                <option value="">Select team</option>
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             {errors.team && (
               <p className="mt-1 type-11 text-token-error">{errors.team}</p>
             )}
@@ -856,25 +923,43 @@ export function TeamsPage() {
   const handleRegenerateKey = async (member) => {
     setError("");
     const token = localStorage.getItem("convene_token");
-    const res = await fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams/${selectedTeam.id}/members/${member.id}/key`, {
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await fetch(
+      `${API_BASE}/events/${activeEvent.id}/organizing-teams/${selectedTeam.id}/members/${member.id}/key`,
+      {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     const data = await res.json();
     if (!res.ok) {
       setError(data.error || "Could not regenerate the invite key.");
       return;
     }
-    const nextTeams = teams.map((team) => team.id === selectedTeam.id
-      ? formatTeam({ ...team, members: team.members.map((item) => item.id === member.id ? { ...item, inviteKey: data.inviteKey } : item) })
-      : team);
+    const nextTeams = teams.map((team) =>
+      team.id === selectedTeam.id
+        ? formatTeam({
+            ...team,
+            members: team.members.map((item) =>
+              item.id === member.id
+                ? { ...item, inviteKey: data.inviteKey }
+                : item,
+            ),
+          })
+        : team,
+    );
     setTeams(nextTeams);
     const nextTeam = nextTeams.find((team) => team.id === selectedTeam.id);
     setSelectedTeam(nextTeam);
     setViewingMemberKey(nextTeam.members.find((item) => item.id === member.id));
   };
 
-  const handleSaveMember = async ({ name, phone, role, accessLevel, orgTeamId }) => {
+  const handleSaveMember = async ({
+    name,
+    phone,
+    role,
+    accessLevel,
+    orgTeamId,
+  }) => {
     const token = localStorage.getItem("convene_token");
     const res = await fetch(
       `${API_BASE}/events/${activeEvent.id}/organizing-teams/${editingMember.orgTeamId}/members/${editingMember.id}`,
@@ -884,7 +969,13 @@ export function TeamsPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: name.trim(), phone, role, accessLevel, orgTeamId }),
+        body: JSON.stringify({
+          name: name.trim(),
+          phone,
+          role,
+          accessLevel,
+          orgTeamId,
+        }),
       },
     );
     if (res.ok) {
@@ -1012,7 +1103,9 @@ export function TeamsPage() {
                     </h3>
                     <p className="type-xs weight-semibold text-token-muted truncate mt-0.5">
                       Lead:{" "}
-                      <span className="text-token-secondary">{team.lead.name}</span>
+                      <span className="text-token-secondary">
+                        {team.lead.name}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -1062,7 +1155,11 @@ export function TeamsPage() {
         onViewKey={setViewingMemberKey}
         isLead={isLead && !eventIsComplete}
       />
-      <InviteKeyModal member={isLead ? viewingMemberKey : null} onClose={() => setViewingMemberKey(null)} onRegenerate={handleRegenerateKey} />
+      <InviteKeyModal
+        member={isLead ? viewingMemberKey : null}
+        onClose={() => setViewingMemberKey(null)}
+        onRegenerate={handleRegenerateKey}
+      />
       <EditMemberModal
         member={isLead && !eventIsComplete ? editingMember : null}
         teams={teams}

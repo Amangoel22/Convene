@@ -1,5 +1,12 @@
 // Purpose: Navbar implements this source module.
-import { Bell, ChevronDown, Menu, Plus, Search, ShieldCheck } from "lucide-react";
+import {
+  Bell,
+  ChevronDown,
+  Menu,
+  Plus,
+  Search,
+  ShieldCheck,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -19,18 +26,19 @@ export function Navbar({ onMenuOpen }) {
   const setActiveEvent = useAppStore((state) => state.setActiveEvent);
   const isLead = role === "lead";
   // Maps the active route to its breadcrumb label.
-  const pageTitle = {
-    "/dashboard": "Dashboard",
-    "/participants": "Participants",
-    "/tasks": "Tasks",
-    "/duties": "Duties",
-    "/teams": "Teams",
-    "/run-of-show": "Run of Show",
-    "/inventory": "Inventory",
-    "/resources": "Resources",
-    "/issues": "Issues",
-    "/settings": "Settings",
-  }[location.pathname] || "Mission Control";
+  const pageTitle =
+    {
+      "/dashboard": "Dashboard",
+      "/participants": "Participants",
+      "/tasks": "Tasks",
+      "/duties": "Duties",
+      "/teams": "Teams",
+      "/run-of-show": "Run of Show",
+      "/inventory": "Inventory",
+      "/resources": "Resources",
+      "/issues": "Issues",
+      "/settings": "Settings",
+    }[location.pathname] || "Mission Control";
 
   useEffect(() => {
     const updateScrolled = () => setScrolled(window.scrollY > 8);
@@ -50,9 +58,19 @@ export function Navbar({ onMenuOpen }) {
   }, []);
 
   return (
-    <header className={cn("app-navbar sticky top-0 z-20 surface-token py-2 border-b border-subtle-token transition-colors", scrolled && "app-navbar-scrolled")}>
+    <header
+      className={cn(
+        "app-navbar sticky top-0 z-20 surface-token py-2 border-b border-subtle-token transition-colors",
+        scrolled && "app-navbar-scrolled",
+      )}
+    >
       <div className="flex h-12 items-center px-1">
-        <GlassButton onClick={onMenuOpen} className="flex lg:hidden h-8 w-8 min-h-0 p-0" icon={<Menu size={18} strokeWidth={1.75} />} aria-label="Open navigation" />
+        <GlassButton
+          onClick={onMenuOpen}
+          className="flex lg:hidden h-8 w-8 min-h-0 p-0"
+          icon={<Menu size={18} strokeWidth={1.75} />}
+          aria-label="Open navigation"
+        />
 
         {/* Breadcrumb */}
         <div className="app-navbar-breadcrumb flex items-center gap-1.5 type-xs weight-semibold text-token-secondary">
@@ -83,15 +101,25 @@ export function Navbar({ onMenuOpen }) {
               className="hidden md:flex items-center gap-2 h-9 rounded-full field-token border border-token px-3.5 type-xs weight-bold text-token-primary hover:hover-token cursor-pointer transition-colors"
             >
               <span>{activeEvent?.name || "Select Event"}</span>
-              <ChevronDown size={13} className={cn("text-token-muted shrink-0 transition-transform", dropdownOpen && "rotate-180")} />
+              <ChevronDown
+                size={13}
+                className={cn(
+                  "text-token-muted shrink-0 transition-transform",
+                  dropdownOpen && "rotate-180",
+                )}
+              />
             </button>
 
             {/* Event Dropdown Menu */}
             {dropdownOpen && (
               <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl surface-card-token border border-token p-2 shadow-xl z-50">
-                <p className="px-3 py-1.5 type-10 weight-bold uppercase tracking-wider text-token-muted">Your Events</p>
+                <p className="px-3 py-1.5 type-10 weight-bold uppercase tracking-wider text-token-muted">
+                  Your Events
+                </p>
                 {events.length === 0 ? (
-                  <p className="px-3 py-2 type-xs weight-medium text-token-muted">No events found</p>
+                  <p className="px-3 py-2 type-xs weight-medium text-token-muted">
+                    No events found
+                  </p>
                 ) : (
                   events.map((evt) => (
                     <div
@@ -102,11 +130,15 @@ export function Navbar({ onMenuOpen }) {
                       }}
                       className={cn(
                         "flex items-center justify-between rounded-xl px-3 py-2 type-xs weight-semibold cursor-pointer transition-colors",
-                        evt.id === activeEvent?.id ? "accent-surface-token text-token-accent" : "text-token-secondary hover:field-token"
+                        evt.id === activeEvent?.id
+                          ? "accent-surface-token text-token-accent"
+                          : "text-token-secondary hover:field-token",
                       )}
                     >
                       <span className="truncate">{evt.name}</span>
-                      <span className="type-10 text-token-muted weight-normal">{evt.type}</span>
+                      <span className="type-10 text-token-muted weight-normal">
+                        {evt.type}
+                      </span>
                     </div>
                   ))
                 )}
@@ -134,11 +166,16 @@ export function Navbar({ onMenuOpen }) {
             title="Your access for the selected event"
           >
             <ShieldCheck size={14} />
-            <span className="app-access-label">{isLead ? "Lead Organizer" : "Team Member"}</span>
+            <span className="app-access-label">
+              {isLead ? "Lead Organizer" : "Team Member"}
+            </span>
           </div>
 
           {/* Profile Avatar */}
-          <UserAvatar initials={isLead ? "AG" : "TM"} className="h-8 w-8 type-xs accent-surface-token text-token-accent" />
+          <UserAvatar
+            initials={isLead ? "AG" : "TM"}
+            className="h-8 w-8 type-xs accent-surface-token text-token-accent"
+          />
         </div>
       </div>
     </header>

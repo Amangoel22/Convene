@@ -21,6 +21,8 @@ import { useNavigate } from "react-router-dom";
 import { ConveneMark } from "@/components/brand/ConveneMark";
 import { useAppStore } from "@/store/useAppStore";
 import { addHoursToTimeString, cn, formatTimeString } from "@/lib/utils";
+import { getApiBase } from "@/lib/api";
+import { STORAGE_KEYS } from "@/constants/storage";
 import "@/styles/login.css";
 
 const eventTypes = [
@@ -255,15 +257,7 @@ const defaultStagesForType = {
   ],
 };
 
-function getApiBase() {
-  const configuredUrl =
-    import.meta.env.VITE_API_URL?.trim() || "http://localhost:8000/api";
-  const normalizedUrl = configuredUrl.replace(/\/+$/, "");
-  return normalizedUrl.endsWith("/api")
-    ? normalizedUrl
-    : `${normalizedUrl}/api`;
-}
-
+// Guides organizers through creating or joining an event workspace.
 export function OnboardingPage() {
   const navigate = useNavigate();
   const events = useAppStore((state) => state.events);
@@ -418,7 +412,7 @@ export function OnboardingPage() {
     setLaunchError(null);
     setIsLaunching(true);
 
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     if (!token) {
       setLaunchError(
         "You are not logged in. Please refresh and sign in again.",

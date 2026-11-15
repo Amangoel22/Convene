@@ -1,6 +1,7 @@
 // Purpose: EmptyState implements this source module.
 import { GlassButton } from "@/components/glass/GlassButton";
 
+// Renders a consistent empty-data message and optional action.
 export function EmptyState({
   title,
   description,

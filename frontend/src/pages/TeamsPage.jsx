@@ -34,8 +34,10 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useAppStore } from "@/store/useAppStore";
 
 import { getApiBase } from "@/lib/api";
+import { STORAGE_KEYS } from "@/constants/storage";
 const API_BASE = getApiBase();
 
+// Normalizes an organizing team for display.
 function formatTeam(team) {
   const members = team.members || [];
   const leadMember =
@@ -99,6 +101,7 @@ const iconMap = {
   HeartHandshake,
 };
 
+// Renders a labeled select control for filtering records.
 function SelectFilter({ value, onChange, options, label }) {
   return (
     <label className="filter-chip flex h-9 shrink-0 items-center rounded-full field-token border border-token pl-3 type-xs weight-semibold text-token-secondary">
@@ -122,6 +125,7 @@ function SelectFilter({ value, onChange, options, label }) {
   );
 }
 
+// Renders organizing-team details in a side drawer.
 function TeamDrawer({
   team,
   onClose,
@@ -336,6 +340,7 @@ function TeamDrawer({
   );
 }
 
+// Renders the organizing-team creation form.
 function CreateTeamModal({ open, onClose, onCreateTeam }) {
   const [name, setName] = useState("");
   const [members, setMembers] = useState([
@@ -543,6 +548,7 @@ function CreateTeamModal({ open, onClose, onCreateTeam }) {
   );
 }
 
+// Renders the invite-key view and regeneration action.
 function InviteKeyModal({ member, onClose, onRegenerate }) {
   if (!member) return null;
   return (
@@ -587,6 +593,7 @@ function InviteKeyModal({ member, onClose, onRegenerate }) {
   );
 }
 
+// Renders the organizing-member edit form.
 function EditMemberModal({ member, teams, onClose, onSave }) {
   const [name, setName] = useState(member?.name || "");
   const [phone, setPhone] = useState(member?.phone || "");
@@ -771,6 +778,7 @@ function EditMemberModal({ member, teams, onClose, onSave }) {
   );
 }
 
+// Renders organizing teams and member management.
 export function TeamsPage() {
   const [teams, setTeams] = useState([]);
   const [search, setSearch] = useState("");
@@ -795,7 +803,7 @@ export function TeamsPage() {
       return;
     }
     setLoading(true);
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     fetch(`${API_BASE}/events/${activeEvent.id}/organizing-teams`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -824,14 +832,14 @@ export function TeamsPage() {
 
       return matchesSearch && matchesLead;
     });
-  }, [isLead, leadFilter, search, teams]);
+  }, [leadFilter, search, teams]);
 
   const handleCreateTeam = async (newTeam) => {
     if (!activeEvent?.id) {
       setError("No active event selected.");
       return false;
     }
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     const res = await fetch(
       `${API_BASE}/events/${activeEvent.id}/organizing-teams`,
       {
@@ -866,7 +874,7 @@ export function TeamsPage() {
   };
 
   const handleSaveNewMember = async ({ name, phone, role, accessLevel }) => {
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     const res = await fetch(
       `${API_BASE}/events/${activeEvent.id}/organizing-teams/${addingMember.orgTeamId}/members`,
       {
@@ -896,7 +904,7 @@ export function TeamsPage() {
 
   const handleRemoveMember = async (member) => {
     if (!window.confirm(`Remove ${member.name} from this team?`)) return;
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     const res = await fetch(
       `${API_BASE}/events/${activeEvent.id}/organizing-teams/${selectedTeam.id}/members/${member.id}`,
       { method: "DELETE", headers: { Authorization: `Bearer ${token}` } },
@@ -922,7 +930,7 @@ export function TeamsPage() {
 
   const handleRegenerateKey = async (member) => {
     setError("");
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     const res = await fetch(
       `${API_BASE}/events/${activeEvent.id}/organizing-teams/${selectedTeam.id}/members/${member.id}/key`,
       {
@@ -960,7 +968,7 @@ export function TeamsPage() {
     accessLevel,
     orgTeamId,
   }) => {
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     const res = await fetch(
       `${API_BASE}/events/${activeEvent.id}/organizing-teams/${editingMember.orgTeamId}/members/${editingMember.id}`,
       {

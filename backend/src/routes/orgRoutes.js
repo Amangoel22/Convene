@@ -164,7 +164,7 @@ router.post(
   authorizeEventMembership(["organizer"]),
   authorizeOrgLead(),
   async (req, res) => {
-    const { name, email, phone, userId, role, accessLevel } = req.body;
+    const { name, phone, userId, role, accessLevel } = req.body;
     if (!name?.trim())
       return res.status(400).json({ error: "Member name is required." });
     if (!/^\d{10}$/.test(phone || ""))

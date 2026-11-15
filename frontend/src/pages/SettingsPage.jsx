@@ -4,6 +4,7 @@ import { ThemePicker } from "@/components/ui/ThemePicker";
 import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { getApiBase } from "@/lib/api";
+import { STORAGE_KEYS } from "@/constants/storage";
 
 const API_BASE = getApiBase();
 
@@ -19,15 +20,16 @@ function savePreference(key, value) {
   window.localStorage.setItem(key, String(value));
 }
 
+// Renders account and local preference controls.
 export function SettingsPage() {
   const token =
     useAppStore((state) => state.token) ||
-    localStorage.getItem("convene_token");
+    localStorage.getItem(STORAGE_KEYS.authToken);
   const [notifications, setNotifications] = useState(
-    () => readPreference("convene_notifications", "true") === "true",
+    () => readPreference(STORAGE_KEYS.notifications, "true") === "true",
   );
   const [timeFormat, setTimeFormat] = useState(() =>
-    readPreference("convene_time_format", "12h"),
+    readPreference(STORAGE_KEYS.timeFormat, "12h"),
   );
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
@@ -43,13 +45,13 @@ export function SettingsPage() {
   // Updates a local notification preference without changing event data.
   function updateNotifications(value) {
     setNotifications(value);
-    savePreference("convene_notifications", value);
+    savePreference(STORAGE_KEYS.notifications, value);
   }
 
   // Updates a local time-format preference without changing event data.
   function updateTimeFormat(value) {
     setTimeFormat(value);
-    savePreference("convene_time_format", value);
+    savePreference(STORAGE_KEYS.timeFormat, value);
   }
 
   // Keeps password fields controlled while the user edits the secure form.

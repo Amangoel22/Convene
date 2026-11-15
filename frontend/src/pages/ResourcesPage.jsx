@@ -14,6 +14,7 @@ const API_BASE = getApiBase();
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_FILE_TYPES = ".pdf,.jpg,.jpeg,.png,.csv,.xls,.xlsx";
 
+// Renders resource storage and upload management.
 export function ResourcesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [title, setTitle] = useState("");

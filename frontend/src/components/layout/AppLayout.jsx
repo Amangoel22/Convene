@@ -8,6 +8,7 @@ import { PageTransition } from "@/components/layout/PageTransition";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useAppStore } from "@/store/useAppStore";
 
+// Composes the persistent navigation and routed page content.
 export function AppLayout() {
   const themePalette = useAppStore((state) => state.themePalette);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);

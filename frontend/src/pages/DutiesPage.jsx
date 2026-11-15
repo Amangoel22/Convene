@@ -1,5 +1,5 @@
 // Displays persisted shift duties and lets organizing leads assign them.
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Clock, MapPin, Plus, Search, UserCheck, Pencil } from "lucide-react";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { GlassModal } from "@/components/glass/GlassModal";
@@ -11,6 +11,7 @@ import { cn, formatDisplayTime, isEventComplete } from "@/lib/utils";
 import { PageTitle } from "@/components/ui/PageTitle";
 
 import { getApiBase } from "@/lib/api";
+import { STORAGE_KEYS } from "@/constants/storage";
 const API_BASE = getApiBase();
 
 // Builds compact initials for member avatars.
@@ -69,6 +70,7 @@ function formatDuty(raw) {
   };
 }
 
+// Renders duty assignments for the active event.
 export function DutiesPage() {
   const activeEvent = useAppStore((state) => state.activeEvent);
   const currentUser = useAppStore((state) => state.currentUser);
@@ -94,14 +96,15 @@ export function DutiesPage() {
   const [newNotes, setNewNotes] = useState("");
   const [editingDuty, setEditingDuty] = useState(false);
 
-  const loadDuties = async () => {
+  // Loads the duties and organizing-team members for the selected event.
+  const loadDuties = useCallback(async () => {
     if (!activeEvent?.id) {
       if (eventsHydrated) setLoading(false);
       return;
     }
     setLoading(true);
     setError("");
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     try {
       const headers = { Authorization: `Bearer ${token}` };
       const [dutiesResponse, teamsResponse] = await Promise.all([
@@ -134,11 +137,11 @@ export function DutiesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeEvent?.id, eventsHydrated]);
 
   useEffect(() => {
     loadDuties();
-  }, [activeEvent?.id, eventsHydrated]);
+  }, [loadDuties]);
 
   const teamOptions = useMemo(
     () => [
@@ -208,7 +211,7 @@ export function DutiesPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("convene_token")}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEYS.authToken)}`,
           },
           body: JSON.stringify({
             title: newTitle.trim(),
@@ -270,7 +273,7 @@ export function DutiesPage() {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("convene_token")}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEYS.authToken)}`,
           },
           body: JSON.stringify({
             title: newTitle.trim(),

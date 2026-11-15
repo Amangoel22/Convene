@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AppShell } from "@/layouts/AppShell";
 import { useAppStore } from "@/store/useAppStore";
 import { getApiBase } from "@/lib/api";
+import { STORAGE_KEYS } from "@/constants/storage";
 
 // Purpose: load named page exports only when their route is opened.
 const lazyPage = (loader, exportName) =>
@@ -60,10 +61,11 @@ function RouteLoader() {
   );
 }
 
+// Validates the persisted session before rendering protected application routes.
 function ProtectedRoute({ children }) {
   const token =
     useAppStore((state) => state.token) ||
-    localStorage.getItem("convene_token");
+    localStorage.getItem(STORAGE_KEYS.authToken);
   const setUserSession = useAppStore((state) => state.setUserSession);
   const clearSession = useAppStore((state) => state.clearSession);
 
@@ -72,6 +74,7 @@ function ProtectedRoute({ children }) {
 
   useEffect(() => {
     let isMounted = true;
+    // Validates the persisted token and hydrates the user's event session.
     async function validateToken() {
       if (!token) {
         if (isMounted) {
@@ -152,7 +155,7 @@ function ProtectedRoute({ children }) {
     return () => {
       isMounted = false;
     };
-  }, [token]);
+  }, [clearSession, setUserSession, token]);
 
   if (isValidating) {
     return (
@@ -173,6 +176,7 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+// Configures the application's public and protected route tree.
 export function App() {
   return (
     <BrowserRouter>

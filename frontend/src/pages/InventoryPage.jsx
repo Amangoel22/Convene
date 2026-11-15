@@ -24,6 +24,7 @@ const API_BASE = getApiBase();
 
 import { useEffect } from "react";
 
+// Renders the form for creating or editing an inventory item.
 function EditItemModal({ open, item, onClose, onSave }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -190,6 +191,7 @@ function EditItemModal({ open, item, onClose, onSave }) {
   );
 }
 
+// Renders inventory tracking for the active event.
 export function InventoryPage() {
   const [inventory, setInventory] = useState(initialInventory);
   const [loading, setLoading] = useState(true);

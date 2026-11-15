@@ -1,7 +1,9 @@
 // Purpose: utils implements this source module.
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { STORAGE_KEYS } from "@/constants/storage";
 
+// Merges conditional class names and resolves Tailwind conflicts.
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
@@ -40,7 +42,7 @@ export function formatDisplayTime(date) {
   if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
   const use24Hour =
     typeof window !== "undefined" &&
-    window.localStorage.getItem("convene_time_format") === "24h";
+    window.localStorage.getItem(STORAGE_KEYS.timeFormat) === "24h";
   return date.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -90,12 +92,14 @@ export function parseTimeString(timeStr, baseDate = new Date()) {
   return result;
 }
 
+// Returns a valid Date copy or null for an invalid input.
 function validDate(value) {
   if (!value) return null;
   const parsed = value instanceof Date ? new Date(value) : new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+// Builds an event Date from separate date and time fields.
 function eventDateTime(event, dateKey, timeKey) {
   const dateValue = event?.[dateKey];
   const timeValue = event?.[timeKey];
@@ -136,6 +140,7 @@ export function getStageStatus(stage, now = new Date()) {
   return persisted === "live" ? "LIVE" : "Upcoming";
 }
 
+// Determines whether every stage or the event end time has passed.
 export function isEventComplete(event, now = new Date()) {
   if (!event) return false;
   const stages = event.stages || [];

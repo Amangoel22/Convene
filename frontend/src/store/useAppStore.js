@@ -4,6 +4,7 @@ import {
   getInitialConveneTheme,
   isConveneTheme,
 } from "@/constants/conveneTheme";
+import { STORAGE_KEYS } from "@/constants/storage";
 
 export const initialEvents = [];
 
@@ -24,7 +25,7 @@ export const useAppStore = create((set) => ({
 
   setUserSession: (user, token) => set({ currentUser: user, token }),
   clearSession: () => {
-    localStorage.removeItem("convene_token");
+    localStorage.removeItem(STORAGE_KEYS.authToken);
     set({
       currentUser: null,
       token: null,
@@ -37,7 +38,7 @@ export const useAppStore = create((set) => ({
   setThemePalette: (themePalette) => {
     if (!isConveneTheme(themePalette)) return;
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("convene_palette", themePalette);
+      window.localStorage.setItem(STORAGE_KEYS.themePalette, themePalette);
       document.documentElement.dataset.convenePalette = themePalette;
     }
     set({ themePalette });

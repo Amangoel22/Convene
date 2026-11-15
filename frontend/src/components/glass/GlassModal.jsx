@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { modalAnimation } from "@/motion";
 import { cn } from "@/lib/utils";
 
+// Renders the shared animated modal shell.
 export function GlassModal({ open, className, children }) {
   return (
     <AnimatePresence>

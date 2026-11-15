@@ -1,6 +1,7 @@
 // Purpose: UserAvatar implements this source module.
 import { cn } from "@/lib/utils";
 
+// Renders a user image or initials fallback.
 export function UserAvatar({ initials, image, className }) {
   return (
     <span

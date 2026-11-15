@@ -1,7 +1,8 @@
 // Purpose: StatusBadge implements this source module.
 import { cn } from "@/lib/utils";
-import { STATUS_TEXT_CLASSES } from "@/constants/colors";
+import { STATUS_TEXT_CLASSES } from "@/constants/statuses";
 
+// Renders a semantic status label.
 export function StatusBadge({ status, children, className }) {
   return (
     <span

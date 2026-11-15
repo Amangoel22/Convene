@@ -216,6 +216,8 @@ app.use((req, res) => {
 
 // Global Error Handler
 app.use((err, req, res, _next) => {
+  // Express identifies error middleware by its four-argument signature.
+  void _next;
   console.error("Unhandled Error:", err);
   res
     .status(500)

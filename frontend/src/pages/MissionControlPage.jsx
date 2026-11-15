@@ -23,6 +23,7 @@ import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { useAppStore } from "@/store/useAppStore";
 import { PageTitle } from "@/components/ui/PageTitle";
 import { getApiBase } from "@/lib/api";
+import { STORAGE_KEYS } from "@/constants/storage";
 
 const initialOrganizerDuties = [];
 const initialOrganizerTasks = [];
@@ -72,7 +73,7 @@ export function MissionControlPage() {
       return;
     }
     setTasksLoading(true);
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     const apiBase = getApiBase();
     Promise.all([
       fetch(`${apiBase}/events/${activeEvent.id}/tasks`, {
@@ -114,8 +115,8 @@ export function MissionControlPage() {
       .finally(() => setTasksLoading(false));
   }, [activeEvent?.id, currentUser?.id, eventsHydrated]);
 
-  // Derive dynamic stage rail from activeEvent or empty array
-  const rawStages = activeEvent?.stages || [];
+  // Keeps the stage collection referentially stable between event updates.
+  const rawStages = useMemo(() => activeEvent?.stages ?? [], [activeEvent?.stages]);
   const eventIsComplete = isEventComplete(activeEvent, now);
 
   // Evaluate dynamic status based on current real-time clock
@@ -209,6 +210,7 @@ export function MissionControlPage() {
   const [secondsRemaining, setSecondsRemaining] = useState(0);
 
   useEffect(() => {
+    // Calculates the countdown target for the current event state.
     function calculateTargetSeconds() {
       let parsedTarget = upcomingStage?.startAt
         ? new Date(upcomingStage.startAt)
@@ -253,7 +255,7 @@ export function MissionControlPage() {
     if (!task) return;
     const nextStatus =
       task.status === "Completed" ? "In Progress" : "Completed";
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     try {
       const response = await fetch(`${getApiBase()}/tasks/${taskId}/status`, {
         method: "PATCH",

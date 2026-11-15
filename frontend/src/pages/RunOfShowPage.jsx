@@ -32,6 +32,7 @@ import {
   parseTimeString,
   addHoursToTimeString,
 } from "@/lib/utils";
+import { STORAGE_KEYS } from "@/constants/storage";
 
 const statusStyles = {
   LIVE: "bg-token-success/10 text-token-success",
@@ -39,6 +40,7 @@ const statusStyles = {
   Upcoming: "accent-surface-token text-token-accent",
 };
 
+// Renders a semantic status label.
 function StatusBadge({ status = "Upcoming" }) {
   return (
     <span
@@ -62,6 +64,7 @@ function StatusBadge({ status = "Upcoming" }) {
   );
 }
 
+// Formats a stage's date and time range for display.
 function formatStageSchedule(stage) {
   const start = stage.startAt ? new Date(stage.startAt) : null;
   const end = stage.endAt ? new Date(stage.endAt) : null;
@@ -84,6 +87,7 @@ function formatStageSchedule(stage) {
   return `${dateRange} | ${startTime} – ${endTime}`;
 }
 
+// Renders a labeled select control for filtering records.
 function SelectFilter({ value, onChange, options, label }) {
   return (
     <label className="filter-chip flex h-9 shrink-0 items-center rounded-full field-token border border-token pl-3 type-xs weight-semibold text-token-secondary">
@@ -112,6 +116,7 @@ import { getApiBase } from "@/lib/api";
 
 const API_BASE = getApiBase();
 
+// Renders stage details and lead-only actions in a side drawer.
 function StageDrawer({ stage, onClose, onUpdateStatus }) {
   const navigate = useNavigate();
   const role = useAppStore((state) => state.role);
@@ -249,7 +254,16 @@ function StageDrawer({ stage, onClose, onUpdateStatus }) {
   );
 }
 
+// Renders the form for creating or editing a timeline stage.
 function StageModal({ open, onClose, stage, onSave, lastStage }) {
+  const stageId = stage?.id;
+  const stageTitle = stage?.title;
+  const stageLocation = stage?.location;
+  const stageStartAt = stage?.startAt;
+  const stageEndAt = stage?.endAt;
+  const stageTimeWindow = stage?.timeWindow;
+  const lastStageId = lastStage?.id;
+  const lastStageTimeWindow = lastStage?.timeWindow;
   const [title, setTitle] = useState(stage ? stage.title : "");
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
@@ -278,16 +292,16 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
   useEffect(() => {
     if (!open) return;
 
-    if (stage) {
-      setTitle(stage.title || "");
-      setLocation(stage.location || "");
-      const persistedStartTime = stage.startAt && toInputTime(stage.startAt);
-      const persistedEndTime = stage.endAt && toInputTime(stage.endAt);
+    if (stageId) {
+      setTitle(stageTitle || "");
+      setLocation(stageLocation || "");
+      const persistedStartTime = stageStartAt && toInputTime(stageStartAt);
+      const persistedEndTime = stageEndAt && toInputTime(stageEndAt);
       if (persistedStartTime && persistedEndTime) {
         setStartTime(persistedStartTime);
         setEndTime(persistedEndTime);
-      } else if (stage.timeWindow) {
-        const parts = stage.timeWindow.split(/[–—-]/);
+      } else if (stageTimeWindow) {
+        const parts = stageTimeWindow.split(/[–—-]/);
         setStartTime(to24h(parts[0]?.trim()));
         setEndTime(to24h(parts[1]?.trim()));
       }
@@ -295,8 +309,8 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
       // Adding new stage: clear title and location, auto-chain time from previous stage
       setTitle("");
       setLocation("");
-      if (lastStage && lastStage.timeWindow) {
-        const parts = lastStage.timeWindow.split(/[–—-]/);
+      if (lastStageTimeWindow) {
+        const parts = lastStageTimeWindow.split(/[–—-]/);
         const lastEnd12h = parts[1]?.trim() || "10:00 AM";
         const nextStart24h = to24h(lastEnd12h);
         const nextEnd12h = addHoursToTimeString(lastEnd12h, 1);
@@ -308,7 +322,17 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
         setEndTime("10:00");
       }
     }
-  }, [stage?.id, open, lastStage?.id]);
+  }, [
+    lastStageId,
+    lastStageTimeWindow,
+    open,
+    stageEndAt,
+    stageId,
+    stageLocation,
+    stageStartAt,
+    stageTimeWindow,
+    stageTitle,
+  ]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -414,6 +438,7 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
   );
 }
 
+// Renders the event timeline and stage-management controls.
 export function RunOfShowPage() {
   const eventsHydrated = useAppStore((state) => state.eventsHydrated);
   const activeEvent = useAppStore((state) => state.activeEvent);
@@ -427,7 +452,7 @@ export function RunOfShowPage() {
   const role = useAppStore((state) => state.role);
   const isLead = role === "lead";
 
-  const rawStages = activeEvent?.stages || [];
+  const rawStages = useMemo(() => activeEvent?.stages ?? [], [activeEvent?.stages]);
   const timelineLoading = !eventsHydrated;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Statuses");
@@ -473,7 +498,7 @@ export function RunOfShowPage() {
     updateActiveEventStages(stageId, newStatus);
     setSelectedStage((prev) => (prev ? { ...prev, status: newStatus } : null));
 
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     if (token && stageId && !stageId.startsWith("stg-")) {
       try {
         await fetch(`${API_BASE}/stages/${stageId}`, {
@@ -491,7 +516,7 @@ export function RunOfShowPage() {
   };
 
   const handleSaveStage = async (stageData) => {
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
 
     if (editingStage) {
       updateStageDetails(stageData.id, stageData);

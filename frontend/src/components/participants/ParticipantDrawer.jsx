@@ -6,25 +6,24 @@ import { GlassButton } from "@/components/glass/GlassButton";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusPill } from "./ParticipantsComponents";
 import { cn } from "@/lib/utils";
-import { COLORS } from "@/constants/colors";
+import {
+  PARTICIPANT_STATUSES,
+  TEAM_STATUSES,
+} from "@/constants/statuses";
 
+// Renders a concise label-and-value detail cell inside the participant drawer.
 function Info({ label, value }) {
   return (
-    <div
-      className={`rounded-2xl bg-[${COLORS.cardBg}] border border-subtle-token p-3`}
-    >
-      <p className={`type-11 weight-semibold text-[${COLORS.grayMuted}]`}>
-        {label}
-      </p>
-      <p
-        className={`mt-0.5 truncate type-sm weight-bold text-[${COLORS.dark}]`}
-      >
+    <div className="rounded-2xl surface-card-token border border-subtle-token p-3">
+      <p className="type-11 weight-semibold text-token-muted">{label}</p>
+      <p className="mt-0.5 truncate type-sm weight-bold text-token-primary">
         {value || "N/A"}
       </p>
     </div>
   );
 }
 
+// Shows a team or member profile and exposes the lead-only update controls.
 export function ParticipantDrawer({
   team,
   member,
@@ -34,13 +33,14 @@ export function ParticipantDrawer({
   onUpdateMemberStatus,
   onSaveNotes,
 }) {
-  if (!team) return null;
-
+  const selectedTeam = team ?? {};
   const isIndividual = Boolean(member);
   const currentStatus = isIndividual
     ? member.status || "Confirmed"
-    : team.status || "Confirmed";
-  const currentNotes = isIndividual ? member.notes || "" : team.notes || "";
+    : selectedTeam.status || "Confirmed";
+  const currentNotes = isIndividual
+    ? member.notes || ""
+    : selectedTeam.notes || "";
 
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteText, setNoteText] = useState(currentNotes);
@@ -48,25 +48,29 @@ export function ParticipantDrawer({
   useEffect(() => {
     setNoteText(currentNotes);
     setIsEditingNote(false);
-  }, [team?.id, member?.id, currentNotes]);
+  }, [selectedTeam.id, member?.id, currentNotes]);
 
+  // Persists a status against either the selected member or their whole team.
   const handleStatusChange = (newStatus) => {
     if (isIndividual) {
-      onUpdateMemberStatus(team.id, member.id, newStatus);
+      onUpdateMemberStatus(selectedTeam.id, member.id, newStatus);
     } else {
-      onUpdateTeamStatus(team.id, newStatus);
+      onUpdateTeamStatus(selectedTeam.id, newStatus);
     }
   };
 
+  // Saves the note and returns the drawer to its read-only state.
   const handleSaveNoteSubmit = async () => {
     await onSaveNotes(
       isIndividual ? "member" : "team",
-      team.id,
+      selectedTeam.id,
       member?.id,
       noteText,
     );
     setIsEditingNote(false);
   };
+
+  if (!team) return null;
 
   return (
     <AnimatePresence>
@@ -124,22 +128,12 @@ export function ParticipantDrawer({
                 onChange={(e) => handleStatusChange(e.target.value)}
                 className="cursor-pointer appearance-none rounded-full surface-card-token border border-token-accent/30 pl-3 pr-7 py-1 type-xs weight-bold text-token-primary outline-none shadow-sm"
               >
-                {isIndividual ? (
-                  <>
-                    <option value="Checked In">Checked In</option>
-                    <option value="Confirmed">Confirmed</option>
-                    <option value="Unconfirmed">Unconfirmed</option>
-                    <option value="Absent">Absent</option>
-                    <option value="Withdrawn">Withdrawn</option>
-                    <option value="Rejected">Rejected</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="Unconfirmed">Unconfirmed</option>
-                    <option value="Confirmed">Confirmed</option>
-                    <option value="Checked In">Checked In</option>
-                    <option value="Rejected">Rejected</option>
-                  </>
+                {(isIndividual ? PARTICIPANT_STATUSES : TEAM_STATUSES).map(
+                  (status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ),
                 )}
               </select>
             </div>

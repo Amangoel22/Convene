@@ -1,6 +1,6 @@
 // Purpose: renders a compact priority label for task and issue records.
 import { cn } from "@/lib/utils";
-import { PRIORITY_TEXT_CLASSES } from "@/constants/colors";
+import { PRIORITY_TEXT_CLASSES } from "@/constants/statuses";
 
 // Renders a priority label using centralized color tokens.
 export function PriorityBadge({ priority = "Medium", className }) {

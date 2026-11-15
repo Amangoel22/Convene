@@ -48,6 +48,7 @@ const navSections = [
   },
 ];
 
+// Renders the desktop and mobile application navigation.
 export function Sidebar({ mobileOpen = false, onClose }) {
   const navigate = useNavigate();
   const role = useAppStore((state) => state.role);

@@ -14,6 +14,7 @@ import { GlassButton } from "@/components/glass/GlassButton";
 import { useAppStore } from "@/store/useAppStore";
 import { cn } from "@/lib/utils";
 
+// Renders the compact top navigation controls.
 export function Navbar({ onMenuOpen }) {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
@@ -48,6 +49,7 @@ export function Navbar({ onMenuOpen }) {
   }, []);
 
   useEffect(() => {
+    // Closes the control when interaction moves outside its boundary.
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);

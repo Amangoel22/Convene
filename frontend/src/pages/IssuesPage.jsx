@@ -18,6 +18,7 @@ import { PageTitle } from "@/components/ui/PageTitle";
 import { getApiBase } from "@/lib/api";
 const API_BASE = getApiBase();
 
+// Renders issue tracking for the active event.
 export function IssuesPage() {
   const [issues, setIssues] = useState([]);
   const [createModalOpen, setCreateModalOpen] = useState(false);

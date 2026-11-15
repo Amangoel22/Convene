@@ -9,6 +9,7 @@ import { PageTitle } from "@/components/ui/PageTitle";
 import { useAppStore } from "@/store/useAppStore";
 import { isEventComplete } from "@/lib/utils";
 import { getApiBase } from "@/lib/api";
+import { STORAGE_KEYS } from "@/constants/storage";
 import { ParticipantDrawer } from "@/components/participants/ParticipantDrawer";
 import {
   CreateParticipantModal,
@@ -23,6 +24,7 @@ import {
 
 const API_BASE = getApiBase();
 
+// Delays a value update until input activity settles.
 function useDebouncedValue(value, delay = 180) {
   const [debounced, setDebounced] = useState(value);
 
@@ -34,6 +36,7 @@ function useDebouncedValue(value, delay = 180) {
   return debounced;
 }
 
+// Renders participant management for the active event.
 export function ParticipantsPage() {
   const [teams, setTeams] = useState([]);
   const [search, setSearch] = useState("");
@@ -54,7 +57,7 @@ export function ParticipantsPage() {
 
   const loadEventTeams = useCallback(async () => {
     setLoading(true);
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     let eventId = activeEvent?.id;
 
     try {
@@ -266,7 +269,7 @@ export function ParticipantsPage() {
       prev && prev.id === teamId ? { ...prev, status: newStatus } : prev,
     );
 
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     try {
       await fetch(`${API_BASE}/participants/teams/${teamId}/status`, {
         method: "PATCH",
@@ -297,7 +300,7 @@ export function ParticipantsPage() {
       prev && prev.id === memberId ? { ...prev, status: newStatus } : prev,
     );
 
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     try {
       await fetch(`${API_BASE}/participants/${memberId}/status`, {
         method: "PATCH",
@@ -346,7 +349,7 @@ export function ParticipantsPage() {
 
     setCreateModalOpen(false);
 
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     const eventId = activeEvent?.id;
     if (eventId) {
       try {
@@ -369,7 +372,7 @@ export function ParticipantsPage() {
   };
 
   const handleSaveNotes = async (type, teamId, memberId, noteText) => {
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
 
     if (type === "member" && memberId) {
       setTeams((prev) =>
@@ -432,7 +435,7 @@ export function ParticipantsPage() {
       `${API_BASE}/participants/${activeEvent.id}/participants/export`,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("convene_token")}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEYS.authToken)}`,
         },
       },
     );

@@ -30,8 +30,10 @@ import { useAppStore } from "@/store/useAppStore";
 
 const statuses = ["All Statuses", "Todo", "In Progress", "Completed"];
 import { getApiBase } from "@/lib/api";
+import { STORAGE_KEYS } from "@/constants/storage";
 const API_BASE = getApiBase();
 
+// Normalizes a persisted task for display.
 function formatTask(task) {
   const member = task.assignedOrgMember;
   const team = task.orgTeam;
@@ -61,12 +63,14 @@ function formatTask(task) {
   };
 }
 
+// Converts a date value into an input-compatible date string.
 function dateInputValue(value) {
   if (!value) return "";
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
 }
 
+// Renders a labeled select control for filtering records.
 function SelectFilter({ value, onChange, options, label }) {
   return (
     <label className="filter-chip flex h-9 shrink-0 items-center rounded-full field-token border border-token pl-3 type-xs weight-semibold text-token-secondary">
@@ -90,6 +94,7 @@ function SelectFilter({ value, onChange, options, label }) {
   );
 }
 
+// Renders task details and update controls in a side drawer.
 function TaskDrawer({
   task: initialTask,
   onClose,
@@ -343,6 +348,7 @@ function TaskDrawer({
   );
 }
 
+// Renders the task creation form.
 function NewTaskModal({ open, onClose, onCreateTask, teams, members }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -495,6 +501,7 @@ function NewTaskModal({ open, onClose, onCreateTask, teams, members }) {
   );
 }
 
+// Renders task management for the active event.
 export function TasksPage() {
   const [tasksList, setTasksList] = useState([]);
   const [teamsList, setTeamsList] = useState([]);
@@ -522,7 +529,7 @@ export function TasksPage() {
       if (eventsHydrated) setLoading(false);
       return;
     }
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     const headers = { Authorization: `Bearer ${token}` };
     setLoading(true);
     Promise.all([
@@ -648,7 +655,7 @@ export function TasksPage() {
   const handleUpdateTask = async (updatedTask) => {
     if (eventIsComplete) return;
     const existingTask = tasksList.find((task) => task.id === updatedTask.id);
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
@@ -698,7 +705,7 @@ export function TasksPage() {
 
   const handleCreateTask = async (newTask) => {
     if (!activeEvent?.id || eventIsComplete) return;
-    const token = localStorage.getItem("convene_token");
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     const res = await fetch(`${API_BASE}/events/${activeEvent.id}/tasks`, {
       method: "POST",
       headers: {
@@ -723,7 +730,7 @@ export function TasksPage() {
       `${API_BASE}/events/${activeEvent.id}/tasks/export`,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("convene_token")}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEYS.authToken)}`,
         },
       },
     );

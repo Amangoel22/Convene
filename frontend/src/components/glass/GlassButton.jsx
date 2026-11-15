@@ -4,6 +4,7 @@ import { buttonAnimation } from "@/motion";
 import { glassButtonVariants } from "@/components/glass/variants";
 import { cn } from "@/lib/utils";
 
+// Renders the shared animated button component.
 export function GlassButton({
   className,
   icon,

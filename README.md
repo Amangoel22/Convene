@@ -207,8 +207,6 @@ Participant imports use one worksheet. A consistent `teamCode` groups people int
 | Tailwind CSS | Utility styling |
 | `clsx` + `tailwind-merge` | Conditional class composition |
 | Lucide React | Icon system |
-| React Hook Form + Zod | Form and validation utilities |
-| Sonner | Toast notifications |
 
 ### Backend
 
@@ -231,7 +229,7 @@ Convene/
 ├── frontend/
 │   ├── src/pages/              Product screens
 │   ├── src/components/         Shared UI and layout
-│   ├── src/constants/          Colors, typography, palettes
+│   ├── src/constants/          UI status, storage, typography, and theme values
 │   ├── src/styles/             Global, theme, landing, login styles
 │   └── public/                 Browser assets and favicon
 ├── backend/

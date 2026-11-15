@@ -17,6 +17,7 @@ export function ThemePicker({ compact = false, className = "" }) {
 
   // Closes the palette menu after the user clicks elsewhere.
   useEffect(() => {
+    // Closes the control when interaction moves outside its boundary.
     function handleClickOutside(event) {
       if (pickerRef.current && !pickerRef.current.contains(event.target))
         setOpen(false);

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/store/useAppStore";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { ConveneMark } from "@/components/brand/ConveneMark";
+import { getApiBase } from "@/lib/api";
+import { STORAGE_KEYS } from "@/constants/storage";
 import {
   LogIn,
   UserPlus,
@@ -13,16 +15,7 @@ import {
 } from "lucide-react";
 import "@/styles/login.css";
 
-// Resolves the API origin consistently for local and Render deployments.
-function getApiBase() {
-  const configuredUrl =
-    import.meta.env.VITE_API_URL?.trim() || "http://localhost:8000/api";
-  const normalizedUrl = configuredUrl.replace(/\/+$/, "");
-  return normalizedUrl.endsWith("/api")
-    ? normalizedUrl
-    : `${normalizedUrl}/api`;
-}
-
+// Renders the authentication form and initializes the authenticated session.
 export function LoginPage() {
   const navigate = useNavigate();
   const setUserSession = useAppStore((state) => state.setUserSession);
@@ -93,7 +86,7 @@ export function LoginPage() {
       }
 
       // Store JWT Token & update global user state
-      localStorage.setItem("convene_token", data.token);
+      localStorage.setItem(STORAGE_KEYS.authToken, data.token);
       if (setUserSession) setUserSession(data.user, data.token);
 
       // Invite-based registration joins an existing event; otherwise begin setup.

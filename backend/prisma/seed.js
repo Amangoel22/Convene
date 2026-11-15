@@ -29,6 +29,7 @@ const MEMBER_NAMES = [
   ["Nitin Agarwal", "Prerna Pandey", "Rohan Vaswani", "Siddharth Kaul"],
 ];
 
+// Seeds the database with initial development data.
 async function main() {
   console.log("🌱 Starting Convene Database Seeding...");
 

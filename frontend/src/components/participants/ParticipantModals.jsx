@@ -6,9 +6,11 @@ import { GlassModal } from "@/components/glass/GlassModal";
 import { cn } from "@/lib/utils";
 
 import { getApiBase } from "@/lib/api";
+import { STORAGE_KEYS } from "@/constants/storage";
 const API_BASE = getApiBase();
 const MAX_IMPORT_SIZE = 5 * 1024 * 1024;
 
+// Renders the form for adding a participant or team.
 export function CreateParticipantModal({ open, onClose, onSubmit, teams }) {
   const [mode, setMode] = useState("newTeam"); // "newTeam" | "existingTeam" | "individual"
   const [teamName, setTeamName] = useState("");
@@ -366,7 +368,7 @@ export function ImportModal({ open, onClose, eventId, onImported }) {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("convene_token")}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEYS.authToken)}`,
           },
           body: form,
         },

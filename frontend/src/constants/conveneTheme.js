@@ -1,29 +1,4 @@
-// Purpose: centralize the unified Convene palette used by the app-wide visual layer.
-export const CONVENE_THEME = {
-  background: {
-    page: "#F5F1EA",
-    surface: "#FFFDF8",
-    sidebar: "#EEE8DE",
-    field: "#EDE6DC",
-    selected: "#E7D8C9",
-  },
-  accent: {
-    primary: "#B85C38",
-    deep: "#8E432B",
-    gold: "#A9792F",
-  },
-  state: {
-    success: "#4F7A62",
-    warning: "#A9792F",
-    error: "#B04A3A",
-    info: "#8B6F5A",
-  },
-  text: {
-    primary: "#2A2622",
-    secondary: "#6E665C",
-    muted: "#9A9084",
-  },
-};
+import { STORAGE_KEYS } from "@/constants/storage";
 
 // Purpose: define the selectable visual presets exposed to public and authenticated users.
 export const CONVENE_THEME_OPTIONS = [
@@ -76,6 +51,6 @@ export function isConveneTheme(value) {
 // Purpose: read the persisted palette without allowing an old value to break rendering.
 export function getInitialConveneTheme() {
   if (typeof window === "undefined") return CONVENE_DEFAULT_THEME;
-  const storedTheme = window.localStorage.getItem("convene_palette");
+  const storedTheme = window.localStorage.getItem(STORAGE_KEYS.themePalette);
   return isConveneTheme(storedTheme) ? storedTheme : CONVENE_DEFAULT_THEME;
 }

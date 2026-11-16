@@ -56,12 +56,10 @@ export function authorizeEventMembership(
       req.eventMembership = membership;
       next();
     } catch (error) {
-      return res
-        .status(500)
-        .json({
-          error: "Event authorization check failed.",
-          details: error.message,
-        });
+      return res.status(500).json({
+        error: "Event authorization check failed.",
+        details: error.message,
+      });
     }
   };
 }
@@ -75,19 +73,15 @@ export function authorizeOrgLead() {
         where: { unique_event_org_access: { eventId, userId: req.user.id } },
       });
       if (!access || access.accessLevel !== "lead")
-        return res
-          .status(403)
-          .json({
-            error: "Access denied. Organizing lead access is required.",
-          });
+        return res.status(403).json({
+          error: "Access denied. Organizing lead access is required.",
+        });
       next();
     } catch (error) {
-      return res
-        .status(500)
-        .json({
-          error: "Organizing access check failed.",
-          details: error.message,
-        });
+      return res.status(500).json({
+        error: "Organizing access check failed.",
+        details: error.message,
+      });
     }
   };
 }

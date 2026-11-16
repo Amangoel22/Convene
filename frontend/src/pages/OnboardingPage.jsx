@@ -508,8 +508,12 @@ export function OnboardingPage() {
                 <b>Setup progression</b>
                 <small>
                   {step === 1 && "Mode & Role Selection"}
-                  {step === 2 && setupMode === "new" && "Event Identity & Venue"}
-                  {step === 2 && setupMode === "existing" && "Event Association"}
+                  {step === 2 &&
+                    setupMode === "new" &&
+                    "Event Identity & Venue"}
+                  {step === 2 &&
+                    setupMode === "existing" &&
+                    "Event Association"}
                   {step === 3 && "Run of Show & Stages"}
                 </small>
               </span>
@@ -520,11 +524,23 @@ export function OnboardingPage() {
               <span className={step >= 1 ? "is-done" : "is-current"}>
                 {step > 1 ? "✓" : "1"}
               </span>
-              <i style={{ background: step >= 2 ? "var(--color-success)" : undefined }} />
-              <span className={step >= 2 ? (step > 2 ? "is-done" : "is-current") : ""}>
+              <i
+                style={{
+                  background: step >= 2 ? "var(--color-success)" : undefined,
+                }}
+              />
+              <span
+                className={
+                  step >= 2 ? (step > 2 ? "is-done" : "is-current") : ""
+                }
+              >
                 {step > 2 ? "✓" : step === 2 ? <b /> : "2"}
               </span>
-              <i style={{ background: step >= 3 ? "var(--color-success)" : undefined }} />
+              <i
+                style={{
+                  background: step >= 3 ? "var(--color-success)" : undefined,
+                }}
+              />
               <span className={step === 3 ? "is-current" : ""}>
                 {step === 3 ? <b /> : "3"}
               </span>
@@ -609,7 +625,8 @@ export function OnboardingPage() {
                       Create New Event
                     </h3>
                     <p className="mt-1.5 type-xs weight-medium text-token-secondary leading-relaxed">
-                      Set up an event from scratch, configure stages, and manage crew.
+                      Set up an event from scratch, configure stages, and manage
+                      crew.
                     </p>
                     <div className="mt-4 flex items-center gap-1.5 type-xs weight-bold text-token-accent">
                       <span>Start New Setup</span>
@@ -628,7 +645,8 @@ export function OnboardingPage() {
                       Join Existing Event
                     </h3>
                     <p className="mt-1.5 type-xs weight-medium text-token-secondary leading-relaxed">
-                      Access an event you have been assigned to or invited to join.
+                      Access an event you have been assigned to or invited to
+                      join.
                     </p>
                     <div className="mt-4 flex items-center gap-1.5 type-xs weight-bold text-token-accent">
                       <span>Select Assigned Event</span>
@@ -719,7 +737,10 @@ export function OnboardingPage() {
                     )}
                   </div>
                 ) : (
-                  <form onSubmit={handleProceedToSchedule} className="space-y-4 pt-2">
+                  <form
+                    onSubmit={handleProceedToSchedule}
+                    className="space-y-4 pt-2"
+                  >
                     <div>
                       <label className="type-xs weight-bold text-token-primary">
                         Event Name
@@ -825,7 +846,8 @@ export function OnboardingPage() {
                       Timeline & Run of Show
                     </h2>
                     <p className="type-xs weight-medium text-token-secondary">
-                      Configure operating hours and schedule stages for {eventName}.
+                      Configure operating hours and schedule stages for{" "}
+                      {eventName}.
                     </p>
                   </div>
                 </div>
@@ -1005,7 +1027,10 @@ export function OnboardingPage() {
                   <div className="pt-2 space-y-3">
                     {launchError && (
                       <div className="flex items-start gap-3 rounded-2xl error-surface-token border border-token-error-light px-4 py-3">
-                        <Zap size={16} className="text-token-error mt-0.5 shrink-0" />
+                        <Zap
+                          size={16}
+                          className="text-token-error mt-0.5 shrink-0"
+                        />
                         <p className="type-xs weight-semibold text-token-error leading-relaxed">
                           {launchError}
                         </p>

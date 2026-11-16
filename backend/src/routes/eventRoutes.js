@@ -117,12 +117,10 @@ router.post("/", authenticate, async (req, res) => {
       },
       include: { stages: { orderBy: { stageOrder: "asc" } } },
     });
-    return res
-      .status(201)
-      .json({
-        message: "Event created successfully.",
-        event: { ...event, userRole: "organizer", accessLevel: "lead" },
-      });
+    return res.status(201).json({
+      message: "Event created successfully.",
+      event: { ...event, userRole: "organizer", accessLevel: "lead" },
+    });
   } catch (error) {
     return res
       .status(500)

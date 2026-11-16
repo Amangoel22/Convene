@@ -21,11 +21,9 @@ router.post("/register", async (req, res) => {
   } = req.body;
 
   if (!name || !email || !password || !phone) {
-    return res
-      .status(400)
-      .json({
-        error: "Name, email, password, and phone number are required fields.",
-      });
+    return res.status(400).json({
+      error: "Name, email, password, and phone number are required fields.",
+    });
   }
 
   const normalizedPhone = phone.replace(/\D/g, "");
@@ -50,11 +48,9 @@ router.post("/register", async (req, res) => {
       invitedMember?.phone &&
       invitedMember.phone.replace(/\D/g, "") !== normalizedPhone
     ) {
-      return res
-        .status(400)
-        .json({
-          error: "Phone number does not match the invited team member.",
-        });
+      return res.status(400).json({
+        error: "Phone number does not match the invited team member.",
+      });
     }
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {

@@ -610,21 +610,16 @@ export function TasksPage() {
         (assignee === "All Assignees" || task.assignee.name === assignee)
       );
     });
-  }, [
-    assignee,
-    currentUser?.id,
-    department,
-    isLead,
-    search,
-    tasksList,
-  ]);
+  }, [assignee, currentUser?.id, department, isLead, search, tasksList]);
 
   const taskCounts = useMemo(() => {
     return {
       total: baseVisibleTasks.length,
-      inProgress: baseVisibleTasks.filter((t) => t.status === "In Progress").length,
+      inProgress: baseVisibleTasks.filter((t) => t.status === "In Progress")
+        .length,
       todo: baseVisibleTasks.filter((t) => t.status === "Todo").length,
-      completed: baseVisibleTasks.filter((t) => t.status === "Completed").length,
+      completed: baseVisibleTasks.filter((t) => t.status === "Completed")
+        .length,
     };
   }, [baseVisibleTasks]);
 
@@ -802,7 +797,9 @@ export function TasksPage() {
         <button
           type="button"
           onClick={() =>
-            setStatus((prev) => (prev === "In Progress" ? "All Statuses" : "In Progress"))
+            setStatus((prev) =>
+              prev === "In Progress" ? "All Statuses" : "In Progress",
+            )
           }
           className={cn(
             "text-left rounded-3xl surface-card-token border p-4 shadow-token-card transition-all cursor-pointer hover:border-token-accent/40",
@@ -848,7 +845,9 @@ export function TasksPage() {
         <button
           type="button"
           onClick={() =>
-            setStatus((prev) => (prev === "Completed" ? "All Statuses" : "Completed"))
+            setStatus((prev) =>
+              prev === "Completed" ? "All Statuses" : "Completed",
+            )
           }
           className={cn(
             "text-left rounded-3xl surface-card-token border p-4 shadow-token-card transition-all cursor-pointer hover:border-token-success/40",

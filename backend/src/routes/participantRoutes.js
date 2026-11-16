@@ -475,12 +475,10 @@ router.post(
         .status(201)
         .json({ message: "Participants imported successfully.", ...result });
     } catch (error) {
-      return res
-        .status(500)
-        .json({
-          error: "Failed to import participants.",
-          details: error.message,
-        });
+      return res.status(500).json({
+        error: "Failed to import participants.",
+        details: error.message,
+      });
     }
   },
 );
@@ -560,12 +558,10 @@ router.get(
       );
       return res.send(buffer);
     } catch (error) {
-      return res
-        .status(500)
-        .json({
-          error: "Failed to export participants.",
-          details: error.message,
-        });
+      return res.status(500).json({
+        error: "Failed to export participants.",
+        details: error.message,
+      });
     }
   },
 );

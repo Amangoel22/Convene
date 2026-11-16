@@ -116,7 +116,10 @@ export function MissionControlPage() {
   }, [activeEvent?.id, currentUser?.id, eventsHydrated]);
 
   // Keeps the stage collection referentially stable between event updates.
-  const rawStages = useMemo(() => activeEvent?.stages ?? [], [activeEvent?.stages]);
+  const rawStages = useMemo(
+    () => activeEvent?.stages ?? [],
+    [activeEvent?.stages],
+  );
   const eventIsComplete = isEventComplete(activeEvent, now);
 
   // Evaluate dynamic status based on current real-time clock
@@ -143,7 +146,11 @@ export function MissionControlPage() {
 
   // Compute continuous timeline line progress percentage across all stages
   const lineProgressPercent = useMemo(() => {
-    if (eventIsComplete || (evaluatedStages.length > 0 && completedCount === evaluatedStages.length)) return 100;
+    if (
+      eventIsComplete ||
+      (evaluatedStages.length > 0 && completedCount === evaluatedStages.length)
+    )
+      return 100;
     if (evaluatedStages.length <= 1) return 0;
     const totalSegments = evaluatedStages.length - 1;
 
@@ -152,7 +159,10 @@ export function MissionControlPage() {
       let startDateObj = curStage.startAt ? new Date(curStage.startAt) : null;
       let endDateObj = curStage.endAt ? new Date(curStage.endAt) : null;
 
-      if ((!startDateObj || Number.isNaN(startDateObj.getTime())) && curStage.timeWindow) {
+      if (
+        (!startDateObj || Number.isNaN(startDateObj.getTime())) &&
+        curStage.timeWindow
+      ) {
         const parts = curStage.timeWindow.split(/[–—-]/);
         startDateObj = parseTimeString(parts[0]?.trim(), now);
         endDateObj = parseTimeString(parts[1]?.trim(), now);
@@ -179,12 +189,19 @@ export function MissionControlPage() {
     // When no stage is LIVE, line reaches the last completed stage node (not beyond it)
     if (completedCount <= 0) return 0;
     const lastCompletedIndex = Math.min(totalSegments, completedCount - 1);
-    return Math.min(100, Math.round((lastCompletedIndex / totalSegments) * 100));
+    return Math.min(
+      100,
+      Math.round((lastCompletedIndex / totalSegments) * 100),
+    );
   }, [eventIsComplete, evaluatedStages, liveStageIndex, completedCount, now]);
 
   // Overall schedule completion percentage based on total stages
   const scheduleProgressPercent = useMemo(() => {
-    if (eventIsComplete || (rawStages.length > 0 && completedCount === rawStages.length)) return 100;
+    if (
+      eventIsComplete ||
+      (rawStages.length > 0 && completedCount === rawStages.length)
+    )
+      return 100;
     if (rawStages.length === 0) return 0;
 
     if (liveStageIndex !== -1) {
@@ -192,17 +209,35 @@ export function MissionControlPage() {
       let startDateObj = curStage.startAt ? new Date(curStage.startAt) : null;
       let endDateObj = curStage.endAt ? new Date(curStage.endAt) : null;
       let fraction = 0;
-      if (startDateObj && endDateObj && endDateObj.getTime() > startDateObj.getTime()) {
+      if (
+        startDateObj &&
+        endDateObj &&
+        endDateObj.getTime() > startDateObj.getTime()
+      ) {
         fraction = Math.max(
           0,
-          Math.min(1, (now.getTime() - startDateObj.getTime()) / (endDateObj.getTime() - startDateObj.getTime())),
+          Math.min(
+            1,
+            (now.getTime() - startDateObj.getTime()) /
+              (endDateObj.getTime() - startDateObj.getTime()),
+          ),
         );
       }
-      return Math.min(99, Math.round(((completedCount + fraction) / rawStages.length) * 100));
+      return Math.min(
+        99,
+        Math.round(((completedCount + fraction) / rawStages.length) * 100),
+      );
     }
 
     return Math.min(100, Math.round((completedCount / rawStages.length) * 100));
-  }, [eventIsComplete, rawStages.length, completedCount, liveStageIndex, evaluatedStages, now]);
+  }, [
+    eventIsComplete,
+    rawStages.length,
+    completedCount,
+    liveStageIndex,
+    evaluatedStages,
+    now,
+  ]);
 
   const progressPercent = scheduleProgressPercent;
 
@@ -428,14 +463,16 @@ export function MissionControlPage() {
                           <span
                             className="absolute inset-0 rounded-full animate-ping pointer-events-none opacity-75"
                             style={{
-                              background: "var(--color-primary-accent, #3B6FD4)",
+                              background:
+                                "var(--color-primary-accent, #3B6FD4)",
                             }}
                           />
                           {/* Ambient Glowing Halo */}
                           <span
                             className="absolute -inset-1.5 rounded-full pointer-events-none animate-pulse"
                             style={{
-                              background: "var(--color-primary-accent, #3B6FD4)",
+                              background:
+                                "var(--color-primary-accent, #3B6FD4)",
                               filter: "blur(6px)",
                               opacity: 0.7,
                             }}

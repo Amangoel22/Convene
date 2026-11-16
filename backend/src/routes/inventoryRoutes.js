@@ -66,12 +66,10 @@ router.post(
       });
       return res.status(201).json({ item });
     } catch (error) {
-      return res
-        .status(500)
-        .json({
-          error: "Failed to create inventory item.",
-          details: error.message,
-        });
+      return res.status(500).json({
+        error: "Failed to create inventory item.",
+        details: error.message,
+      });
     }
   },
 );
@@ -98,12 +96,10 @@ router.patch(
       });
       return res.json({ item });
     } catch (error) {
-      return res
-        .status(500)
-        .json({
-          error: "Failed to update inventory item.",
-          details: error.message,
-        });
+      return res.status(500).json({
+        error: "Failed to update inventory item.",
+        details: error.message,
+      });
     }
   },
 );

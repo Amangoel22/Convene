@@ -452,7 +452,10 @@ export function RunOfShowPage() {
   const role = useAppStore((state) => state.role);
   const isLead = role === "lead";
 
-  const rawStages = useMemo(() => activeEvent?.stages ?? [], [activeEvent?.stages]);
+  const rawStages = useMemo(
+    () => activeEvent?.stages ?? [],
+    [activeEvent?.stages],
+  );
   const timelineLoading = !eventsHydrated;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Statuses");

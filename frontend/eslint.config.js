@@ -14,17 +14,20 @@ export default [
       globals: globals.browser,
       parserOptions: {
         ecmaFeatures: {
-          jsx: true
-        }
-      }
+          jsx: true,
+        },
+      },
     },
     plugins: {
       "react-hooks": reactHooks,
-      "react-refresh": reactRefresh
+      "react-refresh": reactRefresh,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }]
-    }
-  }
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
+      ],
+    },
+  },
 ];

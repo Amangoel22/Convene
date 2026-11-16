@@ -1,14 +1,17 @@
 # Product Scope
 
 ## Purpose
+
 Convene replaces spreadsheets, chat threads, and scattered files used to execute college events.
 
 ## Users
 
 ### Organizing team
+
 Organizers create and operate events. They manage organizing teams such as Design, Tech, Logistics, participants, tasks, event-day duties, venues, resources, and issues.
 
 ### Participants
+
 Participants see only events they belong to. They can view event information, venue details and images, the run of show, and their entry QR code.
 
 ## Core rules
@@ -22,7 +25,9 @@ Participants see only events they belong to. They can view event information, ve
 7. Venue records are reusable inside an event and contain optional map data and images.
 
 ## MVP
+
 Authentication, events, organizer teams and members, participant teams, participant QR/check-in, venues, run of show, tasks, duties, resources, issues, and mission-control dashboard.
 
 ## Later
+
 Inventory transactions, announcements, browser notification delivery, analytics, realtime updates, and participant feedback workflows.

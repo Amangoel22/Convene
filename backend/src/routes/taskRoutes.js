@@ -221,12 +221,10 @@ router.patch("/:taskId/status", authenticate, async (req, res) => {
     });
     const isAssignedMember = task.assignedOrgMember?.userId === req.user.id;
     if (!membership || (membership.role !== "organizer" && !isAssignedMember))
-      return res
-        .status(403)
-        .json({
-          error:
-            "Only the assigned member or an organizer can update task status.",
-        });
+      return res.status(403).json({
+        error:
+          "Only the assigned member or an organizer can update task status.",
+      });
     const prismaStatus =
       status === "In Progress"
         ? "In_Progress"
@@ -301,12 +299,10 @@ router.patch("/:taskId", authenticate, async (req, res) => {
     });
     return res.json({ message: "Task assignment updated.", task: updated });
   } catch (error) {
-    return res
-      .status(500)
-      .json({
-        error: "Failed to update task assignment.",
-        details: error.message,
-      });
+    return res.status(500).json({
+      error: "Failed to update task assignment.",
+      details: error.message,
+    });
   }
 });
 export default router;

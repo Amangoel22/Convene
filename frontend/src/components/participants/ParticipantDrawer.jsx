@@ -6,10 +6,7 @@ import { GlassButton } from "@/components/glass/GlassButton";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { StatusPill } from "./ParticipantsComponents";
 import { cn } from "@/lib/utils";
-import {
-  PARTICIPANT_STATUSES,
-  TEAM_STATUSES,
-} from "@/constants/statuses";
+import { PARTICIPANT_STATUSES, TEAM_STATUSES } from "@/constants/statuses";
 
 // Renders a concise label-and-value detail cell inside the participant drawer.
 function Info({ label, value }) {

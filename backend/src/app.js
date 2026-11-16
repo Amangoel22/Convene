@@ -51,13 +51,11 @@ app.use(express.json());
 
 // Root Welcome Endpoint
 app.get("/", (req, res) => {
-  res
-    .status(200)
-    .json({
-      message: "Convene Backend API is running.",
-      version: "0.1.0",
-      docs: "/docs",
-    });
+  res.status(200).json({
+    message: "Convene Backend API is running.",
+    version: "0.1.0",
+    docs: "/docs",
+  });
 });
 
 // Health Check Endpoint

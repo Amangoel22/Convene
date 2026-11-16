@@ -43,12 +43,10 @@ router.post("/verify", authenticate, async (req, res) => {
       },
     });
     if (!membership || membership.role !== "organizer")
-      return res
-        .status(403)
-        .json({
-          valid: false,
-          error: "Only organizers of this event can verify entry QR codes.",
-        });
+      return res.status(403).json({
+        valid: false,
+        error: "Only organizers of this event can verify entry QR codes.",
+      });
     return res.json({
       valid: true,
       participant: {

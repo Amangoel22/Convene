@@ -44,12 +44,10 @@ router.get(
       });
       return res.json({ teams });
     } catch (error) {
-      return res
-        .status(500)
-        .json({
-          error: "Failed to fetch organizing teams.",
-          details: error.message,
-        });
+      return res.status(500).json({
+        error: "Failed to fetch organizing teams.",
+        details: error.message,
+      });
     }
   },
 );
@@ -69,11 +67,9 @@ router.post(
         (member) => member.name?.trim() && !/^\d{10}$/.test(member.phone || ""),
       )
     )
-      return res
-        .status(400)
-        .json({
-          error: "Every added member must have a 10-digit phone number.",
-        });
+      return res.status(400).json({
+        error: "Every added member must have a 10-digit phone number.",
+      });
     try {
       const team = await prisma.orgTeam.create({
         data: {
@@ -142,17 +138,13 @@ router.post(
         .json({ message: "Organizing team created successfully.", team });
     } catch (error) {
       if (error.code === "P2002")
-        return res
-          .status(409)
-          .json({
-            error: "A team with this name already exists for the event.",
-          });
-      return res
-        .status(500)
-        .json({
-          error: "Failed to create organizing team.",
-          details: error.message,
+        return res.status(409).json({
+          error: "A team with this name already exists for the event.",
         });
+      return res.status(500).json({
+        error: "Failed to create organizing team.",
+        details: error.message,
+      });
     }
   },
 );
@@ -265,12 +257,10 @@ router.patch(
         inviteKey: updated.inviteKey,
       });
     } catch (error) {
-      return res
-        .status(500)
-        .json({
-          error: "Failed to regenerate invite key.",
-          details: error.message,
-        });
+      return res.status(500).json({
+        error: "Failed to regenerate invite key.",
+        details: error.message,
+      });
     }
   },
 );
@@ -363,12 +353,10 @@ router.patch(
       }
       return res.json({ message: "Team member updated successfully.", member });
     } catch (error) {
-      return res
-        .status(500)
-        .json({
-          error: "Failed to update team member.",
-          details: error.message,
-        });
+      return res.status(500).json({
+        error: "Failed to update team member.",
+        details: error.message,
+      });
     }
   },
 );
@@ -392,12 +380,10 @@ router.delete(
         return res.status(404).json({ error: "Team member not found." });
       return res.json({ message: "Team member removed successfully." });
     } catch (error) {
-      return res
-        .status(500)
-        .json({
-          error: "Failed to remove team member.",
-          details: error.message,
-        });
+      return res.status(500).json({
+        error: "Failed to remove team member.",
+        details: error.message,
+      });
     }
   },
 );

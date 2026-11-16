@@ -28,9 +28,9 @@
 
 <div align="center">
 
-| 🗓️ **Schedule** | 👥 **People** | ✅ **Work** | 🚨 **Issues** | 📦 **Resources** |
-|:---:|:---:|:---:|:---:|:---:|
-| Run of Show | Teams & participants | Tasks & duties | Report & resolve | Private event files |
+| 🗓️ **Schedule** |    👥 **People**     |  ✅ **Work**   |  🚨 **Issues**   |  📦 **Resources**   |
+| :-------------: | :------------------: | :------------: | :--------------: | :-----------------: |
+|   Run of Show   | Teams & participants | Tasks & duties | Report & resolve | Private event files |
 
 </div>
 
@@ -77,17 +77,17 @@ The interface is intentionally organized around three questions: **what is happe
 
 ## What the product does
 
-| Area | What users can do | Primary users |
-|---|---|---|
-| Mission Control | See current stage, progress, assigned work, and operational focus | Everyone in the event |
-| Run of Show | Build stages with exact start/end timestamps, venues, status, and handoffs | Lead organizers |
-| Teams | Create organizing teams, members, access levels, and invite keys | Lead organizers |
-| Participants | Import, export, register, group by team code, check in, and verify QR codes | Organizers |
-| Tasks | Assign preparation work, set status/priority/due date, and track completion | Organizers and assignees |
-| Duties | Create event-day shifts, add notes/venues, assign people, and mark work complete | Organizers and assignees |
-| Inventory | Maintain event equipment and operational stock | Lead organizers |
-| Resources | Upload private PDF, image, CSV, XLS, and XLSX files up to 5 MB | Lead organizers |
-| Issues | Report and close incidents with priority and resolution feedback | Event members |
+| Area            | What users can do                                                                | Primary users            |
+| --------------- | -------------------------------------------------------------------------------- | ------------------------ |
+| Mission Control | See current stage, progress, assigned work, and operational focus                | Everyone in the event    |
+| Run of Show     | Build stages with exact start/end timestamps, venues, status, and handoffs       | Lead organizers          |
+| Teams           | Create organizing teams, members, access levels, and invite keys                 | Lead organizers          |
+| Participants    | Import, export, register, group by team code, check in, and verify QR codes      | Organizers               |
+| Tasks           | Assign preparation work, set status/priority/due date, and track completion      | Organizers and assignees |
+| Duties          | Create event-day shifts, add notes/venues, assign people, and mark work complete | Organizers and assignees |
+| Inventory       | Maintain event equipment and operational stock                                   | Lead organizers          |
+| Resources       | Upload private PDF, image, CSV, XLS, and XLSX files up to 5 MB                   | Lead organizers          |
+| Issues          | Report and close incidents with priority and resolution feedback                 | Event members            |
 
 ## The core event loop
 
@@ -197,30 +197,30 @@ Participant imports use one worksheet. A consistent `teamCode` groups people int
 
 ### Frontend
 
-| Library | Role |
-|---|---|
-| React 19 | Component-based interface |
-| Vite | Development server and production bundling |
-| React Router | SPA routing and protected routes |
-| Zustand | Session, active-event, role, and theme state |
-| Framer Motion | Page transitions and landing-page motion |
-| Tailwind CSS | Utility styling |
-| `clsx` + `tailwind-merge` | Conditional class composition |
-| Lucide React | Icon system |
+| Library                   | Role                                         |
+| ------------------------- | -------------------------------------------- |
+| React 19                  | Component-based interface                    |
+| Vite                      | Development server and production bundling   |
+| React Router              | SPA routing and protected routes             |
+| Zustand                   | Session, active-event, role, and theme state |
+| Framer Motion             | Page transitions and landing-page motion     |
+| Tailwind CSS              | Utility styling                              |
+| `clsx` + `tailwind-merge` | Conditional class composition                |
+| Lucide React              | Icon system                                  |
 
 ### Backend
 
-| Library | Role |
-|---|---|
-| Express | HTTP API and routing |
-| Prisma + `@prisma/client` | PostgreSQL access and migrations |
-| `jsonwebtoken` | Session tokens |
-| `bcryptjs` | Password hashing |
-| `helmet` | HTTP security headers |
-| `cors` | Frontend origin policy |
-| `multer` | Multipart upload parsing |
-| `@supabase/supabase-js` | Private object storage and signed URLs |
-| `xlsx` / SheetJS | Excel and CSV import/export |
+| Library                   | Role                                   |
+| ------------------------- | -------------------------------------- |
+| Express                   | HTTP API and routing                   |
+| Prisma + `@prisma/client` | PostgreSQL access and migrations       |
+| `jsonwebtoken`            | Session tokens                         |
+| `bcryptjs`                | Password hashing                       |
+| `helmet`                  | HTTP security headers                  |
+| `cors`                    | Frontend origin policy                 |
+| `multer`                  | Multipart upload parsing               |
+| `@supabase/supabase-js`   | Private object storage and signed URLs |
+| `xlsx` / SheetJS          | Excel and CSV import/export            |
 
 ## Repository map
 

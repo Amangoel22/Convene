@@ -128,12 +128,10 @@ router.post(
         },
         include: { venue: true },
       });
-      return res
-        .status(201)
-        .json({
-          message: "Stage created successfully.",
-          stage: serializeStage(stage),
-        });
+      return res.status(201).json({
+        message: "Stage created successfully.",
+        stage: serializeStage(stage),
+      });
     } catch (error) {
       return res
         .status(500)

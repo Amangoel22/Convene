@@ -4,10 +4,10 @@
 
 Convene is a two-service deployment:
 
-| Part | Render service | Root directory | Build | Start/publish |
-|---|---|---|---|---|
-| React/Vite frontend | Static Site | `frontend` | `npm install && npm run build` | Publish `dist` |
-| Express API | Web Service | `backend` | `npm install && npx prisma generate` | `node src/server.js` |
+| Part                | Render service | Root directory | Build                                | Start/publish        |
+| ------------------- | -------------- | -------------- | ------------------------------------ | -------------------- |
+| React/Vite frontend | Static Site    | `frontend`     | `npm install && npm run build`       | Publish `dist`       |
+| Express API         | Web Service    | `backend`      | `npm install && npx prisma generate` | `node src/server.js` |
 
 Render Web Services must listen on the provided `PORT` and `0.0.0.0`; the backend already reads `process.env.PORT`.
 

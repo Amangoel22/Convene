@@ -179,6 +179,10 @@ router.patch("/:stageId", authenticate, async (req, res) => {
       orgTeamId,
       status,
     } = req.body;
+    if (!title?.trim() || (!timeWindow && (!startAt || !endAt)))
+      return res
+        .status(400)
+        .json({ error: "Title and schedule are required." });
     const event = await prisma.event.findUnique({
       where: { id: existing.eventId },
       select: { startDate: true },

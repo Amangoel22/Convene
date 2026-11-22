@@ -268,6 +268,7 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
   const [location, setLocation] = useState(stage ? stage.location : "");
+  const [validationError, setValidationError] = useState("");
 
   // Helper to format 24h or manual time string (e.g. 09:00, 2:30 pm) into 12h format (e.g. 02:30 PM)
   const format12h = (tStr) => {
@@ -291,6 +292,7 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
   // Sync state if editing target stage changes or opening for new stage
   useEffect(() => {
     if (!open) return;
+    setValidationError("");
 
     if (stageId) {
       setTitle(stageTitle || "");
@@ -336,7 +338,11 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || !startTime || !endTime) {
+      setValidationError("Stage title, start time, and end time are required.");
+      return;
+    }
+    setValidationError("");
 
     const formattedWindow = `${format12h(startTime)} – ${format12h(endTime)}`;
 
@@ -415,6 +421,12 @@ function StageModal({ open, onClose, stage, onSave, lastStage }) {
             />
           </div>
         </div>
+
+        {validationError && (
+          <p className="type-xs weight-semibold text-token-danger" role="alert">
+            {validationError}
+          </p>
+        )}
 
         <div className="mt-6 flex justify-end gap-3 pt-2">
           <GlassButton
@@ -498,6 +510,7 @@ export function RunOfShowPage() {
   }, [search, statusFilter, stages]);
 
   const handleUpdateStatus = async (stageId, newStatus) => {
+    const stage = stages.find((item) => item.id === stageId);
     updateActiveEventStages(stageId, newStatus);
     setSelectedStage((prev) => (prev ? { ...prev, status: newStatus } : null));
 
@@ -510,7 +523,12 @@ export function RunOfShowPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ status: newStatus }),
+          body: JSON.stringify({
+            title: stage?.title,
+            timeWindow: stage?.timeWindow,
+            location: stage?.location,
+            status: newStatus,
+          }),
         });
       } catch (err) {
         console.warn("Backend status sync warning:", err.message);

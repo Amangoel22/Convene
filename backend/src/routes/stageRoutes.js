@@ -47,7 +47,7 @@ async function resolveVenue(eventId, venueId, location) {
       error.statusCode = 400;
       throw error;
     }
-    return { connect: { id: venue.id } };
+    return venue.id;
   }
   if (!location) return undefined;
   const venue = await prisma.venue.upsert({
@@ -55,7 +55,7 @@ async function resolveVenue(eventId, venueId, location) {
     create: { eventId, name: location },
     update: {},
   });
-  return { connect: { id: venue.id } };
+  return venue.id;
 }
 
 // Handles router.get.
@@ -123,7 +123,7 @@ router.post(
           title,
           startAt: parsed.startAt,
           endAt: parsed.endAt,
-          ...(venue && { venue }),
+          ...(venue && { venueId: venue }),
           ...(orgTeamId && { orgTeam: { connect: { id: orgTeamId } } }),
         },
         include: { venue: true },
@@ -201,7 +201,7 @@ router.patch("/:stageId", authenticate, async (req, res) => {
         ...(startAt && { startAt: new Date(startAt) }),
         ...(endAt && { endAt: new Date(endAt) }),
         ...schedule,
-        ...(venue && { venue }),
+        ...(venue && { venueId: venue }),
         ...(orgTeamId !== undefined && {
           orgTeam: orgTeamId
             ? { connect: { id: orgTeamId } }

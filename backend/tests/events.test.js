@@ -1,6 +1,7 @@
 // API TEST FILE: Covers GET /api/events, POST /api/events, and GET /api/events/:eventId.
 
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import request from "supertest";
@@ -247,7 +248,7 @@ test("event detail rejects a user without event membership", async () => {
 test("event detail denies an inaccessible nonexistent event ID", async () => {
   const { token } = await createTestUser();
   const response = await request(app)
-    .get(`/api/events/${uniqueValue("missing-event")}`)
+    .get(`/api/events/${randomUUID()}`)
     .set("Authorization", `Bearer ${token}`);
 
   assert.equal(response.statusCode, 403);

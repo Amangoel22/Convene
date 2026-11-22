@@ -197,6 +197,7 @@ app.use("/api/auth", authRoutes);
 app.use("/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/events", taskRoutes);
+app.use("/api/events", stageRoutes);
 app.use("/api/stages", stageRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/participants", participantRoutes);

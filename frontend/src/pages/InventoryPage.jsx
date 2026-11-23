@@ -24,6 +24,11 @@ const API_BASE = getApiBase();
 
 import { useEffect } from "react";
 
+// Keeps inventory quantity inputs limited to non-negative whole-number characters.
+function normalizeQuantityInput(value) {
+  return value.replace(/\D/g, "");
+}
+
 // Renders the form for creating or editing an inventory item.
 function EditItemModal({ open, item, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -130,9 +135,14 @@ function EditItemModal({ open, item, onClose, onSave }) {
             <input
               type="number"
               min={0}
+              step={1}
+              inputMode="numeric"
               value={formData.totalNeeded}
               onChange={(e) =>
-                setFormData({ ...formData, totalNeeded: e.target.value })
+                setFormData({
+                  ...formData,
+                  totalNeeded: normalizeQuantityInput(e.target.value),
+                })
               }
               className="mt-1 h-10 w-full rounded-full field-token border border-token px-4 type-xs weight-semibold text-token-primary outline-none"
             />
@@ -145,9 +155,14 @@ function EditItemModal({ open, item, onClose, onSave }) {
             <input
               type="number"
               min={0}
+              step={1}
+              inputMode="numeric"
               value={formData.available}
               onChange={(e) =>
-                setFormData({ ...formData, available: e.target.value })
+                setFormData({
+                  ...formData,
+                  available: normalizeQuantityInput(e.target.value),
+                })
               }
               className="mt-1 h-10 w-full rounded-full field-token border border-token px-4 type-xs weight-semibold text-token-primary outline-none"
             />
@@ -160,9 +175,14 @@ function EditItemModal({ open, item, onClose, onSave }) {
             <input
               type="number"
               min={0}
+              step={1}
+              inputMode="numeric"
               value={formData.defective}
               onChange={(e) =>
-                setFormData({ ...formData, defective: e.target.value })
+                setFormData({
+                  ...formData,
+                  defective: normalizeQuantityInput(e.target.value),
+                })
               }
               className="mt-1 h-10 w-full rounded-full field-token border border-token px-4 type-xs weight-semibold text-token-primary outline-none"
             />

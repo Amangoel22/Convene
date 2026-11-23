@@ -356,10 +356,15 @@ function NewTaskModal({ open, onClose, onCreateTask, teams, members }) {
   const [assignedOrgMemberId, setAssignedOrgMemberId] = useState("");
   const [priority, setPriority] = useState("Medium");
   const [dueAt, setDueAt] = useState("");
+  const [validationError, setValidationError] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      setValidationError("Task title is required.");
+      return;
+    }
+    setValidationError("");
 
     const selectedMember = members.find(
       (member) => member.id === assignedOrgMemberId,
@@ -431,6 +436,12 @@ function NewTaskModal({ open, onClose, onCreateTask, teams, members }) {
             className="mt-1 w-full rounded-2xl field-token border border-token p-3.5 type-xs weight-medium text-token-primary outline-none placeholder:text-token-muted"
           />
         </div>
+
+        {validationError && (
+          <p className="type-xs weight-semibold text-token-danger" role="alert">
+            {validationError}
+          </p>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -729,7 +740,11 @@ export function TasksPage() {
         },
       },
     );
-    if (!response.ok) return;
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      setError(data.error || "Failed to export tasks.");
+      return;
+    }
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");

@@ -26,6 +26,7 @@ const TASK_WORKBOOK_HEADERS = [
   "Status",
   "Priority",
   "Due Date",
+  "Completion State",
   "Created At",
   "Updated At",
 ];
@@ -115,6 +116,7 @@ router.get(
         Status: task.status === "In_Progress" ? "In Progress" : task.status,
         Priority: task.priority,
         "Due Date": task.dueAt ? task.dueAt.toISOString() : "",
+        "Completion State": task.status === "Completed" ? "Completed" : "Open",
         "Created At": task.createdAt.toISOString(),
         "Updated At": task.updatedAt.toISOString(),
       }));
@@ -151,8 +153,11 @@ router.post(
       priority,
       dueAt,
     } = req.body;
-    if (!title)
+    if (!title?.trim())
       return res.status(400).json({ error: "Task title is required." });
+    const validPriorities = ["Critical", "High", "Medium", "Low"];
+    if (priority !== undefined && !validPriorities.includes(priority))
+      return res.status(400).json({ error: "Invalid task priority." });
     try {
       let resolvedOrgTeamId = null;
       if (assignedOrgMemberId) {
@@ -208,6 +213,15 @@ router.post(
 router.patch("/:taskId/status", authenticate, async (req, res) => {
   const { status } = req.body;
   if (!status) return res.status(400).json({ error: "Status is required." });
+  const statusMap = {
+    Todo: "Todo",
+    "In Progress": "In_Progress",
+    In_Progress: "In_Progress",
+    Blocked: "Blocked",
+    Completed: "Completed",
+  };
+  if (!statusMap[status])
+    return res.status(400).json({ error: "Invalid task status." });
   try {
     const task = await prisma.task.findUnique({
       where: { id: req.params.taskId },
@@ -225,12 +239,7 @@ router.patch("/:taskId/status", authenticate, async (req, res) => {
         error:
           "Only the assigned member or an organizer can update task status.",
       });
-    const prismaStatus =
-      status === "In Progress"
-        ? "In_Progress"
-        : status === "Todo"
-          ? "Todo"
-          : status;
+    const prismaStatus = statusMap[status];
     const updated = await prisma.task.update({
       where: { id: task.id },
       data: { status: prismaStatus, lastUpdatedByName: req.user.name },
@@ -247,6 +256,14 @@ router.patch("/:taskId/status", authenticate, async (req, res) => {
 // Handles router.patch.
 router.patch("/:taskId", authenticate, async (req, res) => {
   const { assignedOrgMemberId, priority, dueAt } = req.body;
+  if (
+    assignedOrgMemberId === undefined &&
+    priority === undefined &&
+    dueAt === undefined
+  )
+    return res.status(400).json({
+      error: "At least one task assignment field is required.",
+    });
   try {
     const task = await prisma.task.findUnique({
       where: { id: req.params.taskId },
@@ -259,6 +276,18 @@ router.patch("/:taskId", authenticate, async (req, res) => {
     });
     if (!membership || membership.role !== "organizer")
       return res.status(403).json({ error: "Organizer access required." });
+    const access = await prisma.orgAccess.findUnique({
+      where: {
+        unique_event_org_access: {
+          eventId: task.eventId,
+          userId: req.user.id,
+        },
+      },
+    });
+    if (!access || access.accessLevel !== "lead")
+      return res.status(403).json({
+        error: "Lead organizer access is required for this event.",
+      });
     let resolvedTeamId = task.orgTeamId;
     let resolvedMemberId = task.assignedOrgMemberId;
     if (assignedOrgMemberId !== undefined && assignedOrgMemberId) {

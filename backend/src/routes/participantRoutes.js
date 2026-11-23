@@ -628,8 +628,8 @@ router.patch("/:id/status", authenticate, async (req, res) => {
       return res.status(404).json({ error: "Participant not found." });
     }
 
-    // Verify user is an organizer of this event
-    let membership = await prisma.eventMembership.findUnique({
+    // Verify user is an organizer of this event.
+    const membership = await prisma.eventMembership.findUnique({
       where: {
         unique_event_user: {
           eventId: participant.eventId,
@@ -637,16 +637,8 @@ router.patch("/:id/status", authenticate, async (req, res) => {
         },
       },
     });
-
-    if (!membership) {
-      membership = await prisma.eventMembership.create({
-        data: {
-          eventId: participant.eventId,
-          userId: req.user.id,
-          role: "organizer",
-        },
-      });
-    }
+    if (!membership || membership.role !== "organizer")
+      return res.status(403).json({ error: "Only organizers can update participant status." });
 
     const dataToUpdate = {};
 
@@ -687,6 +679,13 @@ router.patch("/teams/:teamId/status", authenticate, async (req, res) => {
   const { status, internalNotes } = req.body;
 
   try {
+    const team = await prisma.participantTeam.findUnique({ where: { id: teamId } });
+    if (!team) return res.status(404).json({ error: "Team not found." });
+    const membership = await prisma.eventMembership.findUnique({
+      where: { unique_event_user: { eventId: team.eventId, userId: req.user.id } },
+    });
+    if (!membership || membership.role !== "organizer")
+      return res.status(403).json({ error: "Only organizers can update team status." });
     const dataToUpdate = {};
     if (status !== undefined) dataToUpdate.status = status;
     if (internalNotes !== undefined) dataToUpdate.internalNotes = internalNotes;
@@ -716,8 +715,15 @@ router.patch("/teams/:teamId/notes", authenticate, async (req, res) => {
   const { internalNotes } = req.body;
 
   try {
+    const team = await prisma.participantTeam.findUnique({ where: { id: teamId } });
+    if (!team) return res.status(404).json({ error: "Team not found." });
+    const membership = await prisma.eventMembership.findUnique({
+      where: { unique_event_user: { eventId: team.eventId, userId: req.user.id } },
+    });
+    if (!membership || membership.role !== "organizer")
+      return res.status(403).json({ error: "Only organizers can update team notes." });
     const updatedTeam = await prisma.participantTeam.update({
-      where: { id: teamId },
+      where: { id: team.id },
       data: { internalNotes },
     });
 

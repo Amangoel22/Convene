@@ -38,7 +38,7 @@ const dutyInclude = {
 router.get(
   "/:eventId/duties",
   authenticate,
-  authorizeEventMembership(),
+  authorizeEventMembership(["organizer"]),
   async (req, res) => {
     try {
       const duties = await prisma.duty.findMany({
@@ -188,6 +188,18 @@ router.patch("/:eventId/duties/:dutyId", authenticate, async (req, res) => {
     });
     if (!membership || membership.role !== "organizer")
       return res.status(403).json({ error: "Organizer access required." });
+    const access = await prisma.orgAccess.findUnique({
+      where: {
+        unique_event_org_access: {
+          eventId: duty.eventId,
+          userId: req.user.id,
+        },
+      },
+    });
+    if (!access || access.accessLevel !== "lead")
+      return res.status(403).json({
+        error: "Lead organizer access is required for this event.",
+      });
     const memberIds = [
       ...new Set(
         Array.isArray(orgMemberIds) ? orgMemberIds.filter(Boolean) : [],

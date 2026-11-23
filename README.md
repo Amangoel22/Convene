@@ -1,6 +1,6 @@
 # Convene
 
-🌐 **Live:** [Convene](https://convene-oxmg.onrender.com/)
+**Live:** [Convene](https://convene-oxmg.onrender.com/)
 
 <div align="center">
 

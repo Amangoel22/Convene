@@ -76,8 +76,8 @@ async function main() {
     data: {
       name: "TechNext Summit 2026",
       type: "Conference & Hackathon",
-      startDate: new Date("2026-10-15"),
-      endDate: new Date("2026-10-17"),
+      startDate: new Date("2026-11-26"),
+      endDate: new Date("2026-11-28"),
       startTime: "09:00 AM",
       endTime: "06:00 PM",
       durationDisplay: "3 Days",
